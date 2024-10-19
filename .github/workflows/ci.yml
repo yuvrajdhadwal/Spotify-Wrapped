@@ -17,6 +17,12 @@ jobs:
       with:
         python-version: 3.12  # Ensure it matches your environment
 
+    # Step 2.5: Initialize conda for the shell
+    - name: Initialize conda
+      run: |
+        conda init bash  # Initializes conda for the bash shell
+        source ~/.bashrc  # Sources the updated bashrc to apply changes
+
     # Step 3: Create and activate the conda environment
     - name: Create conda environment
       run: |
