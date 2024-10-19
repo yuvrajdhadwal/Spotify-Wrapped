@@ -27,7 +27,6 @@ jobs:
     - name: Create conda environment
       run: |
         conda env create -f environment.yml
-        conda init zsh
         conda activate myenv
 
     # Step 4: Lint the code (PEP 8 style checks)
