@@ -26,7 +26,7 @@ jobs:
     # Step 4: Lint the code (PEP 8 style checks)
     - name: Lint code with pylint
       run: |
-        pylint spotify-wrapper/ --exit-zero
+        pylint $(git ls-files '*.py')
 
     # Step 5: Run tests and generate code coverage report
     - name: Run tests with coverage
