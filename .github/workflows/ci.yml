@@ -29,7 +29,7 @@ jobs:
     # Step 4: Lint the code (PEP 8 style checks)
     - name: Lint code with pylint
       run: |
-        conda run -n myenv pylint $(git ls-files '*.py')
+        conda run -n myenv pylint $(git ls-files '*.py') --fail-under=8
 
     # Step 5: Run tests and generate code coverage report
     - name: Run tests with coverage

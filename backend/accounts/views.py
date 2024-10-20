@@ -1,12 +1,24 @@
-from django.shortcuts import render, redirect
+"""
+This module contains views for handling Spotify authentication and authorization.
+
+It includes class-based views and function-based views to handle the Spotify OAuth flow, 
+check user authentication status, and interact with the Spotify API.
+
+Classes:
+    - AuthURL: Returns the Spotify authorization URL to initiate OAuth.
+    - IsAuthenticated: Checks if a user is authenticated with Spotify.
+    
+Functions:
+    - spotify_callback: Handles the Spotify redirect after user authorization and stores tokens.
+"""
 import os
+from django.shortcuts import HttpResponse
 from dotenv import load_dotenv
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from requests import Request, post
 from .utils import update_or_create_user_tokens, is_spotify_authenticated
-from django.shortcuts import HttpResponse
 
 # Create your views here.
 
@@ -22,12 +34,12 @@ class AuthURL(APIView):
         APIView (rest_framework.views.APIView): Django Rest Framework class to handle API views.
     
     Methods:
-        get(self, request, format=None): 
+        get(self, request): 
             Handles GET requests and constructs the Spotify authorization URL 
             with necessary parameters such as scope, response_type, and redirect URI.
     """
-    
-    def get(self, request, format=None):
+
+    def get(self, request):
         """
         Handles GET request to create the Spotify authorization URL.
 
@@ -37,7 +49,6 @@ class AuthURL(APIView):
 
         Parameters:
             request (HttpRequest): The HTTP request object.
-            format (str, optional): Response format (defaults to None).
 
         Returns:
             Response (rest_framework.response.Response): 
@@ -45,16 +56,24 @@ class AuthURL(APIView):
         """
         load_dotenv()
 
+        client_id = os.getenv('CLIENT_ID')
+        scope = os.getenv('SCOPE')
+        redirect_uri = os.getenv('REDIRECT_URI')
+
+        if not client_id or not scope or not redirect_uri:
+            return Response({'error': 'Missing environment variables'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
-            'scope': os.getenv('SCOPE'),
+            'scope': scope,
             'response_type': 'code',
-            'redirect_url': os.getenv('REDIRECT_URI'),
-            'client_id': os.getenv('CLIENT_ID')
+            'redirect_url': redirect_uri,
+            'client_id': client_id
         }).prepare().url
 
         return Response({'url': url}, status=status.HTTP_200_OK)
 
-def spotify_callback(request, format=None):
+def spotify_callback(request):
     """
     View to handle the callback from Spotify after user authorization.
 
@@ -64,19 +83,21 @@ def spotify_callback(request, format=None):
 
     Parameters:
         request (HttpRequest): The HTTP request object containing the Spotify callback data.
-        format (str, optional): Response format (defaults to None).
     
     Returns:
         HttpResponse: Redirects the user to a frontend webpage or handles any errors.
 
     Notes:
         - The authorization code is extracted from the request URL.
-        - Access and refresh tokens are obtained by making a POST request to Spotify's token endpoint.
+        - Access and refresh tokens are obtained by making a POST request to Spotify's token
+            endpoint.
         - Tokens are stored using the `update_or_create_user_tokens` utility.
     """
     load_dotenv()
     code = request.GET.get('code')
-    error = request.GET.get('error')
+
+    if not code:
+        return HttpResponse("Authentication Failed: Missing code parameter")
 
     response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'authorization_code',
@@ -84,13 +105,15 @@ def spotify_callback(request, format=None):
         'redirect_uri': os.getenv('REDIRECT_URI'),
         'client_id': os.getenv('CLIENT_ID'),
         'client_secret': os.getenv('CLIENT_SECRET')
-    }).json()
+    }, timeout=10).json()
+
+    if 'error' in response:
+        return HttpResponse(f"Authentication Failed: {response['error']}")
 
     access_token = response.get('access_token')
     token_type = response.get('token_type')
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
-    error = response.get('error')
 
     if not request.session.exists(request.session.session_key):
         request.session.create()
@@ -99,7 +122,7 @@ def spotify_callback(request, format=None):
     update_or_create_user_tokens(request.session.session_key, access_token=access_token,
                                  token_type=token_type, refresh_token=refresh_token,
                                  expires_in=expires_in)
-    
+
     # TODO: Redirect to a frontend page after successful token storage
     # return redirect('frontend:') how to redirect to frontend webpage
     return HttpResponse("Authentication Successful")
@@ -118,7 +141,7 @@ class IsAuthenticated(APIView):
             Handles GET requests and returns the authentication status of the user.
     """
 
-    def get(self, request, format=None):
+    def get(self, request):
         """
         Handles GET request to check if the user is authenticated with Spotify.
 
@@ -126,12 +149,14 @@ class IsAuthenticated(APIView):
 
         Parameters:
             request (HttpRequest): The HTTP request object.
-            format (str, optional): Response format (defaults to None).
 
         Returns:
             Response (rest_framework.response.Response): 
                 A JSON response indicating the authentication status (True/False).
         """
         # TODO: Are we still using session key? or user data unsure
-        is_authenticated = is_spotify_authenticated(self.request.session.session_key)
-        return Response({'status': is_authenticated}, status=status.HTTP_200_OK )
+        try:
+            is_authenticated = is_spotify_authenticated(self.request.session.session_key)
+        except Exception:
+            is_authenticated = False
+        return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
