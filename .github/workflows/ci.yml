@@ -31,20 +31,12 @@ jobs:
       run: |
         conda run -n myenv pylint $(git ls-files '*.py') --fail-under=8
 
-    # Step 5: Run tests and generate code coverage report
+    # Step 5: Run tests
     - name: Run tests with coverage
       run: |
         conda run -n myenv coverage run -m pytest
-        conda run -n myenv coverage report
-        conda run -n myenv coverage xml 
 
     # Step 6: Check code coverage
     - name: Ensure at least 80% code coverage
       run: |
         conda run -n myenv coverage report --fail-under=80
-
-    # Step 7: Upload Coverage
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
