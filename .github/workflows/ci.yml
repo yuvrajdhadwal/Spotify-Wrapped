@@ -15,33 +15,33 @@ jobs:
     - name: Set up Miniconda
       uses: conda-incubator/setup-miniconda@v2
       with:
-        python-version: 3.12  # Ensure it matches your environment
+        python-version: 3.12
+        auto-update-conda: true 
 
-    # Step 2.5: Initialize conda for the shell
-    - name: Initialize conda
-      run: |
-        conda init bash  # Initializes conda for the bash shell
-        source ~/.bashrc  # Sources the updated bashrc to apply changes
-
-    # Step 3: Create and activate the conda environment
+    # Step 3: Create the conda environment
     - name: Create conda environment
       run: |
         conda env create -f environment.yml
-        conda activate myenv
 
     # Step 4: Lint the code (PEP 8 style checks)
     - name: Lint code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        conda run -n myenv pylint $(git ls-files '*.py')
 
     # Step 5: Run tests and generate code coverage report
     - name: Run tests with coverage
       run: |
-        coverage run -m pytest
-        coverage report
-        coverage xml 
+        conda run -n myenv coverage run -m pytest
+        conda run -n myenv coverage report
+        conda run -n myenv coverage xml 
 
     # Step 6: Check code coverage
     - name: Ensure at least 80% code coverage
       run: |
-        coverage report --fail-under=80
+        conda run -n myenv coverage report --fail-under=80
+
+    # Step 7: Upload Coverage
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
