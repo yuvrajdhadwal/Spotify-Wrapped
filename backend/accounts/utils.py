@@ -1,9 +1,21 @@
-from .models import SpotifyToken
-from django.utils import timezone
+"""
+This module provides utility functions to manage Spotify authentication tokens for users.
+
+It includes functionality for retrieving, updating, and refreshing Spotify tokens,
+allowing users to authenticate with the Spotify API.
+
+Functions:
+    - get_user_tokens: Retrieve Spotify tokens for a given user session.
+    - update_or_create_user_tokens: Update or create Spotify tokens for a user in the database.
+    - is_spotify_authenticated: Check if a user is authenticated with Spotify.
+    - refresh_spotify_token: Refresh a user's Spotify access token using their refresh token.
+"""
 from datetime import timedelta
 import os
+from django.utils import timezone
 from dotenv import load_dotenv
 from requests import post
+from accounts.models import SpotifyToken
 
 def get_user_tokens(session_id):
     """
@@ -22,8 +34,7 @@ def get_user_tokens(session_id):
     user_tokens = SpotifyToken.objects.filter(user=session_id)
     if user_tokens.exists():
         return user_tokens[0]
-    else:
-        return None
+    return None
 
 def update_or_create_user_tokens(session_id, access_token, token_type, expires_in, refresh_token):
     """
@@ -97,18 +108,24 @@ def refresh_spotify_token(session_id):
     """
     load_dotenv()
     refresh_token = get_user_tokens(session_id=session_id).refresh_token
+    client_id = os.getenv('CLIENT_ID')
+    client_secret = os.getenv('CLIENT_SECRET')
+
+    if not client_id or not client_secret:
+        raise TypeError("SET UP CLIENT ENV VARIABLES")
 
     response = post('https://accounts.spotify.com/api/tokens', data={
         'grant_type': 'refresh_token',
         'refresh_token': refresh_token,
-        'client_id': os.getenv('CLIENT_ID'),
-        'client_secret': os.getenv('CLIENT_SECRET')
-    }).json()
+        'client_id': client_id,
+        'client_secret': client_secret
+    }, timeout=10).json()
 
     access_token = response.get('access_token')
     token_type = response.get('token_type')
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
-    
-    update_or_create_user_tokens(session_id=session_id, access_token=access_token, token_type=token_type,
-                                 refresh_token=refresh_token, expires_in=expires_in)
+
+    update_or_create_user_tokens(session_id=session_id, access_token=access_token,
+                                 token_type=token_type, refresh_token=refresh_token,
+                                 expires_in=expires_in)
