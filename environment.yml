@@ -44,3 +44,5 @@ dependencies:
   - tzdata==2024a
   - urllib3==2.2.2
   - wrapt==1.14.1
+  - pytest-django==4.9.0
+  - pytest-mock==3.10.0 
