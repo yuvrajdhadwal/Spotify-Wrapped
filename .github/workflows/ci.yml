@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Miniconda
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: 3.12
+        auto-update-conda: true 
+
+    # Step 3: Create the conda environment
+    - name: Create conda environment
+      run: |
+        conda env create -f environment.yml
+
+    # Step 4: Lint the code (PEP 8 style checks)
+    - name: Lint code with pylint
+      run: |
+        conda run -n myenv pylint $(git ls-files '*.py') --fail-under=8
+
+    # Step 5: Run tests
+    - name: Run tests with coverage
+      run: |
+        conda run -n myenv coverage run -m pytest
+
+    # Step 6: Check code coverage
+    - name: Ensure at least 80% code coverage
+      run: |
+        conda run -n myenv coverage report --fail-under=80
