@@ -68,4 +68,4 @@ UI.
 a. 1 point
 b. Note 1: to earn the point for this story, you must show your finalized UI flow
 diagram and Figma wireframes to your TA by the end of sprint 1
-c. Note 2: This is what we refer to as top-down software development.
+c. Note 2: This is what we refer to as top-down software development
