@@ -55,7 +55,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',  # The default port for create-react-app
+    'http://localhost:3000',  # The default port for nextjs apps
     'http://localhost:8000',   #the django addr, not sure which one yet so I included both
 ]
 
