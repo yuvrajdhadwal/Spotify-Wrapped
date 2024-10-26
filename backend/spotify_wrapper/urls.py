@@ -19,6 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/', include('spotify_data.urls')),
+    path('api/spotify_data', include('spotify_data.urls')), #best practice for naming api endpoints, should do this
     path('spotify/', include('accounts.urls'))
 ]
