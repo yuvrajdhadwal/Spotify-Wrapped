@@ -20,15 +20,19 @@ easier to write, maintain, and execute Django tests across the project.
 import os
 import sys
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# Calculate the absolute path to the 'backend' directory
+backend_path = os.path.abspath(os.path.dirname(__file__))
 
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+# Add 'backend' to sys.path if it's not already there
+if backend_path not in sys.path:
+    sys.path.insert(0, backend_path)
+
+print("sys.path:", sys.path)  # For debugging
+
 
 import pytest
 import django
 
-print("sys.path:", sys.path)  # Debugging line
 
 def pytest_configure():
     """
