@@ -19,13 +19,16 @@ easier to write, maintain, and execute Django tests across the project.
 """
 import os
 import sys
-import pytest
-import django
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+import pytest
+import django
+
+print("sys.path:", sys.path)  # Debugging line
 
 def pytest_configure():
     """
