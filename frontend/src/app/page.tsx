@@ -1,6 +1,28 @@
-import Image from "next/image";
+//import Image from "next/image";
+"use client";
+import React from 'react';
 
-export default function Home() {
+export default function Home() { //functional component called Home, set to be the default export of this module
+  const handleLoginClick = () => {
+    window.location.href = '/login'; //replace with the spotify 3rd party login url
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h1 className="text-4xl font-bold mb-4 text-black">spotify roaster</h1>
+      <h2 className="text-2xl mb-8 text-black">your music taste has never been so embarrassing</h2>
+      <button
+        className="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-700"
+        onClick={handleLoginClick}
+      >
+        Login
+      </button>
+    </div>
+  );
+}
+
+//the below is the default Next.js homepage
+/*export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -98,4 +120,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+}*/
