@@ -1,35 +1,47 @@
-import os
-from dotenv import load_dotenv
+"""
+Utils used in spotify_data/views.
+"""
+
 import requests
 
-def refresh_access_token(refresh_token):
-    # Return the new access token and other related data as a dictionary.
-    load_dotenv()
-    client_id = os.getenv('CLIENT_ID')
-    client_secret = os.getenv('CLIENT_SECRET')
-
-    url = 'https://accounts.spotify.com/api/token'
-    data = {
-        'grant_type': 'refresh_token',
-        'refresh_token': refresh_token,
-        'client_id': client_id,
-        'client_secret': client_secret
-    }
-    response = requests.post(url, data=data, timeout=5)
-    return response.json()
-
 def get_spotify_user_data(access_token):
+    """
+    Retrieves current user data including spotify id, email, profile image, and username.
+
+    Parameters:
+        - access_token: the access token associated with the current session
+
+    Returns:
+        JSON response containing user data
+    """
+
     # Fetch the user's data from Spotify API
     headers = {
-        'Authorization': f'Bearer {access_token}'
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
     response = requests.get('https://api.spotify.com/v1/me', headers=headers, timeout=5)
     return response.json() if response.status_code == 200 else None
 
 def get_user_favorite_tracks(access_token, timelimit):
+    """
+    Returns a list of 20 user favorite tracks over one of three time periods:
+    - short-term: 4 weeks
+    - medium-term: 6 months
+    - long-term: 1 year
+
+    Parameters:
+        - access_token: the access token associated with the current session
+        - timelimit: the desired term
+
+    Returns:
+        JSON response containing user favorite tracks
+    """
+
     # Fetch the user's data from Spotify API
     headers = {
-        'Authorization': f'Bearer {access_token}'
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
     params = {
         'time_limit': timelimit,
@@ -40,9 +52,24 @@ def get_user_favorite_tracks(access_token, timelimit):
     return response.json() if response.status_code == 200 else None
 
 def get_user_favorite_artists(access_token, timelimit):
+    """
+    Returns a list of 20 user favorite artists over one of three time periods:
+    - short-term: 4 weeks
+    - medium-term: 6 months
+    - long-term: 1 year
+
+    Parameters:
+        - access_token: the access token associated with the current session
+        - timelimit: the desired term
+
+    Returns:
+        JSON response containing user favorite artists
+    """
+
     # Fetch the user's data from Spotify API
     headers = {
-        'Authorization': f'Bearer {access_token}'
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
     params = {
         'time_limit': timelimit,
