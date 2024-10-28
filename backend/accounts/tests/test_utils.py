@@ -85,7 +85,7 @@ class SpotifyTokensTestCase(TestCase):
 
     @patch('accounts.utils.get_user_tokens')
     @patch('accounts.utils.SpotifyToken')
-    def test_update_or_create_user_tokens_create(self, mock_SpotifyToken, mock_get_user_tokens):
+    def test_update_or_create_user_tokens_create(self, mock_spotifytoken, mock_get_user_tokens):
         """
         Test that update_or_create_user_tokens creates new tokens when none exist.
         """
@@ -101,17 +101,17 @@ class SpotifyTokensTestCase(TestCase):
                                      refresh_token)
         expected_expires_in =(timezone.now()
                               + timedelta(seconds=expires_in)).replace(microsecond=0)
-        actual_expires_in = mock_SpotifyToken.call_args[1]['expires_in'].replace(microsecond=0)
+        actual_expires_in = mock_spotifytoken.call_args[1]['expires_in'].replace(microsecond=0)
         assert actual_expires_in == expected_expires_in
 
-        mock_SpotifyToken.assert_called_once_with(
+        mock_spotifytoken.assert_called_once_with(
             user=session_id,
             access_token=access_token,
             token_type=token_type,
-            expires_in=mock_SpotifyToken.call_args[1]['expires_in'],
+            expires_in=mock_spotifytoken.call_args[1]['expires_in'],
             refresh_token=refresh_token
         )
-        mock_SpotifyToken.return_value.save.assert_called_once()
+        mock_spotifytoken.return_value.save.assert_called_once()
 
     @patch('accounts.utils.refresh_spotify_token')
     @patch('accounts.utils.get_user_tokens')
