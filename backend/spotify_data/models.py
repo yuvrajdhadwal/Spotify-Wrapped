@@ -45,3 +45,4 @@ class SpotifyUser(models.Model):
     favorite_artists_medium = models.JSONField(blank=True, null=True)
     favorite_artists_long = models.JSONField(blank=True, null=True)
     llama_description = models.TextField(null=True, blank=True)
+
