@@ -22,9 +22,13 @@ from .serializers import SongSerializer
 # Load environment variables
 load_dotenv()
 
-# Groq API Configuration (Ensure your Groq API key is set in your environment variables)
-groq_api_key = os.getenv("GROQ_API_KEY")
+groq_api_key = os.getenv('GROQ_API_KEY')
+
+if not groq_api_key:
+    raise GroqError("GROQ_API_KEY environment variable is not set.")
+
 client = Groq(api_key=groq_api_key)
+
 
 # pylint: disable=too-many-ancestors
 class SongViewSet(viewsets.ModelViewSet):
