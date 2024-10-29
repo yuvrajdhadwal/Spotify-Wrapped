@@ -46,23 +46,6 @@ def update_or_add_spotify_user(request, session_id):
     except ObjectDoesNotExist:
         return HttpResponse("User add/update failed: missing access token", status=500)
 
-    # If token does not exist or is expired, refresh it
-    if timezone.now() >= token_entry.expires_in:
-        refresh_spotify_token(session_id)
-        access_token = token_entry.access_token
-
-        if access_token:
-            # Update token in the database
-            token_entry, created = SpotifyToken.objects.update_or_create(
-                user=session_id,
-                defaults={
-                    'access_token': access_token['access_token'],
-                    'expires_in': timezone.now()
-                                  + timezone.timedelta(seconds=access_token['expires_in']),
-                    'refresh_token': access_token['refresh_token'],
-                    'token_type': access_token['token_type']
-                }
-            )
     access_token = token_entry.access_token
 
     # Fetch user data from Spotify API
