@@ -107,3 +107,41 @@ def test_failed_user_data_fetch(mock_request, session_id, mock_token):
         response = update_or_add_spotify_user(mock_request, session_id)
         assert response.status_code == 500
         assert json.loads(response.content) == {'error': 'Could not fetch user data from Spotify'}
+
+
+@pytest.mark.django_db
+def test_llm_api_call(mock_request, session_id, mock_token, mock_user_data, user):
+    """Test successful LLM API call and description generation."""
+    mock_request.user = user
+
+    # Create the token with a valid datetime for expires_in
+    token_entry = SpotifyToken.objects.create(
+        user=session_id,
+        access_token=mock_token['access_token'],
+        expires_in=timezone.now() + timezone.timedelta(seconds=3600)  # 1 hour from now
+    )
+
+    with patch('accounts.views.is_spotify_authenticated', return_value=True), \
+            patch('accounts.models.SpotifyToken.objects.get', return_value=token_entry), \
+            patch('spotify_data.views.get_spotify_user_data', return_value=mock_user_data), \
+            patch('spotify_data.views.get_user_favorite_tracks', return_value=['track1', 'track2']), \
+            patch('spotify_data.views.get_user_favorite_artists', return_value=['artist1', 'artist2']), \
+            patch('groq.Groq.chat.completions.create') as mock_llm_api:
+        # Simulate LLM response
+        mock_llm_api.return_value = MagicMock(
+            choices=[MagicMock(message=MagicMock(content="Test dynamic description"))])
+
+        response = update_or_add_spotify_user(mock_request, session_id)
+
+        # Check response status
+        assert response.status_code == 200
+
+        # Check if LLM API was called with expected prompt
+        mock_llm_api.assert_called_once()
+        call_args = mock_llm_api.call_args[1]  # Get the second argument (kwargs)
+        assert "Describe how someone who listens to artists like artist1, artist2 tends to act, think, and dress." in \
+               call_args['messages'][1]['content']
+
+        # Check if description is present in the response
+        response_data = json.loads(response.content)
+        assert response_data['spotify_user']['description'] == "Test dynamic description"

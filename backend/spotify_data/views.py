@@ -8,10 +8,11 @@ from accounts.utils import is_spotify_authenticated, refresh_spotify_token
 from .utils import (get_spotify_user_data, get_user_favorite_artists, get_user_favorite_tracks)
 from .models import Song, SpotifyUser
 from .serializers import SongSerializer
+from dotenv import load_dotenv
 import os
 from groq import Groq
 
-
+load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
 # Groq API Configuration (Ensure your Groq API key is set in your environment variables)
 client = Groq(
