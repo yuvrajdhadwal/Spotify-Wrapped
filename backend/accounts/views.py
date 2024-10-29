@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from requests import Request, post
+from spotify_data.views import update_or_add_spotify_user
 from .utils import update_or_create_user_tokens, is_spotify_authenticated
 
 # Create your views here.
@@ -117,11 +118,15 @@ def spotify_callback(request):
 
     if not request.session.exists(request.session.session_key):
         request.session.create()
+    session_id = request.session.session_key
 
-    # TODO: Might switch session key with user_id, unsure for now
-    update_or_create_user_tokens(request.session.session_key, access_token=access_token,
+    # resolved: continue using session key
+    update_or_create_user_tokens(session_id, access_token=access_token,
                                  token_type=token_type, refresh_token=refresh_token,
                                  expires_in=expires_in)
+
+    # Add the user to database, or update user info
+    update_or_add_spotify_user(request, session_id)
 
     # TODO: Redirect to a frontend page after successful token storage
     # return redirect('frontend:') how to redirect to frontend webpage
@@ -154,7 +159,7 @@ class IsAuthenticated(APIView):
             Response (rest_framework.response.Response): 
                 A JSON response indicating the authentication status (True/False).
         """
-        # TODO: Are we still using session key? or user data unsure
+        # resolved: continue using session key
         try:
             is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         except Exception:
