@@ -10,7 +10,7 @@ from rest_framework import viewsets
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse
-from groq import Groq
+from groq import Groq, GroqError
 
 from accounts.models import SpotifyToken  # Local imports
 from accounts.utils import is_spotify_authenticated
