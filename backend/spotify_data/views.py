@@ -1,29 +1,37 @@
+"""
+Views for managing Spotify user data, including updating user profiles,
+fetching favorite tracks and artists, and generating dynamic descriptions using Groq API.
+"""
+
+import os  # Standard library import
+
+from dotenv import load_dotenv  # Third-party imports
 from rest_framework import viewsets
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse
-from django.utils import timezone
-from accounts.models import SpotifyToken
-from accounts.utils import is_spotify_authenticated, refresh_spotify_token
-from .utils import (get_spotify_user_data, get_user_favorite_artists, get_user_favorite_tracks)
-from .models import Song, SpotifyUser
-from .serializers import SongSerializer
-from dotenv import load_dotenv
-import os
 from groq import Groq
 
-load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
-# Groq API Configuration (Ensure your Groq API key is set in your environment variables)
-client = Groq(
-    api_key=groq_api_key,
-)
+from accounts.models import SpotifyToken  # Local imports
+from accounts.utils import is_spotify_authenticated
+from .utils import get_spotify_user_data, get_user_favorite_artists, get_user_favorite_tracks
+from .models import Song, SpotifyUser
+from .serializers import SongSerializer
 
+
+# Load environment variables
+load_dotenv()
+
+# Groq API Configuration (Ensure your Groq API key is set in your environment variables)
+groq_api_key = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=groq_api_key)
+
+# pylint: disable=too-many-ancestors
 class SongViewSet(viewsets.ModelViewSet):
     """
     For testing, API endpoint that allows songs to be viewed or edited.
     """
-    queryset = Song.objects.all()
+    queryset = Song.objects.all()  # pylint: disable=no-member
     serializer_class = SongSerializer
 
 def update_or_add_spotify_user(request, session_id):
@@ -53,14 +61,19 @@ def update_or_add_spotify_user(request, session_id):
         favorite_artists_long = get_user_favorite_artists(access_token, 'long_term')
 
         # Create a dynamic description using Groq Llama3 API
-        description_prompt = f"Describe how someone who listens to artists like {', '.join(favorite_artists_long)} tends to act, think, and dress."
+        description_prompt = (
+            f"Describe how someone who listens to artists like {', '.join(favorite_artists_long)} "
+            "tends to act, think, and dress."
+        )
 
         try:
             response = client.chat.completions.create(
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a music analyst who describes user behavior based on their music tastes.",
+                        "content": "You are a music analyst who"
+                                   " describes user"
+                                   " behavior based on their music tastes.",
                     },
                     {
                         "role": "user",
@@ -71,11 +84,13 @@ def update_or_add_spotify_user(request, session_id):
             )
 
             llama_description = response.choices[0].message.content
+        except KeyError as e:
+            llama_description = f"Key error: {str(e)}"
         except Exception as e:
-            llama_description = f"Description unavailable due to API error: {str(e)}"
+            llama_description = f"Description unavailable due to API error: {str(e)}"  # pylint: disable=broad-exception-caught
 
         # Update or create the SpotifyUser
-        spotify_user, created = SpotifyUser.objects.update_or_create(
+        spotify_user, created = SpotifyUser.objects.update_or_create(  # pylint: disable=no-member
             spotify_id=user_data['id'],
             defaults={
                 'user': user,
@@ -94,6 +109,8 @@ def update_or_add_spotify_user(request, session_id):
             }
         )
 
-        return JsonResponse({'spotify_user': {'id': spotify_user.spotify_id, 'created': created, 'description': llama_description}})
+        return JsonResponse({'spotify_user': {'id': spotify_user.spotify_id,
+                                              'created': created,
+                                              'description': llama_description}})
 
     return JsonResponse({'error': 'Could not fetch user data from Spotify'}, status=500)
