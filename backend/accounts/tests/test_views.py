@@ -19,6 +19,7 @@ from django.test import TestCase, RequestFactory
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.test import APIClient
+from groq import Groq,  GroqError
 from accounts.views import spotify_callback
 from requests import Request
 

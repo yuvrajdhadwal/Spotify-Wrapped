@@ -33,6 +33,8 @@ jobs:
 
     # Step 5: Run tests
     - name: Run tests with coverage
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       run: |
         conda run -n myenv coverage run -m pytest
 

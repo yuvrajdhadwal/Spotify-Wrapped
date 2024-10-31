@@ -10,7 +10,7 @@ from rest_framework import viewsets
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse
-from groq import Groq, GroqError
+from groq import Groq,  GroqError
 
 from accounts.models import SpotifyToken  # Local imports
 from accounts.utils import is_spotify_authenticated
@@ -23,6 +23,7 @@ from .serializers import SongSerializer
 load_dotenv()
 
 groq_api_key = os.getenv('GROQ_API_KEY')
+print(groq_api_key)
 
 if not groq_api_key:
     raise GroqError("GROQ_API_KEY environment variable is not set.")
