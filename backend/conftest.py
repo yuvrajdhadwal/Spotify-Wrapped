@@ -34,6 +34,10 @@ import pytest
 import django
 
 
+def pytest_load_initial_conftests(args):
+    import os
+    os.environ['GROQ_API_KEY'] = os.environ.get('GROQ_API_KEY')
+
 def pytest_configure():
     """
     Configures the Django settings for pytest.
