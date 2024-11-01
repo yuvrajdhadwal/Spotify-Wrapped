@@ -61,6 +61,8 @@ class AuthURL(APIView):
         scope = os.getenv('SCOPE')
         redirect_uri = os.getenv('REDIRECT_URI')
 
+        print(client_id + scope + redirect_uri)
+
         if not client_id or not scope or not redirect_uri:
             return Response({'error': 'Missing environment variables'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -68,13 +70,13 @@ class AuthURL(APIView):
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scope,
             'response_type': 'code',
-            'redirect_url': redirect_uri,
+            'redirect_uri': redirect_uri,
             'client_id': client_id
         }).prepare().url
 
         return Response({'url': url}, status=status.HTTP_200_OK)
 
-def spotify_callback(request):
+def spotify_callback(request, format=None):
     """
     View to handle the callback from Spotify after user authorization.
 
@@ -126,7 +128,7 @@ def spotify_callback(request):
                                  expires_in=expires_in)
 
     # Add the user to database, or update user info
-    update_or_add_spotify_user(request, session_id)
+    # update_or_add_spotify_user(request, session_id)
 
     # TODO: Redirect to a frontend page after successful token storage
     # return redirect('frontend:') how to redirect to frontend webpage

@@ -20,6 +20,6 @@ from .views import AuthURL, spotify_callback, IsAuthenticated
 # URL patterns for handling Spotify authentication.
 urlpatterns = [
     path('get-auth-url', AuthURL.as_view(), name='auth-url'),
-    path('redirect', spotify_callback, name='spotify-callback'),
+    path('callback', spotify_callback, name='spotify-callback'),
     path('is-authenticated', IsAuthenticated.as_view(), name='is-authenticated')
 ]

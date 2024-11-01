@@ -5,6 +5,7 @@ import React from 'react';
 export default function Home() { //functional component called Home, set to be the default export of this module
   const handleLoginClick = () => {
     window.location.href = '/login'; //replace with the spotify 3rd party login url
+      // needs to redirect to a template that points to {% url auth-url % }
   };
 
   return (
