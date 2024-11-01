@@ -61,8 +61,6 @@ class AuthURL(APIView):
         scope = os.getenv('SCOPE')
         redirect_uri = os.getenv('REDIRECT_URI')
 
-        print(client_id + scope + redirect_uri)
-
         if not client_id or not scope or not redirect_uri:
             return Response({'error': 'Missing environment variables'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
