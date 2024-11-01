@@ -29,7 +29,14 @@ class SpotifyUser(models.Model):
     - favorite_artists_short: a list of 20 favorite artists over 4 weeks
     - favorite_artists_medium: a list of 20 favorite artists over 6 months
     - favorite_artists_long: a list of 20 favorite artists over 12 months
-    - llama_description: gives a description of the how the user acts/thinks/dresses using an LLM
+    - favorite_genres_short: a list of 20 favorite genres pulled from favorite_artists_short
+    - favorite_genres_medium: a list of 20 favorite genres pulled from favorite_artists_medium
+    - favorite_genres_long: a list of 20 favorite genres pulled from favorite_artists_long
+    - quirkiest_artists_short: 5 quirkiest artists pulled from favorite_artists_short
+    - quirkiest_artists_medium: 5 quirkiest artists pulled from favorite_artists_medium
+    - quirkiest_artists_long: 5 quirkiest artists pulled from favorite_artists_long
+    - llama_description: gives a description of how the user acts/thinks/dresses using an LLM
+    - llama_songrecs: a string containing song recommendation as pulled from the LLM
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     spotify_id = models.CharField(max_length=100, unique=True)
@@ -38,11 +45,17 @@ class SpotifyUser(models.Model):
     profile_image_url = models.URLField(blank=True, null=True)
 
     # Add fields to store summarized data
-    favorite_tracks_short = models.JSONField(blank=True, null=True)
-    favorite_tracks_medium = models.JSONField(blank=True, null=True)
-    favorite_tracks_long = models.JSONField(blank=True, null=True)
-    favorite_artists_short = models.JSONField(blank=True, null=True)
-    favorite_artists_medium = models.JSONField(blank=True, null=True)
-    favorite_artists_long = models.JSONField(blank=True, null=True)
+    favorite_tracks_short = models.JSONField(default=[], blank=True, null=True)
+    favorite_tracks_medium = models.JSONField(default=[], blank=True, null=True)
+    favorite_tracks_long = models.JSONField(default=[], blank=True, null=True)
+    favorite_artists_short = models.JSONField(default=[], blank=True, null=True)
+    favorite_artists_medium = models.JSONField(default=[], blank=True, null=True)
+    favorite_artists_long = models.JSONField(default=[], blank=True, null=True)
+    favorite_genres_short = models.JSONField(default=[], blank=True, null=True)
+    favorite_genres_medium = models.JSONField(default=[], blank=True, null=True)
+    favorite_genres_long = models.JSONField(default=[], blank=True, null=True)
+    quirkiest_artists_short = models.JSONField(default=[], blank=True, null=True)
+    quirkiest_artists_medium = models.JSONField(default=[], blank=True, null=True)
+    quirkiest_artists_long = models.JSONField(default=[], blank=True, null=True)
     llama_description = models.TextField(null=True, blank=True)
-
+    llama_songrecs = models.TextField(null=True, blank=True)
