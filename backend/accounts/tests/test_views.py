@@ -14,11 +14,13 @@ on environment variables.
 import unittest
 import os
 from unittest.mock import patch
+from unittest import mock
 from django.urls import reverse
 from django.test import TestCase, RequestFactory
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.test import APIClient
+from groq import Groq,  GroqError
 from accounts.views import spotify_callback
 from requests import Request
 
@@ -72,6 +74,7 @@ class AuthURLTestCase(TestCase):
         self.assertIn('error', response.data)
         self.assertEqual(response.data['error'], 'Missing environment variables')
 
+
 class SpotifyCallbackTestCase(TestCase):
     """Test cases for the spotify_callback view."""
 
@@ -90,12 +93,15 @@ class SpotifyCallbackTestCase(TestCase):
         Test that spotify_callback successfully processes the Spotify callback.
         """
         # Mock environment variables
+        groq = os.getenv("GROQ_API_KEY")
         client_id = os.getenv('CLIENT_ID')
         client_secret = os.getenv('CLIENT_SECRET')
         redirect_uri = os.getenv('REDIRECT_URI')
         mock_getenv.side_effect = lambda key: {'REDIRECT_URI': redirect_uri,
                                                'CLIENT_ID': client_id,
-                                               'CLIENT_SECRET': client_secret}.get(key)
+                                               'CLIENT_SECRET': client_secret,
+                                                'GROQ_API_KEY': groq}.get(key)
+
         mock_load_dotenv.return_value = None
 
         # Mock POST response from Spotify
@@ -138,12 +144,15 @@ class SpotifyCallbackTestCase(TestCase):
         Test that spotify_callback handles errors from Spotify.
         """
         # Mock environment variables
+        groq = os.getenv("GROQ_API_KEY")
         client_id = os.getenv('CLIENT_ID')
         client_secret = os.getenv('CLIENT_SECRET')
         redirect_uri = os.getenv('REDIRECT_URI')
         mock_getenv.side_effect = lambda key: {'REDIRECT_URI': redirect_uri,
                                                'CLIENT_ID': client_id,
-                                               'CLIENT_SECRET': client_secret}.get(key)
+                                               'CLIENT_SECRET': client_secret,
+                                               'GROQ_API_KEY': groq}.get(key)
+
         mock_load_dotenv.return_value = None
 
         # Mock POST response from Spotify with an error
@@ -166,13 +175,16 @@ class SpotifyCallbackTestCase(TestCase):
         Test that spotify_callback handles missing 'code' parameter.
         """
         # Mock environment variables
+        groq = os.getenv("GROQ_API_KEY")
         client_id = os.getenv('CLIENT_ID')
         client_secret = os.getenv('CLIENT_SECRET')
         redirect_uri = os.getenv('REDIRECT_URI')
         mock_getenv.side_effect = lambda key: {'REDIRECT_URI': redirect_uri,
                                                'CLIENT_ID': client_id,
-                                               'CLIENT_SECRET': client_secret}.get(key)
+                                               'CLIENT_SECRET': client_secret,
+                                                'GROQ_API_KEY': groq}.get(key)
         mock_load_dotenv.return_value = None
+
 
         # Create a request without 'code' parameter
         request = self.factory.get('/spotify/redirect')

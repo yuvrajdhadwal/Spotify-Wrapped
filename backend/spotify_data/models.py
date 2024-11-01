@@ -29,6 +29,7 @@ class SpotifyUser(models.Model):
     - favorite_artists_short: a list of 20 favorite artists over 4 weeks
     - favorite_artists_medium: a list of 20 favorite artists over 6 months
     - favorite_artists_long: a list of 20 favorite artists over 12 months
+    - llama_description: gives a description of the how the user acts/thinks/dresses using an LLM
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     spotify_id = models.CharField(max_length=100, unique=True)
@@ -43,3 +44,5 @@ class SpotifyUser(models.Model):
     favorite_artists_short = models.JSONField(blank=True, null=True)
     favorite_artists_medium = models.JSONField(blank=True, null=True)
     favorite_artists_long = models.JSONField(blank=True, null=True)
+    llama_description = models.TextField(null=True, blank=True)
+
