@@ -27,12 +27,16 @@ backend_path = os.path.abspath(os.path.dirname(__file__))
 if backend_path not in sys.path:
     sys.path.insert(0, backend_path)
 
-print("sys.path:", sys.path)  # For debugging
+# print("sys.path:", sys.path)  # For debugging
 
 
 import pytest
 import django
 
+
+def pytest_load_initial_conftests(args):
+    import os
+    os.environ['GROQ_API_KEY'] = os.environ.get('GROQ_API_KEY')
 
 def pytest_configure():
     """

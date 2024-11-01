@@ -1,4 +1,6 @@
 name: myenv
+env:
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 channels:
   - defaults
   - conda-forge
@@ -47,3 +49,4 @@ dependencies:
   - pytest-django==4.9.0
   - pytest-mock==3.10.0
   - django-cors-headers==4.5.0
+  - groq==0.11.0
