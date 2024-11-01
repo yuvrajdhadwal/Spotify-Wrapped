@@ -92,14 +92,16 @@ class NonAPIFunctions(unittest.TestCase):
         Tests that artists are properly filtered by lowest popularity
         """
         # Mock data for favorite artists with popularity scores
-        favorite_artists = [
-            {'id': '1', 'name': 'Artist A', 'popularity': 50},
-            {'id': '2', 'name': 'Artist B', 'popularity': 20},
-            {'id': '3', 'name': 'Artist C', 'popularity': 30},
-            {'id': '4', 'name': 'Artist D', 'popularity': 10},
-            {'id': '5', 'name': 'Artist E', 'popularity': 60},
-            {'id': '6', 'name': 'Artist F', 'popularity': 5},
-        ]
+        favorite_artists = {
+            'items': [
+                {'id': '1', 'name': 'Artist A', 'popularity': 50},
+                {'id': '2', 'name': 'Artist B', 'popularity': 20},
+                {'id': '3', 'name': 'Artist C', 'popularity': 30},
+                {'id': '4', 'name': 'Artist D', 'popularity': 10},
+                {'id': '5', 'name': 'Artist E', 'popularity': 60},
+                {'id': '6', 'name': 'Artist F', 'popularity': 5},
+            ]
+        }
 
         # Expected output: the 5 quirkiest artists (lowest popularity scores)
         expected_output = [
