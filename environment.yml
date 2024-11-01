@@ -1,6 +1,4 @@
-name: myenv
-env:
-  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+name: django
 channels:
   - defaults
   - conda-forge
