@@ -29,14 +29,14 @@ jobs:
     # Step 4: Lint the code (PEP 8 style checks)
     - name: Lint code with pylint
       run: |
-        conda run -n myenv pylint $(git ls-files '*.py') --fail-under=8
+        conda run -n django pylint $(git ls-files '*.py') --fail-under=8
 
     # Step 5: Run tests
     - name: Run tests with coverage
       run: |
-        conda run -n myenv coverage run -m pytest
+        conda run -n django coverage run -m pytest
 
     # Step 6: Check code coverage
     - name: Ensure at least 80% code coverage
       run: |
-        conda run -n myenv coverage report --fail-under=80
+        conda run -n django coverage report --fail-under=80
