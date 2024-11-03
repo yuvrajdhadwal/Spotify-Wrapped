@@ -1,12 +1,32 @@
-//import Image from "next/image";
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function Home() { //functional component called Home, set to be the default export of this module
+export default function Home() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is already authenticated
+    fetch('http://127.0.0.1:8000/spotify/is-authenticated/', { credentials: 'include' })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status) {
+          router.push('/dashboard');
+        } else {
+          setIsAuthenticated(false);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }, [router]);
+
   const handleLoginClick = () => {
-    window.location.href = 'http://127.0.0.1:8000/spotify/get-auth-url/'; //link to our redirect link to spotify login
-      // needs to redirect to a template that points to {% url auth-url % }
+    window.location.href = 'http://127.0.0.1:8000/spotify/get-auth-url/';
   };
+
+  if (isAuthenticated) {
+    return null; // or a loading spinner
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -16,7 +36,7 @@ export default function Home() { //functional component called Home, set to be t
         className="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-700"
         onClick={handleLoginClick}
       >
-        Login
+        Login with Spotify
       </button>
     </div>
   );

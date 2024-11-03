@@ -128,9 +128,9 @@ def spotify_callback(request, format=None):
     # Add the user to database, or update user info
     # update_or_add_spotify_user(request, session_id)
 
-    # TODO: Redirect to a frontend page after successful token storage
-    # return redirect('frontend:') how to redirect to frontend webpage
-    return HttpResponse("Authentication Successful")
+    # Redirect to the frontend dashboard page after successful authentication
+    frontend_dashboard_url = 'http://localhost:3000/dashboard'  # Adjust this URL as needed
+    return redirect(frontend_dashboard_url)
 
 
 class IsAuthenticated(APIView):
