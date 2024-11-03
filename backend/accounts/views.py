@@ -12,7 +12,7 @@ Functions:
     - spotify_callback: Handles the Spotify redirect after user authorization and stores tokens.
 """
 import os
-from django.shortcuts import HttpResponse
+from django.shortcuts import HttpResponse, redirect
 from dotenv import load_dotenv
 from rest_framework.views import APIView
 from rest_framework import status
@@ -72,7 +72,7 @@ class AuthURL(APIView):
             'client_id': client_id
         }).prepare().url
 
-        return Response({'url': url}, status=status.HTTP_200_OK)
+        return redirect(url)
 
 def spotify_callback(request, format=None):
     """
