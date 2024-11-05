@@ -62,12 +62,11 @@ CORS_ORIGIN_WHITELIST = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-SESSION_COOKIE_SECURE = True  # Use only with HTTPS
+SESSION_COOKIE_SECURE = False  # Use only with HTTPS
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'  # Or 'None' if using cross-origin
+SESSION_COOKIE_SAMESITE = 'None'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 1209600  # 2 weeks, in seconds
 
 ROOT_URLCONF = "spotify_wrapper.urls"
 

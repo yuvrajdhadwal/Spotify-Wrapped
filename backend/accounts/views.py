@@ -127,7 +127,6 @@ def spotify_callback(request, format=None):
     update_or_create_user_tokens(session_id, access_token=access_token,
                                  token_type=token_type, refresh_token=refresh_token,
                                  expires_in=expires_in)
-    request.session['authed'] = True
     request.session.save() #explicit save
 
     # Redirect to the frontend dashboard page after successful authentication
