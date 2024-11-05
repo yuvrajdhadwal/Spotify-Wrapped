@@ -161,6 +161,7 @@ class IsAuthenticated(APIView):
         """
         # resolved: continue using session key
         try:
+            print(self.request.session.session_key)
             is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         except Exception:
             is_authenticated = False
