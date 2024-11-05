@@ -44,8 +44,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -61,6 +61,13 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+SESSION_COOKIE_SECURE = True  # Use only with HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'  # Or 'None' if using cross-origin
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 1209600  # 2 weeks, in seconds
 
 ROOT_URLCONF = "spotify_wrapper.urls"
 

@@ -12,6 +12,8 @@ Functions:
     - spotify_callback: Handles the Spotify redirect after user authorization and stores tokens.
 """
 import os
+
+from django.http import JsonResponse
 from django.shortcuts import HttpResponse, redirect
 from dotenv import load_dotenv
 from rest_framework.views import APIView
@@ -111,22 +113,22 @@ def spotify_callback(request, format=None):
     if 'error' in response:
         return HttpResponse(f"Authentication Failed: {response['error']}")
 
+    if not request.session.exists(request.session.session_key):
+        request.session.create()
+    session_id = request.session.session_key
+
     access_token = response.get('access_token')
     token_type = response.get('token_type')
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
 
-    if not request.session.exists(request.session.session_key):
-        request.session.create()
-    session_id = request.session.session_key
-
-    # resolved: continue using session key
+    # Add the user to database, or update user info
+    # update_or_add_spotify_user(request, session_id)
     update_or_create_user_tokens(session_id, access_token=access_token,
                                  token_type=token_type, refresh_token=refresh_token,
                                  expires_in=expires_in)
-
-    # Add the user to database, or update user info
-    # update_or_add_spotify_user(request, session_id)
+    request.session['authed'] = True
+    request.session.save() #explicit save
 
     # Redirect to the frontend dashboard page after successful authentication
     frontend_dashboard_url = 'http://localhost:3000/dashboard'  # Adjust this URL as needed
@@ -161,8 +163,8 @@ class IsAuthenticated(APIView):
         """
         # resolved: continue using session key
         try:
-            print(self.request.session.session_key)
+            print(f"IsAuth", self.request.session.session_key)
             is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         except Exception:
             is_authenticated = False
-        return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
+        return Response({'status':  is_authenticated}, status=status.HTTP_200_OK)
