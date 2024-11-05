@@ -55,7 +55,7 @@ class AuthURLTestCase(TestCase):
             'client_id': client_id
         }).prepare().url
 
-        # Check the response status and URL
+        # Check the response status
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
 
     @patch('accounts.views.os.getenv')
@@ -121,7 +121,7 @@ class SpotifyCallbackTestCase(TestCase):
 
         response = spotify_callback(request)
 
-        # Assert that the response is an HttpResponse
+        # Assert that the response is an HttpResponseRedirect
         self.assertIsInstance(response, HttpResponseRedirect)
 
         # Assert that tokens are updated

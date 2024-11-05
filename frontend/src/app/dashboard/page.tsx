@@ -28,7 +28,7 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <h1 className="text-4xl font-bold mb-4 text-black">Welcome to Your Dashboard</h1>
-      <p className="text-xl mb-8 text-black">You're now logged in with Spotify!</p>
+      <p className="text-xl mb-8 text-black">Now logged in with Spotify!</p>
       {/* Add more dashboard content here */}
     </div>
   );
