@@ -57,8 +57,10 @@ MIDDLEWARE = [
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',  # The default port for next.js apps
     'http://localhost:3001',  # for some reason this is Yixiong's next.js port, so I added it.
-    'http://localhost:8000',   #the django addr, not sure which one yet so I included both
+    'http://localhost:8000',  # the django addr, not sure which one yet so I included both
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "spotify_wrapper.urls"
 
