@@ -21,6 +21,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     #best practice for naming api endpoints, should do this
-    path('api/spotify_data', include('spotify_data.urls')),
-    path('', include('accounts.urls'))
+    path('spotify_data/', include('spotify_data.urls')),
+    path('spotify/', include('accounts.urls'))
 ]

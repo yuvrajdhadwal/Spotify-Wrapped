@@ -12,7 +12,7 @@ Functions:
     - spotify_callback: Handles the Spotify redirect after user authorization and stores tokens.
 """
 import os
-from django.shortcuts import HttpResponse
+from django.shortcuts import HttpResponse, redirect
 from dotenv import load_dotenv
 from rest_framework.views import APIView
 from rest_framework import status
@@ -72,7 +72,7 @@ class AuthURL(APIView):
             'client_id': client_id
         }).prepare().url
 
-        return Response({'url': url}, status=status.HTTP_200_OK)
+        return redirect(url)
 
 def spotify_callback(request, format=None):
     """
@@ -128,9 +128,9 @@ def spotify_callback(request, format=None):
     # Add the user to database, or update user info
     # update_or_add_spotify_user(request, session_id)
 
-    # TODO: Redirect to a frontend page after successful token storage
-    # return redirect('frontend:') how to redirect to frontend webpage
-    return HttpResponse("Authentication Successful")
+    # Redirect to the frontend dashboard page after successful authentication
+    frontend_dashboard_url = 'http://localhost:3000/dashboard'  # Adjust this URL as needed
+    return redirect(frontend_dashboard_url)
 
 
 class IsAuthenticated(APIView):
