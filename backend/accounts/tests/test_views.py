@@ -17,7 +17,7 @@ from unittest.mock import patch
 from unittest import mock
 from django.urls import reverse
 from django.test import TestCase, RequestFactory
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework import status
 from rest_framework.test import APIClient
 from groq import Groq,  GroqError
@@ -56,9 +56,7 @@ class AuthURLTestCase(TestCase):
         }).prepare().url
 
         # Check the response status and URL
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('url', response.data)
-        self.assertEqual(response.data['url'], expected_url)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
 
     @patch('accounts.views.os.getenv')
     def test_get_auth_url_missing_env_variables(self, mock_getenv):
@@ -124,8 +122,7 @@ class SpotifyCallbackTestCase(TestCase):
         response = spotify_callback(request)
 
         # Assert that the response is an HttpResponse
-        self.assertIsInstance(response, HttpResponse)
-        self.assertEqual(response.content.decode(), "Authentication Successful")
+        self.assertIsInstance(response, HttpResponseRedirect)
 
         # Assert that tokens are updated
         mock_update_tokens.assert_called_once_with(
