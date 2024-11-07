@@ -4,6 +4,7 @@ import Heading1 from '../../Components/Heading1'
 import { useEffect } from 'react';
 
 export default function Title() {
+    // links the entire page to the artist page
     useEffect(() => {
       document.body.addEventListener('click', () => {
         window.location.href = "./artists/";
