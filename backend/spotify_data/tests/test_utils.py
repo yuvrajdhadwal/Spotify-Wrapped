@@ -3,8 +3,9 @@
 from unittest.mock import patch
 import unittest
 import pytest
+from unittest.mock import patch, Mock
 from ..utils import (get_spotify_user_data, get_user_favorite_artists, get_user_favorite_tracks,
-                     get_top_genres, get_quirkiest_artists)
+                     get_top_genres, get_quirkiest_artists, get_spotify_recommendations)
 
 
 @pytest.mark.parametrize("status_code, expected_result", [
@@ -117,3 +118,39 @@ class NonAPIFunctions(unittest.TestCase):
 
         # Assert that the result matches the expected output
         self.assertEqual(result, expected_output)
+
+
+@patch('spotify_data.utils.requests.get')
+def test_get_spotify_recommendations(mock_get):
+    """Test fetching song recommendations using Spotify API."""
+    mock_user_token = "mock_access_token"
+    seed_artists = ["artist_id_1"]
+    mock_response_data = {
+        "tracks": [
+            {
+                "id": "track_id_1",
+                "name": "Song 1",
+                "artists": [{"name": "Artist 1"}],
+                "album": {"name": "Album 1"},
+                "preview_url": "http://example.com/preview",
+                "external_urls": {"spotify": "http://example.com/song"}
+            }
+        ]
+    }
+
+    mock_response = Mock()
+    mock_response.json.return_value = mock_response_data
+    mock_response.status_code = 200
+    mock_get.return_value = mock_response
+
+    recommendations = get_spotify_recommendations(
+        user_token=mock_user_token,
+        seed_artists=seed_artists
+    )
+
+    assert len(recommendations) == 1
+    assert recommendations[0]["name"] == "Song 1"
+    assert recommendations[0]["artist"] == "Artist 1"
+    assert recommendations[0]["album"] == "Album 1"
+    assert recommendations[0]["preview_url"] == "http://example.com/preview"
+    assert recommendations[0]["external_url"] == "http://example.com/song"
