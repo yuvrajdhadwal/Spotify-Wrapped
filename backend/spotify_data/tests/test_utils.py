@@ -3,9 +3,15 @@
 from unittest.mock import patch
 import unittest
 import pytest
-from unittest.mock import patch, Mock
+from groq import Groq,  GroqError
+from unittest.mock import patch, Mock, MagicMock
 from ..utils import (get_spotify_user_data, get_user_favorite_artists, get_user_favorite_tracks,
-                     get_top_genres, get_quirkiest_artists, get_spotify_recommendations)
+                     get_top_genres, get_quirkiest_artists,
+                     get_spotify_recommendations, create_groq_description)
+
+
+
+
 
 
 @pytest.mark.parametrize("status_code, expected_result", [
@@ -154,3 +160,79 @@ def test_get_spotify_recommendations(mock_get):
     assert recommendations[0]["album"] == "Album 1"
     assert recommendations[0]["preview_url"] == "http://example.com/preview"
     assert recommendations[0]["external_url"] == "http://example.com/song"
+
+
+
+
+def test_create_groq_description_returns_response():
+    """Test that a response is successfully returned from the Groq API."""
+    mock_groq_api_key = "mock_api_key"
+    favorite_artists = ["Artist1", "Artist2"]
+
+    # Mock response content
+    mock_response = MagicMock()
+    mock_response.choices[0].message.content = "Sample description."
+
+    # Patch the Groq client in the correct module
+    with patch("spotify_data.utils.Groq") as MockGroq:
+        mock_client = MockGroq.return_value
+        mock_client.chat.completions.create.return_value = mock_response
+
+        llama_description = create_groq_description(mock_groq_api_key, favorite_artists)
+
+        assert llama_description is not None, "Expected a response but got None."
+        mock_client.chat.completions.create.assert_called_once()
+
+
+def test_create_groq_description_no_api_key():
+    """Test that GroqError is raised when no API key is provided."""
+    favorite_artists = ["Artist1", "Artist2"]
+    with pytest.raises(GroqError, match="GROQ_API_KEY environment variable is not set."):
+        create_groq_description("", favorite_artists)
+
+
+def test_create_groq_description_key_error_handling():
+    """Test that the function handles KeyError in the response gracefully."""
+    mock_groq_api_key = "mock_api_key"
+    favorite_artists = ["Artist1", "Artist2"]
+
+    with patch("spotify_data.utils.Groq") as MockGroq:
+        mock_client = MockGroq.return_value
+        mock_client.chat.completions.create.side_effect = KeyError("choices")
+
+        llama_description = create_groq_description(mock_groq_api_key, favorite_artists)
+
+        assert llama_description is not None, "Expected an error message but got None."
+
+
+def test_create_groq_description_general_exception_handling():
+    """Test that the function handles a general API exception gracefully."""
+    mock_groq_api_key = "mock_api_key"
+    favorite_artists = ["Artist1", "Artist2"]
+
+    with patch("spotify_data.utils.Groq") as MockGroq:
+        mock_client = MockGroq.return_value
+        mock_client.chat.completions.create.side_effect = Exception("API error")
+
+        llama_description = create_groq_description(mock_groq_api_key, favorite_artists)
+
+        assert llama_description is not None, "Expected an error message but got None."
+
+
+@pytest.mark.parametrize("favorite_artists", [
+    (["Artist1"]),
+    (["Artist1", "Artist2", "Artist3"]),
+])
+def test_create_groq_description_varied_artist_list(favorite_artists):
+    """Test with different artist lists to ensure function can retrieve a response."""
+    mock_groq_api_key = "mock_api_key"
+    mock_response = MagicMock()
+    mock_response.choices[0].message.content = "Sample description."
+
+    with patch("spotify_data.utils.Groq") as MockGroq:
+        mock_client = MockGroq.return_value
+        mock_client.chat.completions.create.return_value = mock_response
+
+        llama_description = create_groq_description(mock_groq_api_key, favorite_artists)
+
+        assert llama_description is not None, "Expected a response but got None."
