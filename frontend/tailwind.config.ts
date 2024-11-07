@@ -11,6 +11,8 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'spGreen': '#1ED760',
+        'spUIGreen': '#1DB954',
       },
     },
   },

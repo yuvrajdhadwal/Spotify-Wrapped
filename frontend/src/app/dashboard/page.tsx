@@ -1,6 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from '../Components/Button';
+import Heading1 from '../Components/Heading1'
+import Radio from "../Components/Radio";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -26,10 +29,24 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold mb-4 text-black">Welcome to Your Dashboard</h1>
-      <p className="text-xl mb-8 text-black">Now logged in with Spotify!</p>
-      {/* Add more dashboard content here */}
-    </div>
+    <>
+        <Heading1 text = "Username again? Yikes"></Heading1>
+        <div id="radio-group" className="flex flex-col">
+            choose a time range:
+            <Radio name = "time_range" value = "short_term>" text = "Past Month"></Radio>
+            <Radio name = "time_range" value = "medium_term>" text = "Past 6 Months"></Radio>
+            <Radio name = "time_range" value = "long_term>" text = "Past Year"></Radio>
+        </div>
+        <Button text = "Roast Me" url = "/"></Button>
+        <div id = "duo-input">
+            <input type = "text" placeholder = "Friend's Username" className="lowercase"></input>
+            <Button text = "Roast Us" url = "/"></Button>
+        </div>
+
+        <div id = "nav-buttons">
+            <Button text = "Past Roasts" url = "/"></Button>
+            <Button text = "Duo Requests" url = "/"></Button>
+        </div>
+    </>
   );
 }
