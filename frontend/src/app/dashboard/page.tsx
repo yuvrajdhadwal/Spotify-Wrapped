@@ -30,22 +30,22 @@ export default function Dashboard() {
 
   return (
     <>
-        <Heading1 text = "Username again? Yikes"></Heading1>
+        <Heading1 text = "Username again? Yikes"/>
         <div id="radio-group" className="flex flex-col">
             choose a time range:
-            <Radio name = "time_range" value = "short_term>" text = "Past Month"></Radio>
-            <Radio name = "time_range" value = "medium_term>" text = "Past 6 Months"></Radio>
-            <Radio name = "time_range" value = "long_term>" text = "Past Year"></Radio>
+            <Radio name = "time_range" value = "short_term>" text = "Past Month"/>
+            <Radio name = "time_range" value = "medium_term>" text = "Past 6 Months"/>
+            <Radio name = "time_range" value = "long_term>" text = "Past Year"/>
         </div>
-        <Button text = "Roast Me" url = "/"></Button>
+        <Button text = "Roast Me" url = "/wrapped/title"/>
         <div id = "duo-input">
-            <input type = "text" placeholder = "Friend's Username" className="lowercase"></input>
-            <Button text = "Roast Us" url = "/"></Button>
+            <input type = "text" placeholder = "Friend's Username" className="lowercase"/>
+            <Button text = "Roast Us" url = "/wrapped/title"/>
         </div>
 
         <div id = "nav-buttons">
-            <Button text = "Past Roasts" url = "/"></Button>
-            <Button text = "Duo Requests" url = "/"></Button>
+            <Button text = "Past Roasts" url = "/history/"/>
+            <Button text = "Duo Requests" url = "/requests/"/>
         </div>
     </>
   );
