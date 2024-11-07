@@ -5,3 +5,4 @@
 **/__pycache__/
 .aider*
 help
+node_modules
