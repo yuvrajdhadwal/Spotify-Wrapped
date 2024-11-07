@@ -3,6 +3,7 @@ Utils used in spotify_data/views.
 """
 
 from collections import Counter
+from groq import Groq,  GroqError
 import requests
 
 def get_spotify_user_data(access_token):
@@ -169,8 +170,11 @@ def create_groq_description(groq_api_key, favorite_artists):
         llama_description = f"Description unavailable due to API error: {str(e)}"  # pylint: disable=broad-exception-caught
     return llama_description
 
+
+SPOTIFY_RECOMMENDATIONS_URL = "https://api.spotify.com/v1/recommendations"
+
 def get_spotify_recommendations(user_token, seed_artists=None,
-                                seed_tracks=None, seed_genres=None, target_attributes=None):
+                                seed_tracks=None, seed_genres=None):
     """
     Fetches a list of recommended songs from Spotify based on provided seeds and target attributes.
 
@@ -179,8 +183,7 @@ def get_spotify_recommendations(user_token, seed_artists=None,
         seed_artists (list of str): List of Spotify artist IDs to base recommendations on.
         seed_tracks (list of str): List of Spotify track IDs to base recommendations on.
         seed_genres (list of str): List of genres to base recommendations on.
-        target_attributes (dict): Dictionary of target musical attributes
-        (e.g., `target_energy`, `target_valence`).
+
 
     Returns:
         list: A list of recommended songs, where each song
@@ -199,8 +202,7 @@ def get_spotify_recommendations(user_token, seed_artists=None,
         params["seed_tracks"] = ",".join(seed_tracks)
     if seed_genres:
         params["seed_genres"] = ",".join(seed_genres)
-    if target_attributes:
-        params.update(target_attributes)
+
 
     try:
         response = requests.get(SPOTIFY_RECOMMENDATIONS_URL,
