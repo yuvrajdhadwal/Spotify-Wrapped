@@ -37,10 +37,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold mb-4 text-black">spotify roaster</h1>
-      <h2 className="text-2xl mb-8 text-black">your music taste has never been so embarrassing</h2>
+      <h1 className="text-7xl font-bold mb-4 text-black">spotify roaster</h1>
+      <h2 className="text-4xl mb-8 text-black">your music taste has never been so embarrassing</h2>
       <button
-        className="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-700"
+        className="bg-spUIGreen text-white px-6 py-3 rounded-full hover:bg-spGreen"
         onClick={handleLoginClick}
       >
         Login with Spotify
