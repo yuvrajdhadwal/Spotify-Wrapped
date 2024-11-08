@@ -11,11 +11,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Check if the user is authenticated
-    fetch('http://127.0.0.1:8000/spotify/is-authenticated/', { credentials: 'include' })
-      .then(response => response.json())
+    fetch('http://localhost:8000/spotify/is-authenticated/', { credentials: 'include' })
+        .then(response => response.json())
       .then(data => {
         if (!data.status) {
+            setIsAuthenticated(false);
           router.push('/');
+        } else {
+            setIsAuthenticated(true);
         }
       })
       .catch(error => {
