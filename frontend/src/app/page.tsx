@@ -7,21 +7,28 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if the user is already authenticated
-    fetch('http://127.0.0.1:8000/spotify/is-authenticated/', { credentials: 'include' })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status) {
-          router.push('/dashboard');
-        } else {
-          setIsAuthenticated(false);
-        }
-      })
-      .catch(error => console.error('Error:', error));
+  const checkAuthentication = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/spotify/is-authenticated/', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (data.status) {
+        router.push('/dashboard');
+      } else {
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  checkAuthentication();
   }, [router]);
 
   const handleLoginClick = () => {
-    window.location.href = 'http://127.0.0.1:8000/spotify/get-auth-url/';
+    window.location.href = 'http://localhost:8000/spotify/get-auth-url/';
   };
 
   if (isAuthenticated) {

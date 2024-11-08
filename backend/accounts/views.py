@@ -22,6 +22,7 @@ from rest_framework.response import Response
 from requests import Request, post
 from spotify_data.views import update_or_add_spotify_user
 from .utils import update_or_create_user_tokens, is_spotify_authenticated
+from django.contrib.sessions.models import Session
 
 # Create your views here.
 
@@ -147,7 +148,7 @@ class IsAuthenticated(APIView):
             Handles GET requests and returns the authentication status of the user.
     """
 
-    def get(self, request):
+    def get(self, request, format=None):
         """
         Handles GET request to check if the user is authenticated with Spotify.
 
@@ -155,15 +156,15 @@ class IsAuthenticated(APIView):
 
         Parameters:
             request (HttpRequest): The HTTP request object.
+            format: The format of the request data (default: None).
 
         Returns:
             Response (rest_framework.response.Response): 
                 A JSON response indicating the authentication status (True/False).
         """
-        # resolved: continue using session key
         try:
-            print(f"IsAuth", self.request.session.session_key)
-            is_authenticated = is_spotify_authenticated(self.request.session.session_key)
+            key = self.request.session.session_key
+            is_authenticated = is_spotify_authenticated(key)
         except Exception:
             is_authenticated = False
         return Response({'status':  is_authenticated}, status=status.HTTP_200_OK)
