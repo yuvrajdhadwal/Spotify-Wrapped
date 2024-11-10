@@ -34,7 +34,6 @@ def get_user_tokens(session_id):
     # TODO: Are we still using session id?
     user_tokens = SpotifyToken.objects.filter(user=session_id)
     if user_tokens.exists():
-        print(f"<get_user_tokens>", user_tokens[0])
         return user_tokens[0]
     return None
 
@@ -85,11 +84,7 @@ def is_spotify_authenticated(session_id):
     Returns:
         bool: True if the user is authenticated, False otherwise.
     """
-    print(f"Session ID at the start: {session_id}")
     tokens = get_user_tokens(session_id)
-    print(f"<is_spotify_authenticated>", tokens)
-    print(f"Session ID at the end: {session_id}")
-
     if tokens:
         expiry = tokens.expires_in
         if expiry <= timezone.now():

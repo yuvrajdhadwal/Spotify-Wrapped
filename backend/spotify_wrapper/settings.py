@@ -54,17 +54,12 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = [
+CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # The default port for next.js apps
-    'http://localhost:3001',  # for some reason this is Yixiong's next.js port, so I added it.
-    'http://localhost:8000',  # the django addr, not sure which one yet so I included both
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
-SESSION_COOKIE_SECURE = False  # Use only with HTTPS
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'None'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
