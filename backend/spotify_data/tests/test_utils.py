@@ -25,7 +25,7 @@
 #         mock_response = mock_get.return_value
 #         mock_response.status_code = status_code
 #         mock_response.json.return_value = {'id': '123',
-#             'display_name': 'Test User', 'email': 'test@example.com'} if status_code == 200 else {}
+#        'display_name': 'Test User', 'email': 'test@example.com'} if status_code == 200 else {}
 
 #         result = get_spotify_user_data(access_token)
 #         assert result == expected_result
