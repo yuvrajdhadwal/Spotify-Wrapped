@@ -1,3 +1,4 @@
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 
 interface FormData {
@@ -21,6 +22,7 @@ const SignupForm: React.FC = () => {
         password2: ''
     });
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const router = useRouter()
 
     useEffect(() => {
         fetch('http://localhost:8000/spotify/get-csrf-token/', {
@@ -65,6 +67,7 @@ const SignupForm: React.FC = () => {
                 const data = await response.json();
                 console.log('Sign-Up Successful:', data);
                 setErrorMessage(null);
+                router.push('http://localhost:8000/spotify/get-auth-url/');
             } else if (response.status === 400) {
                 const errorData = await response.json();
                 console.error('Unexpected 400 Error:', errorData);

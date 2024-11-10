@@ -18,9 +18,11 @@ from django.shortcuts import HttpResponse, redirect, render
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from requests import Request, post
 from .utils import update_or_create_user_tokens, is_spotify_authenticated
@@ -45,6 +47,7 @@ class AuthURL(APIView):
             Handles GET requests and constructs the Spotify authorization URL 
             with necessary parameters such as scope, response_type, and redirect URI.
     """
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
@@ -80,6 +83,7 @@ class AuthURL(APIView):
 
         return redirect(url)
 
+@login_required
 def spotify_callback(request, format=None):
     """
     View to handle the callback from Spotify after user authorization.
@@ -117,20 +121,21 @@ def spotify_callback(request, format=None):
     if 'error' in response:
         return HttpResponse(f"Authentication Failed: {response['error']}")
 
-    if not request.session.exists(request.session.session_key):
-        request.session.create()
-    session_id = request.session.session_key
+    # if not request.session.exists(request.session.session_key):
+    #     request.session.create()
+    # session_id = request.session.session_key
 
     access_token = response.get('access_token')
     token_type = response.get('token_type')
     refresh_token = response.get('refresh_token')
     expires_in = response.get('expires_in')
+    username = request.user.username
 
     # Add the user to database, or update user info
     # update_or_add_spotify_user(request, session_id)
-    update_or_create_user_tokens(session_id, access_token=access_token,
+    update_or_create_user_tokens(access_token=access_token,
                                  token_type=token_type, refresh_token=refresh_token,
-                                 expires_in=expires_in)
+                                 expires_in=expires_in, username=username)
     request.session.save() #explicit save
 
     # Redirect to the frontend dashboard page after successful authentication
@@ -166,7 +171,7 @@ class IsAuthenticated(APIView):
                 A JSON response indicating the authentication status (True/False).
         """
         try:
-            key = self.request.session.session_key
+            key = request.user.username
             is_authenticated = is_spotify_authenticated(key)
         except Exception:
             is_authenticated = False
@@ -183,23 +188,23 @@ def sign_in(request):
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            print("Form is valid. Cleaned data:", form.cleaned_data)  # Debugging line
+            # print("Form is valid. Cleaned data:", form.cleaned_data)  # Debugging line
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
 
             # Check if user authentication works as expected
             user = authenticate(request, username=username, password=password)
             if user:
-                print("User authenticated successfully")  # Debugging line
+                # print("User authenticated successfully")  # Debugging line
                 login(request, user)
                 return JsonResponse({'message': 'Login successful'}, status=200)
 
-            print("Authentication failed: invalid username or password")  # Debugging line
+            # print("Authentication failed: invalid username or password")  # Debugging line
             return JsonResponse({'errors': {'login': 'Invalid username or password'}},
                                     status=400)
 
         # Print form errors if validation fails
-        print("Form errors:", form.errors)  # Debugging line
+        # print("Form errors:", form.errors)  # Debugging line
         return JsonResponse({'errors': form.errors}, status=400)
 
     return JsonResponse({'error': 'Invalid request'}, status=405)
@@ -220,7 +225,7 @@ def sign_up(request):
             user = form.save(commit=False)
             user.username = user.username.lower()
             password = form.cleaned_data.get('password1')
-            print(password)
+            # print(password)
             if not 6 <= len(user.username) <= 26:
                 messages.error(request, 'Username must be between 6 and 26 characters')
                 return render(request, 'login/register.html', {'form': form})
@@ -234,6 +239,6 @@ def sign_up(request):
             # messages.success(request, "You have signed up successfully.")
             login(request, user)
             return JsonResponse({'message': 'sign-up sucessful'}, status=200)
-        print('an error occured whatttt', form.errors)
+        # print('an error occured whatttt', form.errors)
         return JsonResponse({'errors': form.errors}, status=400)
 
