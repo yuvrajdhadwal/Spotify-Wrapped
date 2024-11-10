@@ -65,7 +65,7 @@ const LoginForm: React.FC = () => {
         const data = await response.json();
         console.log('Login successful:', data);
         setErrorMessage(null);
-        router.push('http://localhost:8000/spotify/get-auth-url/');
+        router.push('dashboard/');
       } else if (response.status === 400) {
         setErrorMessage('Login failed. Retype username and password.');
       } else {
