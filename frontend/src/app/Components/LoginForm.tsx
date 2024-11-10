@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface FormData {
   username: string;
@@ -17,6 +18,7 @@ const getCookie = (name: string): string | null => {
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({ username: '', password: '' });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     fetch('http://localhost:8000/spotify/get-csrf-token/', {
@@ -31,6 +33,10 @@ const LoginForm: React.FC = () => {
         console.error('Error fetching CSRF token:', error);
       });
   }, []);
+
+  const handleSignupRedirect = () => {
+    router.push('/signup');
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -84,6 +90,12 @@ const LoginForm: React.FC = () => {
       </div>
       <button type="submit">Login</button>
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+    <div>
+    <button type="button" onClick={handleSignupRedirect} style={{marginTop: '10px'}}>
+        Sign Up!
+      </button>
+    </div>
+      
     </form>
   );
 };

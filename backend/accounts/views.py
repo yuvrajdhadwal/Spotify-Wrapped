@@ -209,15 +209,11 @@ def sign_out(request):
     '''not implmented yet'''
     logout(request)
     # messages.success(request, f'You are now logged out.')
-    return redirect('http://localhost:3000/')
+    return JsonResponse({'message': 'Logged Out'}, status=200)
 
 
 def sign_up(request):
-    '''not implemented yet'''
-    if request.method == 'GET':
-        form = RegisterForm()
-        return render(request, 'login/register.html', {'form': form})
-
+    '''implemented signup which will check users passwords and such'''
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -237,5 +233,7 @@ def sign_up(request):
             user.save()
             # messages.success(request, "You have signed up successfully.")
             login(request, user)
-            return redirect('map')
-        return render(request, 'login/register.html', {'form': form})
+            return JsonResponse({'message': 'sign-up sucessful'}, status=200)
+        print('an error occured whatttt', form.errors)
+        return JsonResponse({'errors': form.errors}, status=400)
+
