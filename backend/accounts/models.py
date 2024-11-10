@@ -27,7 +27,7 @@ class SpotifyToken(models.Model):
     such as the access token, refresh token, expiration time, and token type.
     
     Attributes:
-        user (CharField): The unique identifier for the user (user ID).
+        user (CharField): The unique identifier for the user (session ID).
         created_at (DateTimeField): The time when the token entry was created in the database.
         refresh_token (CharField): The refresh token that allows generating new access tokens.
         access_token (CharField): The current access token for interacting with Spotify's API.

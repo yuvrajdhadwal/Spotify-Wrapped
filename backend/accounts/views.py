@@ -14,15 +14,18 @@ Functions:
 import os
 
 from django.http import JsonResponse
-from django.shortcuts import HttpResponse, redirect
+from django.shortcuts import HttpResponse, redirect, render
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
 from dotenv import load_dotenv
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from requests import Request, post
-from spotify_data.views import update_or_add_spotify_user
 from .utils import update_or_create_user_tokens, is_spotify_authenticated
-from django.contrib.sessions.models import Session
+
+from .forms import LoginForm, RegisterForm
 
 # Create your views here.
 
@@ -168,3 +171,71 @@ class IsAuthenticated(APIView):
         except Exception:
             is_authenticated = False
         return Response({'status':  is_authenticated}, status=status.HTTP_200_OK)
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    '''Ensures there is a csrf token for the frontend'''
+    return JsonResponse({'detail': 'CSRF cookie set'})
+
+def sign_in(request):
+    '''Signs in user to app'''
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+            print("Form is valid. Cleaned data:", form.cleaned_data)  # Debugging line
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            # Check if user authentication works as expected
+            user = authenticate(request, username=username, password=password)
+            if user:
+                print("User authenticated successfully")  # Debugging line
+                login(request, user)
+                return JsonResponse({'message': 'Login successful'}, status=200)
+
+            print("Authentication failed: invalid username or password")  # Debugging line
+            return JsonResponse({'errors': {'login': 'Invalid username or password'}},
+                                    status=400)
+
+        # Print form errors if validation fails
+        print("Form errors:", form.errors)  # Debugging line
+        return JsonResponse({'errors': form.errors}, status=400)
+
+    return JsonResponse({'error': 'Invalid request'}, status=405)
+
+# logout button will lead to this instead
+def sign_out(request):
+    '''not implmented yet'''
+    logout(request)
+    # messages.success(request, f'You are now logged out.')
+    return redirect('http://localhost:3000/')
+
+
+def sign_up(request):
+    '''not implemented yet'''
+    if request.method == 'GET':
+        form = RegisterForm()
+        return render(request, 'login/register.html', {'form': form})
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            password = form.cleaned_data.get('password1')
+            print(password)
+            if not 6 <= len(user.username) <= 26:
+                messages.error(request, 'Username must be between 6 and 26 characters')
+                return render(request, 'login/register.html', {'form': form})
+            if not password or password.isspace():
+                messages.error(request, 'Password cannot be only empty characters')
+                return render(request, 'login/register.html', {'form': form})
+            if not 6 <= len(password) <= 26:
+                messages.error(request, 'Password must be between 6 and 26 characters')
+                return render(request, 'login/register.html', {'form': form})
+            user.save()
+            # messages.success(request, "You have signed up successfully.")
+            login(request, user)
+            return redirect('map')
+        return render(request, 'login/register.html', {'form': form})

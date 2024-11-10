@@ -15,11 +15,15 @@ Usage:
     Spotify authentication functionality for the 'accounts' app.
 """
 from django.urls import path
-from .views import AuthURL, spotify_callback, IsAuthenticated
+from .views import AuthURL, spotify_callback, IsAuthenticated, sign_in, sign_out, sign_up, get_csrf_token
 
 # URL patterns for handling Spotify authentication.
 urlpatterns = [
     path('get-auth-url/', AuthURL.as_view(), name='auth-url'),
     path('callback/', spotify_callback, name='spotify-callback'),
-    path('is-authenticated/', IsAuthenticated.as_view(), name='is-authenticated')
+    path('is-authenticated/', IsAuthenticated.as_view(), name='is-authenticated'),
+    path("login/", sign_in, name="login"),
+    path("logout/", sign_out, name="logout"),
+    path("register/", sign_up, name='register'),
+    path('get-csrf-token/', get_csrf_token, name='get_csrf_token'),
 ]
