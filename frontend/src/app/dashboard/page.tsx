@@ -5,7 +5,7 @@ import Button from '../Components/Button';
 import Heading1 from '../Components/Heading1'
 import Radio from "../Components/Radio";
 import BodyText from "@/app/Components/BodyText";
-import { getCookie } from "../../../utils";
+import { getCookie } from "@/utils";
 
 /*type DashProps = {
     username: string;
