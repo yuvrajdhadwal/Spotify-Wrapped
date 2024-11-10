@@ -1,15 +1,20 @@
 """
-This module contains views for handling Spotify authentication and authorization.
+This module contains views for handling Spotify authentication and authorization,
+as well as user account management functions for login, logout, and registration.
 
-It includes class-based views and function-based views to handle the Spotify OAuth flow, 
-check user authentication status, and interact with the Spotify API.
+It includes class-based and function-based views to handle the Spotify OAuth flow, 
+check user authentication status, manage CSRF tokens, and interact with the Spotify API.
 
 Classes:
     - AuthURL: Returns the Spotify authorization URL to initiate OAuth.
     - IsAuthenticated: Checks if a user is authenticated with Spotify.
-    
+
 Functions:
     - spotify_callback: Handles the Spotify redirect after user authorization and stores tokens.
+    - get_csrf_token: Ensures that a CSRF token is set for frontend requests.
+    - sign_in: Authenticates and logs in the user.
+    - sign_out: Logs out the user and returns a success message.
+    - sign_up: Registers a new user, validates username and password criteria, and logs them in.
 """
 import os
 
@@ -39,9 +44,6 @@ class AuthURL(APIView):
     Once there, the user can grant permission to the app. This permission is required
     before we can interact with the user's Spotify data.
 
-    Inherits from:
-        APIView (rest_framework.views.APIView): Django Rest Framework class to handle API views.
-    
     Methods:
         get(self, request): 
             Handles GET requests and constructs the Spotify authorization URL 
@@ -101,7 +103,7 @@ def spotify_callback(request, format=None):
     Notes:
         - The authorization code is extracted from the request URL.
         - Access and refresh tokens are obtained by making a POST request to Spotify's token
-            endpoint.
+          endpoint.
         - Tokens are stored using the `update_or_create_user_tokens` utility.
     """
     load_dotenv()
@@ -160,7 +162,7 @@ class IsAuthenticated(APIView):
         """
         Handles GET request to check if the user is authenticated with Spotify.
 
-        Uses the session key to check if the user has valid tokens stored in the database.
+        Uses the username to check if the user has valid tokens stored in the database.
 
         Parameters:
             request (HttpRequest): The HTTP request object.
@@ -179,11 +181,22 @@ class IsAuthenticated(APIView):
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
-    '''Ensures there is a csrf token for the frontend'''
+    """Ensures that a CSRF token is set for frontend requests."""
     return JsonResponse({'detail': 'CSRF cookie set'})
 
 def sign_in(request):
-    '''Signs in user to app'''
+    """
+    Authenticates and logs in the user.
+
+    Validates user credentials and logs them into the application. Returns 
+    an appropriate response based on authentication status.
+
+    Parameters:
+        request (HttpRequest): The HTTP request containing login form data.
+
+    Returns:
+        JsonResponse: JSON response with success or error messages.
+    """
     if request.method == 'POST':
         form = LoginForm(request.POST)
 
@@ -211,14 +224,26 @@ def sign_in(request):
 
 # logout button will lead to this instead
 def sign_out(request):
-    '''not implmented yet'''
+    """Logs out the user and returns a success message."""
     logout(request)
     # messages.success(request, f'You are now logged out.')
     return JsonResponse({'message': 'Logged Out'}, status=200)
 
 
 def sign_up(request):
-    '''implemented signup which will check users passwords and such'''
+    """
+    Registers a new user, validates username and password criteria, and logs them in.
+
+    Processes registration form data, checks for valid username and password length, 
+    saves the new user, and logs them in if successful. Returns appropriate success or 
+    error messages.
+
+    Parameters:
+        request (HttpRequest): The HTTP request containing registration form data.
+
+    Returns:
+        JsonResponse: JSON response with success or error messages.
+    """
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -241,4 +266,3 @@ def sign_up(request):
             return JsonResponse({'message': 'sign-up sucessful'}, status=200)
         # print('an error occured whatttt', form.errors)
         return JsonResponse({'errors': form.errors}, status=400)
-

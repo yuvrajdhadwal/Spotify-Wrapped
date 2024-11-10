@@ -5,7 +5,7 @@ It includes functionality for retrieving, updating, and refreshing Spotify token
 allowing users to authenticate with the Spotify API.
 
 Functions:
-    - get_user_tokens: Retrieve Spotify tokens for a given user session.
+    - get_user_tokens: Retrieve Spotify tokens for a given user by username.
     - update_or_create_user_tokens: Update or create Spotify tokens for a user in the database.
     - is_spotify_authenticated: Check if a user is authenticated with Spotify.
     - refresh_spotify_token: Refresh a user's Spotify access token using their refresh token.
@@ -20,13 +20,13 @@ from accounts.models import SpotifyToken
 
 def get_user_tokens(username):
     """
-    Retrieve the Spotify token for a given user session.
+    Retrieve the Spotify token for a given user by username.
 
-    This function queries the database to retrieve the user's Spotify token based on the session ID.
+    This function queries the database to retrieve the user's Spotify token based on their username.
     If a token exists, it returns the token; otherwise, it returns None.
 
     Parameters:
-        session_id (str): The session ID of the user.
+        username (str): The username of the user.
 
     Returns:
         SpotifyToken: The SpotifyToken object for the user if it exists, otherwise None.
@@ -46,12 +46,12 @@ def update_or_create_user_tokens(access_token, token_type, expires_in, refresh_t
     The expiration time for the token is calculated based on the current time.
 
     Parameters:
-        session_id (str): The session ID of the user.
         access_token (str): The new Spotify access token.
         token_type (str): The type of token (usually 'Bearer').
         expires_in (int): The lifetime of the access token in seconds.
         refresh_token (str): The refresh token used to generate new access tokens.
-    
+        username (str): The username of the user.
+
     Returns:
         None
     """
@@ -79,7 +79,7 @@ def is_spotify_authenticated(username):
     If no tokens exist for the user, it returns False.
 
     Parameters:
-        session_id (str): The session ID of the user.
+        username (str): The username of the user.
 
     Returns:
         bool: True if the user is authenticated, False otherwise.
@@ -101,7 +101,7 @@ def refresh_spotify_token(username):
     access and refresh tokens.
 
     Parameters:
-        session_id (str): The session ID of the user.
+        username (str): The username of the user.
 
     Returns:
         None

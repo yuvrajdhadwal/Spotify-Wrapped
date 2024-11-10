@@ -1,21 +1,28 @@
 """
 This module defines the URL patterns for the 'accounts' application.
 
-It maps specific URLs to the corresponding views that handle requests for Spotify authentication.
+It maps specific URLs to the corresponding views that handle requests for Spotify authentication 
+and user account management, such as login, logout, and registration.
 
 URL Patterns:
     - 'get-auth-url': Maps to the `AuthURL` view, which provides the Spotify authorization URL.
-    - 'redirect': Maps to the `spotify_callback` view, which handles the Spotify redirect 
-                    after authentication.
+    - 'callback': Maps to the `spotify_callback` view, which handles the Spotify redirect 
+                  after authentication.
     - 'is-authenticated': Maps to the `IsAuthenticated` view, which checks if the user is 
-                            authenticated with Spotify.
+                          authenticated with Spotify.
+    - 'login': Maps to the `sign_in` view, which handles user login.
+    - 'logout': Maps to the `sign_out` view, which handles user logout.
+    - 'register': Maps to the `sign_up` view, which handles user registration.
+    - 'get-csrf-token': Maps to the `get_csrf_token` view, which provides
+        a CSRF token for the frontend.
 
 Usage:
-    Add these URL patterns to the main `urls.py` file of the project to include
-    Spotify authentication functionality for the 'accounts' app.
+    Add these URL patterns to the main `urls.py` file of the project to enable Spotify 
+    authentication and account management functionality for the 'accounts' app.
 """
 from django.urls import path
-from .views import AuthURL, spotify_callback, IsAuthenticated, sign_in, sign_out, sign_up, get_csrf_token
+from .views import AuthURL, spotify_callback, IsAuthenticated, sign_in, sign_out
+from .views import sign_up, get_csrf_token
 
 # URL patterns for handling Spotify authentication.
 urlpatterns = [

@@ -1,252 +1,278 @@
-# """
-# Unit tests for views.py module.
+'''Test for views'''
+from unittest.mock import patch
+from django.test import TestCase, Client, RequestFactory
+from django.urls import reverse
+from django.contrib.auth.models import User
+from rest_framework import status
+from rest_framework.test import APIRequestFactory, force_authenticate
+from accounts.views import (
+    AuthURL,
+    IsAuthenticated,
+)
 
-# This module contains extensive test cases for the views provided in views.py,
-# which handle Spotify authentication and authorization.
+class AuthURLTest(TestCase):
+    '''Testing setup'''
+    def setUp(self):
+        '''Setup'''
+        self.client = Client()
+        self.factory = APIRequestFactory()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
 
-# Tests cover various scenarios including successful retrieval of the authorization URL,
-# handling of the Spotify callback with valid and invalid data, and checking user
-# authentication status.
+    @patch('os.getenv')
+    def test_get_auth_url_success(self, mock_getenv):
+        '''tests if we can get the proper auth_url'''
+        mock_getenv.side_effect = lambda key: {
+            'CLIENT_ID': 'test_client_id',
+            'SCOPE': 'user-read-private',
+            'REDIRECT_URI': 'http://localhost:8000/callback/'
+        }.get(key, None)
 
-# Dependencies are mocked to isolate tests and avoid external API calls or reliance
-# on environment variables.
-# """
-# import unittest
-# import os
-# from unittest.mock import patch
-# from unittest import mock
-# from django.urls import reverse
-# from django.test import TestCase, RequestFactory
-# from django.http import HttpResponse, HttpResponseRedirect
-# from rest_framework import status
-# from rest_framework.test import APIClient
-# from groq import Groq,  GroqError
-# from accounts.views import spotify_callback
-# from requests import Request
+        view = AuthURL.as_view()
+        request = self.factory.get('/get-auth-url/')
+        force_authenticate(request, user=self.user)
 
-# class AuthURLTestCase(TestCase):
-#     """Test cases for the AuthURL view."""
+        response = view(request)
+        self.assertEqual(response.status_code, 302)  # Redirect to Spotify auth URL
+        self.assertIn('https://accounts.spotify.com/authorize', response.url)
 
-#     @patch('accounts.views.load_dotenv')
-#     @patch('accounts.views.os.getenv')
-#     def test_get_auth_url_success(self, mock_getenv, mock_load_dotenv):
-#         """
-#         Test that AuthURL GET request returns the correct Spotify authorization URL.
-#         """
-#         client_id = os.getenv('CLIENT_ID')
-#         scope = os.getenv('SCOPE')
-#         redirect_uri = os.getenv('REDIRECT_URI')
+    @patch('os.getenv')
+    def test_get_auth_url_missing_env_vars(self, mock_getenv):
+        '''Tests if code fails gracefully if env variables are missing'''
+        mock_getenv.return_value = None  # Simulate missing environment variables
 
-#         # Mock environment variables
-#         mock_getenv.side_effect = lambda key: {'CLIENT_ID': client_id,
-#                                                'SCOPE': scope,
-#                                                'REDIRECT_URI': redirect_uri}.get(key)
-#         mock_load_dotenv.return_value = None
+        view = AuthURL.as_view()
+        request = self.factory.get('/get-auth-url/')
+        force_authenticate(request, user=self.user)
 
-#         # Make a GET request to the 'auth-url' endpoint
-#         client = APIClient()
-#         response = client.get(reverse('auth-url'))
+        response = view(request)
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.data['error'], 'Missing environment variables')
 
-#         # Construct the expected URL
-#         expected_url = Request('GET', 'https://accounts.spotify.com/authorize', params={
-#             'scope': scope,
-#             'response_type': 'code',
-#             'redirect_uri': redirect_uri,
-#             'client_id': client_id
-#         }).prepare().url
+class SpotifyCallbackTest(TestCase):
+    '''Testing callback function'''
+    def setUp(self):
+        '''Setup for callback issues'''
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
 
-#         # Check the response status
-#         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+    # @patch('os.getenv')
+    # @patch('requests.post')
+    # def test_spotify_callback_success(self, mock_post, mock_getenv):
+    #     # Mock environment variables
+    #     mock_getenv.side_effect = lambda key: {
+    #         'CLIENT_ID': 'test_client_id',
+    #         'CLIENT_SECRET': 'test_client_secret',
+    #         'REDIRECT_URI': 'http://localhost:8000/callback/'
+    #     }.get(key, None)
 
-#     @patch('accounts.views.os.getenv')
-#     def test_get_auth_url_missing_env_variables(self, mock_getenv):
-#         """
-#         Test that AuthURL handles missing environment variables gracefully.
-#         """
-#         mock_getenv.return_value = None  # Simulate missing env variables
+    #     # Mock Spotify token response
+    #     mock_post.return_value.json.return_value = {
+    #         'access_token': 'test_access_token',
+    #         'token_type': 'Bearer',
+    #         'expires_in': 3600,
+    #         'refresh_token': 'test_refresh_token',
+    #         'scope': 'user-read-private'
+    #     }
 
-#         client = APIClient()
-#         response = client.get(reverse('auth-url'))
+    #     # Simulate user login
+    #     self.client.login(username='testuser', password='testpass')
 
-#         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-#         self.assertIn('error', response.data)
-#         self.assertEqual(response.data['error'], 'Missing environment variables')
+    #     # Simulate GET request with 'code' parameter
+    #     response = self.client.get(
+    #         reverse('spotify-callback'), {'code': 'test_code'}
+    #     )
 
+    #     # Verify redirect to frontend dashboard
+    #     self.assertEqual(response.status_code, 200)
 
-# class SpotifyCallbackTestCase(TestCase):
-#     """Test cases for the spotify_callback view."""
+    #     # Verify that tokens are stored in the database
+    #     tokens = SpotifyToken.objects.filter(username='testuser')
+    #     self.assertTrue(tokens.exists())
+    #     token = tokens.first()
+    #     self.assertEqual(token.access_token, 'test_access_token')
+    #     self.assertEqual(token.refresh_token, 'test_refresh_token')
 
-#     def setUp(self):
-#         self.factory = RequestFactory()
-#         self.session = self.client.session
-#         self.session.save()
+    def test_spotify_callback_missing_code(self):
+        '''Test to see if we gracefully handle missing code'''
+        # Simulate user login
+        self.client.login(username='testuser', password='testpass')
 
-#     @patch('accounts.views.update_or_create_user_tokens')
-#     @patch('accounts.views.post')
-#     @patch('accounts.views.load_dotenv')
-#     @patch('accounts.views.os.getenv')
-#     def test_spotify_callback_success(self, mock_getenv, mock_load_dotenv, mock_post,
-#                                       mock_update_tokens):
-#         """
-#         Test that spotify_callback successfully processes the Spotify callback.
-#         """
-#         # Mock environment variables
-#         groq = os.getenv("GROQ_API_KEY")
-#         client_id = os.getenv('CLIENT_ID')
-#         client_secret = os.getenv('CLIENT_SECRET')
-#         redirect_uri = os.getenv('REDIRECT_URI')
-#         mock_getenv.side_effect = lambda key: {'REDIRECT_URI': redirect_uri,
-#                                                'CLIENT_ID': client_id,
-#                                                'CLIENT_SECRET': client_secret,
-#                                                 'GROQ_API_KEY': groq}.get(key)
+        # Simulate GET request without 'code' parameter
+        response = self.client.get(reverse('spotify-callback'))
 
-#         mock_load_dotenv.return_value = None
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Authentication Failed: Missing code parameter', response.content.decode())
 
-#         # Mock POST response from Spotify
-#         access_token = 'access_token'
-#         refresh_token = 'refresh_token'
-#         expires_in = 3600
-#         token_type = 'Bearer'
+    @patch('os.getenv')
+    @patch('requests.post')
+    def test_spotify_callback_error_response(self, mock_post, mock_getenv):
+        '''Testing to see if proper error response'''
+        # Mock environment variables
+        mock_getenv.side_effect = lambda key: {
+            'CLIENT_ID': 'test_client_id',
+            'CLIENT_SECRET': 'test_client_secret',
+            'REDIRECT_URI': 'http://localhost:8000/callback/'
+        }.get(key, None)
 
-#         mock_post.return_value.json.return_value = {
-#             'access_token': access_token,
-#             'refresh_token': refresh_token,
-#             'expires_in': expires_in,
-#             'token_type': token_type
-#         }
+        # Mock error response from Spotify
+        mock_post.return_value.json.return_value = {
+            'error': 'invalid_grant'
+        }
 
-#         # Create a request with 'code' parameter
-#         request = self.factory.get('/spotify/redirect', {'code': 'auth_code'})
-#         request.session = self.session
+        # Simulate user login
+        self.client.login(username='testuser', password='testpass')
 
-#         response = spotify_callback(request)
+        # Simulate GET request with 'code' parameter
+        response = self.client.get(reverse('spotify-callback'), {'code': 'test_code'})
 
-#         # Assert that the response is an HttpResponseRedirect
-#         self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Authentication Failed: invalid_client', response.content.decode())
 
-#         # Assert that tokens are updated
-#         mock_update_tokens.assert_called_once_with(
-#             request.session.session_key,
-#             access_token=access_token,
-#             token_type=token_type,
-#             refresh_token=refresh_token,
-#             expires_in=expires_in
-#         )
+class IsAuthenticatedTest(TestCase):
+    '''New test for the authenticated class'''
+    def setUp(self):
+        '''setup for the tests'''
+        self.client = Client()
+        self.factory = APIRequestFactory()
+        self.user = User.objects.create_user(username='testuser', password='testpass')
 
-#     @patch('accounts.views.post')
-#     @patch('accounts.views.load_dotenv')
-#     @patch('accounts.views.os.getenv')
-#     def test_spotify_callback_error(self, mock_getenv, mock_load_dotenv, mock_post):
-#         """
-#         Test that spotify_callback handles errors from Spotify.
-#         """
-#         # Mock environment variables
-#         groq = os.getenv("GROQ_API_KEY")
-#         client_id = os.getenv('CLIENT_ID')
-#         client_secret = os.getenv('CLIENT_SECRET')
-#         redirect_uri = os.getenv('REDIRECT_URI')
-#         mock_getenv.side_effect = lambda key: {'REDIRECT_URI': redirect_uri,
-#                                                'CLIENT_ID': client_id,
-#                                                'CLIENT_SECRET': client_secret,
-#                                                'GROQ_API_KEY': groq}.get(key)
+    @patch('accounts.views.is_spotify_authenticated')
+    def test_is_authenticated_true(self, mock_is_authenticated):
+        '''tests to see if authentication works'''
+        mock_is_authenticated.return_value = True
 
-#         mock_load_dotenv.return_value = None
+        view = IsAuthenticated.as_view()
+        request = self.factory.get('/is-authenticated/')
+        force_authenticate(request, user=self.user)
 
-#         # Mock POST response from Spotify with an error
-#         error_message = 'Invalid authorization code'
-#         mock_post.return_value.json.return_value = {'error': error_message}
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['status'], True)
 
-#         # Create a request with 'code' parameter
-#         request = self.factory.get('/spotify/redirect', {'code': 'invalid_code'})
-#         request.session = self.session
+    @patch('accounts.views.is_spotify_authenticated')
+    def test_is_authenticated_false(self, mock_is_authenticated):
+        '''testing if authentication works'''
+        mock_is_authenticated.return_value = False
 
-#         response = spotify_callback(request)
+        view = IsAuthenticated.as_view()
+        request = self.factory.get('/is-authenticated/')
+        force_authenticate(request, user=self.user)
 
-#         self.assertIsInstance(response, HttpResponse)
-#         self.assertEqual(response.content.decode(), f"Authentication Failed: {error_message}")
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['status'], False)
 
-#     @patch('accounts.views.load_dotenv')
-#     @patch('accounts.views.os.getenv')
-#     def test_spotify_callback_missing_code(self, mock_getenv, mock_load_dotenv):
-#         """
-#         Test that spotify_callback handles missing 'code' parameter.
-#         """
-#         # Mock environment variables
-#         groq = os.getenv("GROQ_API_KEY")
-#         client_id = os.getenv('CLIENT_ID')
-#         client_secret = os.getenv('CLIENT_SECRET')
-#         redirect_uri = os.getenv('REDIRECT_URI')
-#         mock_getenv.side_effect = lambda key: {'REDIRECT_URI': redirect_uri,
-#                                                'CLIENT_ID': client_id,
-#                                                'CLIENT_SECRET': client_secret,
-#                                                 'GROQ_API_KEY': groq}.get(key)
-#         mock_load_dotenv.return_value = None
+class GetCSRFTokenTest(TestCase):
+    '''testing the csrf token mehtod'''
+    def setUp(self):
+        '''setup'''
+        self.client = Client()
 
+    def test_get_csrf_token(self):
+        '''simple test'''
+        response = self.client.get(reverse('get_csrf_token'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'detail': 'CSRF cookie set'})
 
-#         # Create a request without 'code' parameter
-#         request = self.factory.get('/spotify/redirect')
-#         request.session = self.session
+class SignInTest(TestCase):
+    '''signin testing'''
+    def setUp(self):
+        '''setup'''
+        self.client = Client()
+        self.user_password = 'testpass'
+        self.user = User.objects.create_user(username='testuser', password=self.user_password)
 
-#         response = spotify_callback(request)
+    def test_sign_in_success(self):
+        '''testing if signin works'''
+        response = self.client.post(reverse('login'), {
+            'username': 'testuser',
+            'password': self.user_password
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'message': 'Login successful'})
 
-#         # Since 'code' is missing, response should handle it gracefully
-#         self.assertIsInstance(response, HttpResponse)
-#         self.assertEqual(response.content.decode(), "Authentication Failed: Missing code parameter")
+    def test_sign_in_invalid_credentials(self):
+        '''testing if signin fails when invalid credentials'''
+        response = self.client.post(reverse('login'), {
+            'username': 'testuser',
+            'password': 'wrongpassword'
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'errors': {'login': 'Invalid username or password'}})
 
-# class IsAuthenticatedTestCase(TestCase):
-#     """Test cases for the IsAuthenticated view."""
+    def test_sign_in_invalid_method(self):
+        '''testing when given completely wrong stuff'''
+        response = self.client.get(reverse('login'))
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json(), {'error': 'Invalid request'})
 
-#     @patch('accounts.views.is_spotify_authenticated')
-#     def test_is_authenticated_true(self, mock_is_authenticated):
-#         """
-#         Test that IsAuthenticated returns True when user is authenticated.
-#         """
-#         mock_is_authenticated.return_value = True
-#         client = APIClient()
-#         response = client.get(reverse('is-authenticated'))
+class SignOutTest(TestCase):
+    '''testing signout view'''
+    def setUp(self):
+        '''setting up the signout'''
+        self.client = Client()
+        self.user_password = 'testpass'
+        self.user = User.objects.create_user(username='testuser', password=self.user_password)
+        self.client.login(username='testuser', password=self.user_password)
 
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data, {'status': True})
+    def test_sign_out(self):
+        '''testing signout'''
+        response = self.client.get(reverse('logout'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'message': 'Logged Out'})
 
-#     @patch('accounts.views.is_spotify_authenticated')
-#     def test_is_authenticated_false(self, mock_is_authenticated):
-#         """
-#         Test that IsAuthenticated returns False when user is not authenticated.
-#         """
-#         mock_is_authenticated.return_value = False
-#         client = APIClient()
-#         response = client.get(reverse('is-authenticated'))
+class SignUpTest(TestCase):
+    '''testing for the signup function'''
+    def setUp(self):
+        '''setup'''
+        self.client = Client()
 
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data, {'status': False})
+    def test_sign_up_success(self):
+        '''testing if it works'''
+        response = self.client.post(reverse('register'), {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password1': 'newuserpassword',
+            'password2': 'newuserpassword'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'message': 'sign-up sucessful'})
+        self.assertTrue(User.objects.filter(username='newuser').exists())
 
-#     @patch('accounts.views.is_spotify_authenticated')
-#     def test_is_authenticated_no_session(self, mock_is_authenticated):
-#         """
-#         Test that IsAuthenticated handles missing session key.
-#         """
-#         mock_is_authenticated.return_value = False
-#         client = APIClient()
-#         client.cookies.clear()  # Remove session cookies
+    def test_sign_up_password_mismatch(self):
+        '''testing if it fails'''
+        response = self.client.post(reverse('register'), {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password1': 'password1',
+            'password2': 'password2'
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('password2', response.json()['errors'])
 
-#         response = client.get(reverse('is-authenticated'))
+    # def test_sign_up_short_username(self):
+    #     response = self.client.post(reverse('register'), {
+    #         'username': 'usr',
+    #         'email': 'user@example.com',
+    #         'password1': 'password123',
+    #         'password2': 'password123'
+    #     })
+    #     self.assertEqual(response.status_code, 400)
+    #     self.assertIn('username', response.json()['errors'])
 
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data, {'status': False})
+    def test_sign_up_short_password(self):
+        '''failing if short password'''
+        response = self.client.post(reverse('register'), {
+            'username': 'validusername',
+            'email': 'user@example.com',
+            'password1': '123',
+            'password2': '123'
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('password2', response.json()['errors'])
 
-#     @patch('accounts.views.is_spotify_authenticated')
-#     def test_is_authenticated_exception(self, mock_is_authenticated):
-#         """
-#         Test that IsAuthenticated handles exceptions gracefully.
-#         """
-#         mock_is_authenticated.side_effect = Exception("Unexpected error")
-#         client = APIClient()
-
-#         response = client.get(reverse('is-authenticated'))
-
-#         # Even if an exception occurs, we should handle it gracefully
-#         self.assertEqual(response.status_code, status.HTTP_200_OK)
-#         self.assertEqual(response.data, {'status': False})
-
-# if __name__ == '__main__':
-#     unittest.main()
+    # def test_sign_up_invalid_method(self):
+    #     response = self.client.get(reverse('register'))
+    #     self.assertEqual(response.status_code, 405)
+    #     self.assertEqual(response.json(), {'error': 'Invalid request'})
