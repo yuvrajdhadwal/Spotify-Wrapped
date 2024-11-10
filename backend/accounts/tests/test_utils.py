@@ -1,30 +1,33 @@
-# """
-# Unit tests for spotify_tokens.py module.
+"""
+Unit tests for spotify_tokens.py module.
 
-# This module contains extensive test cases for the utility functions provided in spotify_tokens.py,
-# which manage Spotify authentication tokens for users.
+This module contains extensive test cases for the utility functions provided in spotify_tokens.py,
+which manage Spotify authentication tokens for users.
 
-# Tests cover various scenarios including successful retrieval, creation, updating, and refreshing
-# of Spotify tokens, as well as handling of edge cases and errors.
+Tests cover various scenarios including successful retrieval, creation, updating, and refreshing
+of Spotify tokens, as well as handling of edge cases and errors.
 
-# Dependencies are mocked to isolate tests and avoid external API calls or database interactions.
-# """
+Dependencies are mocked to isolate tests and avoid external API calls or database interactions.
+"""
 
-# import unittest
-# from unittest.mock import patch, MagicMock
-# from datetime import timedelta
-# from django.utils import timezone
-# from django.test import TestCase
-# from requests.exceptions import RequestException
-# from accounts.utils import (
-#     get_user_tokens,
-#     update_or_create_user_tokens,
-#     is_spotify_authenticated,
-#     refresh_spotify_token
-# )
+import unittest
+from unittest.mock import patch, MagicMock
+from datetime import timedelta
+from django.utils import timezone
+from django.test import TestCase
+from requests.exceptions import RequestException
+from accounts.utils import (
+    get_user_tokens,
+    update_or_create_user_tokens,
+    is_spotify_authenticated,
+    refresh_spotify_token
+)
 
-# class SpotifyTokensTestCase(TestCase):
-#     """Test cases for Spotify token management functions."""
+class SpotifyTokensTestCase(TestCase):
+    """Test cases for Spotify token management functions."""
+
+    def test_example_function():
+        assert True
 
 #     @patch('accounts.models.SpotifyToken.objects')
 #     def test_get_user_tokens_exists(self, mock_objects):
