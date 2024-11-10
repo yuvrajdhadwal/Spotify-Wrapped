@@ -9,7 +9,13 @@ from rest_framework import serializers
 from .models import Song, SpotifyUser
 
 class SongSerializer(serializers.ModelSerializer):
-    class Meta:
+    """
+    Serializer for Song model.
+    """
+    class Meta: # pylint: disable=too-few-public-methods
+        """
+        meta class
+        """
         model = Song
         fields = '__all__'
 
@@ -17,7 +23,10 @@ class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for the Django User model.
     """
-    class Meta:
+    class Meta: # pylint: disable=too-few-public-methods
+        """
+        meta class
+        """
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
@@ -26,8 +35,8 @@ class ImageSerializer(serializers.Serializer):
     Serializer for image data in artist profiles.
     """
     url = serializers.URLField()
-    height = serializers.IntegerField(required=False, allow_null=True)
-    width = serializers.IntegerField(required=False, allow_null=True)
+    height = serializers.IntegerField(required=False, allow_null=True, default=None)
+    width = serializers.IntegerField(required=False, allow_null=True, default=None)
 
 class ArtistSerializer(serializers.Serializer):
     """
@@ -78,6 +87,9 @@ class SpotifyUserSerializer(serializers.ModelSerializer):
     quirkiest_artists_medium = ArtistSerializer(many=True)
     quirkiest_artists_long = ArtistSerializer(many=True)
 
-    class Meta:
+    class Meta: # pylint: disable=too-few-public-methods
+        """
+        meta class
+        """
         model = SpotifyUser
         fields = '__all__'

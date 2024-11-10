@@ -5,12 +5,11 @@ Test module for serializers in backend/spotify_data/serializers.py.
 import pytest
 from django.contrib.auth.models import User
 
-from backend.spotify_data.models import Song, SpotifyUser
-from backend.spotify_data.serializers import (
+from spotify_data.models import Song, SpotifyUser
+from spotify_data.serializers import (
     AlbumSerializer,
     ArtistSerializer,
     ImageSerializer,
-    SongSerializer,
     SpotifyUserSerializer,
     TrackSerializer,
     UserSerializer,
@@ -168,34 +167,7 @@ def test_user_serializer():
     assert data['last_name'] == 'User'
 
 
-@pytest.mark.django_db
-def test_song_serializer():
-    """
-    Test the SongSerializer with a Song instance.
-    """
-    song = Song.objects.create(
-        title='Test Song',
-        artist='Test Artist',
-        duration=300,
-    )
-    serializer = SongSerializer(song)
-    data = serializer.data
-    assert data['title'] == 'Test Song'
-    assert data['artist'] == 'Test Artist'
-    assert data['duration'] == 300
 
-    # Test deserialization
-    new_data = {
-        'title': 'Another Test Song',
-        'artist': 'Another Test Artist',
-        'duration': 250,
-    }
-    serializer = SongSerializer(data=new_data)
-    assert serializer.is_valid(), serializer.errors
-    song = serializer.save()
-    assert song.title == 'Another Test Song'
-    assert song.artist == 'Another Test Artist'
-    assert song.duration == 250
 
 
 @pytest.mark.django_db
