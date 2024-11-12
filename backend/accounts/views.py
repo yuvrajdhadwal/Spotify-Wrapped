@@ -259,7 +259,6 @@ def sign_up(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
-            password = form.cleaned_data.get('password1')
             user.save()
             login(request, user)
             return JsonResponse({'message': 'sign-up sucessful'}, status=200)
