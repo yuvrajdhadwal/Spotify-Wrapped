@@ -1,5 +1,8 @@
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { logError } from '../utils/logger';
+import { logInfo } from '../utils/logger';
+import login from '../login/page';
 
 interface FormData {
     username: string
@@ -34,7 +37,7 @@ const SignupForm: React.FC = () => {
             }
         })
         .catch((error) => {
-            console.error('Error fetching CSRF token:', error);
+            logError('Error fetching CSRF token::', error);
         });
     }, []);
 
@@ -65,15 +68,20 @@ const SignupForm: React.FC = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('Sign-Up Successful:', data);
+                logInfo('Sign-Up Successful:', data);
                 setErrorMessage(null);
                 router.push('dashboard/');
             } else if (response.status === 400) {
                 const errorData = await response.json();
-                console.error('Unexpected 400 Error:', errorData);
+                logError('Unexpected 400 Error:', errorData);
 
                 if (errorData.errors) {
-                    const errorMessages = Object.values(errorData.errors).flat().join(' ');
+                    const errorMessages = typeof errorData.errors === 'string'
+                        ? errorData.errors
+                        : Object.values(errorData.errors)
+                            .flat() 
+                            .join(' ');
+            
                     setErrorMessage(errorMessages);
                 } else {
                     setErrorMessage('Unexpected Error. Try Again');
@@ -83,7 +91,7 @@ const SignupForm: React.FC = () => {
                 setErrorMessage(errorData.error || 'An error occured. Please try again.');
             }
         } catch (error) {
-            console.error('Unexpected Error:', error);
+            logError('Unexpected Error:', error);
             setErrorMessage('An Unexpected Error Occured. Please try again.')
         }
     };

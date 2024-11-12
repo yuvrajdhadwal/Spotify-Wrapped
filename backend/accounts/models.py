@@ -36,7 +36,7 @@ class SpotifyToken(models.Model):
         expires_in (DateTimeField): The timestamp when the access token expires.
         token_type (CharField): The type of token provided by Spotify (e.g., Bearer).
     """
-    user = models.CharField(max_length=50, unique=True)
+    user = models.CharField(max_length=150, unique=True)
     username = models.CharField(max_length=150, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     refresh_token = models.CharField(max_length=150)

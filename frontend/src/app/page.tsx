@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logError } from './utils/logger';
 
 export default function Home() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function Home() {
         setIsAuthenticated(false);
       }
     } catch (error) {
-      console.error('Error:', error);
+        logError('Error:', error);
     }
   };
 

@@ -106,6 +106,7 @@ class SpotifyTokensTestCase(TestCase):
         assert actual_expires_in == expected_expires_in
 
         mock_spotifytoken.assert_called_once_with(
+            user=username,
             username=username,
             access_token=access_token,
             token_type=token_type,
