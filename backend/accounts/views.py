@@ -133,6 +133,8 @@ def spotify_callback(request, format=None):
     expires_in = response.get('expires_in')
     username = request.user.username
 
+    print('username', username, 'access token', access_token)
+
     # Add the user to database, or update user info
     # update_or_add_spotify_user(request, session_id)
     update_or_create_user_tokens(access_token=access_token,
