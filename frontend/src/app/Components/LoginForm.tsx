@@ -1,5 +1,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { logError } from '../utils/logger';
+import { logInfo } from '../utils/logger';
 
 interface FormData {
   username: string;
@@ -30,7 +32,7 @@ const LoginForm: React.FC = () => {
         }
       })
       .catch((error) => {
-        console.error('Error fetching CSRF token:', error);
+        logError('Error fetching CSRF token:', error);
       });
   }, []);
 
@@ -63,7 +65,7 @@ const LoginForm: React.FC = () => {
   
       if (response.ok) {
         const data = await response.json();
-        console.log('Login successful:', data);
+        logInfo('Login sucessful:', data);
         setErrorMessage(null);
         router.push('dashboard/');
       } else if (response.status === 400) {
@@ -73,7 +75,7 @@ const LoginForm: React.FC = () => {
         setErrorMessage(errorData.error || 'An error occurred. Please try again.');
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
+      logError('Unexpected Error:', error);
       setErrorMessage('An unexpected error occurred. Please try again.');
     }
   };
@@ -93,7 +95,7 @@ const LoginForm: React.FC = () => {
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
     <div>
     <button type="button" onClick={handleSignupRedirect} style={{marginTop: '10px'}}>
-        Sign Up!
+        Don't Have An Account? Sign Up!
       </button>
     </div>
       
