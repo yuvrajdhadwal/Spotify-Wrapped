@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { logError } from '../utils/logger';
 import { logInfo } from '../utils/logger';
+import login from '../login/page';
 
 interface FormData {
     username: string
@@ -75,7 +76,12 @@ const SignupForm: React.FC = () => {
                 logError('Unexpected 400 Error:', errorData);
 
                 if (errorData.errors) {
-                    const errorMessages = Object.values(errorData.errors).flat().join(' ');
+                    const errorMessages = typeof errorData.errors === 'string'
+                        ? errorData.errors
+                        : Object.values(errorData.errors)
+                            .flat() 
+                            .join(' ');
+            
                     setErrorMessage(errorMessages);
                 } else {
                     setErrorMessage('Unexpected Error. Try Again');

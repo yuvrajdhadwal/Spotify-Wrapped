@@ -95,7 +95,7 @@ const LoginForm: React.FC = () => {
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
     <div>
     <button type="button" onClick={handleSignupRedirect} style={{marginTop: '10px'}}>
-        Sign Up!
+        Don't Have An Account? Sign Up!
       </button>
     </div>
       

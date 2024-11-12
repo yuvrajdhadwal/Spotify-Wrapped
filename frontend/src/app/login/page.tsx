@@ -5,7 +5,7 @@ import LoginForm from '../Components/LoginForm';
 const login = () => {
   return (
     <div>
-      <h1>Log In</h1>
+      <h1>Log Into Spotify Roaster!</h1>
       <LoginForm />
     </div>
   );

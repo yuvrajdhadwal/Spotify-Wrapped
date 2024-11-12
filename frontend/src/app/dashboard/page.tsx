@@ -8,6 +8,7 @@ import BodyText from "@/app/Components/BodyText";
 import { getCookie } from "@/utils";
 import { logError } from '../utils/logger';
 import { logInfo } from '../utils/logger';
+import login from '../login/page';
 
 
 /*type DashProps = {
@@ -26,8 +27,9 @@ export default function Dashboard() {
         .then(response => response.json())
       .then(data => {
         if (!data.status) {
-            setIsAuthenticated(false);
-          router.push('/');
+            logInfo('hold on a second', data)
+            window.location.href = 'http://localhost:8000/spotify/get-auth-url/';
+            setIsAuthenticated(true);
         } else {
             setIsAuthenticated(true);
         }
