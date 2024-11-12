@@ -2,7 +2,7 @@
 This module defines the model for storing Spotify tokens in the database.
 
 The `SpotifyToken` model is used to store access tokens for Spotify users, 
-including the necessary information to refresh tokens when they expire.
+including necessary information to refresh tokens when they expire.
 
 Classes:
     - SpotifyToken: A Django model that stores information about a user's 
@@ -10,6 +10,7 @@ Classes:
 
 Attributes:
     - user (CharField): A unique identifier for the user associated with the token.
+    - username (CharField): The username associated with the Spotify account.
     - created_at (DateTimeField): The timestamp when the token was created.
     - refresh_token (CharField): The token used to refresh the user's access when it expires.
     - access_token (CharField): The current access token for the user.
@@ -27,7 +28,8 @@ class SpotifyToken(models.Model):
     such as the access token, refresh token, expiration time, and token type.
     
     Attributes:
-        user (CharField): The unique identifier for the user (user ID).
+        user (CharField): The unique identifier for the user.
+        username (CharField): The Spotify account's username, uniquely associated with each user.
         created_at (DateTimeField): The time when the token entry was created in the database.
         refresh_token (CharField): The refresh token that allows generating new access tokens.
         access_token (CharField): The current access token for interacting with Spotify's API.
@@ -35,6 +37,7 @@ class SpotifyToken(models.Model):
         token_type (CharField): The type of token provided by Spotify (e.g., Bearer).
     """
     user = models.CharField(max_length=50, unique=True)
+    username = models.CharField(max_length=150, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     refresh_token = models.CharField(max_length=150)
     access_token = models.CharField(max_length=150)

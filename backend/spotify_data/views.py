@@ -10,14 +10,13 @@ from rest_framework import viewsets
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse
-from groq import Groq,  GroqError
-
 from accounts.models import SpotifyToken  # Local imports
 from accounts.utils import is_spotify_authenticated
-from .utils import (get_spotify_user_data, get_user_favorite_artists, get_user_favorite_tracks,
+from .utils import (get_spotify_user_data, get_user_favorite_artists,
+                    get_user_favorite_tracks,
                     get_top_genres, get_quirkiest_artists)
 from .models import Song, SpotifyUser
-from .serializers import SongSerializer
+from .serializers import SongSerializer, SpotifyUserSerializer
 
 
 
@@ -30,6 +29,16 @@ class SongViewSet(viewsets.ModelViewSet):
     """
     queryset = Song.objects.all()  # pylint: disable=no-member
     serializer_class = SongSerializer
+
+# Added the SpotifyUserViewSet class
+class SpotifyUserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows Spotify users to be viewed or edited.
+    """
+    queryset = SpotifyUser.objects.all()  # pylint: disable=no-member
+    serializer_class = SpotifyUserSerializer
+
+
 
 def update_or_add_spotify_user(request):
     """
