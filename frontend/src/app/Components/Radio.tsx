@@ -1,4 +1,5 @@
 import React from "react";
+import BodyText from "@/app/Components/BodyText";
 
 type RadioProps = {
     name: string;
@@ -15,8 +16,9 @@ type RadioProps = {
  */
 function Radio(props: RadioProps) {
     return (
-        <label className="pl-6">
-            <input type="radio" name={props.name} value={props.value}></input>{props.text}
+        <label className="flex items-center pl-6">
+            <input type="radio" name={props.name} value={props.value}></input>
+            <BodyText text={props.text}/>
         </label>
     );
 }

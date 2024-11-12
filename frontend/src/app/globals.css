@@ -7,18 +7,21 @@
   --foreground: #171717;
 }
 
-/* dark mode config
+/* dark mode config */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 }
- */
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
   font-family: "Comic Sans MS", "Comic Neue", sans-serif;
-  @apply flex flex-col items-center justify-center min-h-screen bg-gray-100 lowercase text-3xl;
+}
+
+/* Custom utility class for body styling */
+.body-style {
+  @apply flex flex-col items-center justify-center min-h-screen lowercase text-3xl;
 }
