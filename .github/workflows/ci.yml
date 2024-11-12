@@ -26,17 +26,47 @@ jobs:
       run: |
         conda env create -f environment.yml
 
-    # Step 4: Lint the code (PEP 8 style checks)
-    - name: Lint code with pylint
+    # Step 4: Lint Python code (PEP 8 style checks)
+    - name: Lint Python code with pylint
       run: |
         conda run -n django pylint $(git ls-files '*.py') --fail-under=8
 
-    # Step 5: Run tests
-    - name: Run tests with coverage
+    # Step 5: Run tests with coverage for Python
+    - name: Run Python tests with coverage
       run: |
         conda run -n django coverage run -m pytest
 
-    # Step 6: Check code coverage
-    - name: Ensure at least 80% code coverage
+    # Step 6: Ensure at least 80% code coverage for Python
+    - name: Ensure Python code coverage threshold
       run: |
         conda run -n django coverage report --fail-under=80
+
+    # Step 7: Set up Node.js for JavaScript/TypeScript checks
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    # Step 8: Install JavaScript/TypeScript dependencies
+    - name: Install JavaScript/TypeScript dependencies
+      run: npm ci
+
+    # Step 9: Lint JavaScript/TypeScript code with ESLint
+      # Ensure ESLint configuration file is present in the repository
+    - name: Lint JS/TS code with ESLint
+      run: npx eslint 'frontend/src/**/*.{js,ts,tsx}'
+
+    # Step 10: Run tests with coverage for JavaScript/TypeScript (using Jest)
+    - name: Run JS/TS tests with coverage
+      run: npx jest --coverage
+
+    # Step 11: Ensure at least 80% code coverage for JS/TS
+    - name: Ensure JS/TS code coverage threshold
+      run: |
+        npx jest --coverage
+        COVERAGE=$(npx coverage-percentage ./coverage/lcov.info --lcov --branches)
+        echo "Total Branches Coverage: $COVERAGE%"
+        if (( $(echo "$COVERAGE < 80.0" | bc -l) )); then
+          echo "JS/TS Coverage below threshold: $COVERAGE%"
+          exit 1
+        fi

@@ -6,6 +6,9 @@ import Heading1 from '../Components/Heading1'
 import Radio from "../Components/Radio";
 import BodyText from "@/app/Components/BodyText";
 import { getCookie } from "@/utils";
+import { logError } from '../utils/logger';
+import { logInfo } from '../utils/logger';
+
 
 /*type DashProps = {
     username: string;
@@ -30,7 +33,7 @@ export default function Dashboard() {
         }
       })
       .catch(error => {
-        console.error('Error:', error);
+        logError('Error:', error);
         router.push('/');
       });
   }, [router]);
@@ -55,14 +58,14 @@ export default function Dashboard() {
       if (response.ok) {
         router.push('/');
         const data = await response.json();
-        console.log('Login successful:', data);
+        logInfo('Login Successful:', data);
       } else if (response.status === 400) {
-        console.log(response);
+        logInfo('Response:', response);
       } else {
-        console.log(response);
+        logInfo('Response:', response);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
+        logError('Error:', error);
     }
   };
 
