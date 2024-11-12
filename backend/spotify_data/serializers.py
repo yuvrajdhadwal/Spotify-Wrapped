@@ -1,5 +1,3 @@
-# backend/spotify_data/serializers.py
-
 """
 Serializers for Spotify Roasted models.
 """

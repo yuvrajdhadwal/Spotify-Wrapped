@@ -28,7 +28,7 @@ export default function Home() {
   }, [router]);
 
   const handleLoginClick = () => {
-    window.location.href = 'http://localhost:8000/spotify/get-auth-url/';
+    router.push('/login');
   };
 
   if (isAuthenticated) {
@@ -43,7 +43,7 @@ export default function Home() {
         className="bg-spUIGreen text-white px-6 py-3 rounded-full hover:bg-spGreen"
         onClick={handleLoginClick}
       >
-        Login with Spotify
+        Login with Spotify Roaster
       </button>
     </div>
   );

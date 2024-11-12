@@ -31,7 +31,7 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that get_user_tokens returns the token when it exists in the database.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         token = MagicMock()
 
         # Create a mock queryset
@@ -42,9 +42,9 @@ class SpotifyTokensTestCase(TestCase):
         # Set the return value of filter to be the mock queryset
         mock_objects.filter.return_value = mock_queryset
 
-        result = get_user_tokens(session_id)
+        result = get_user_tokens(username)
 
-        mock_objects.filter.assert_called_with(user=session_id)
+        mock_objects.filter.assert_called_with(username=username)
         self.assertEqual(result, token)
 
     @patch('accounts.models.SpotifyToken.objects')
@@ -52,12 +52,12 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that get_user_tokens returns None when the token does not exist.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         mock_objects.filter.return_value.exists.return_value = False
 
-        result = get_user_tokens(session_id)
+        result = get_user_tokens(username=username)
 
-        mock_objects.filter.assert_called_with(user=session_id)
+        mock_objects.filter.assert_called_with(username=username)
         self.assertIsNone(result)
 
     @patch('accounts.utils.get_user_tokens')
@@ -65,7 +65,7 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that update_or_create_user_tokens updates existing tokens.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         access_token = 'new_access_token'
         token_type = 'Bearer'
         expires_in = 3600
@@ -74,8 +74,8 @@ class SpotifyTokensTestCase(TestCase):
         existing_token = MagicMock()
         mock_get_user_tokens.return_value = existing_token
 
-        update_or_create_user_tokens(session_id, access_token, token_type, expires_in,
-                                     refresh_token)
+        update_or_create_user_tokens(access_token, token_type, expires_in,
+                                     refresh_token, username)
 
         self.assertEqual(existing_token.access_token, access_token)
         self.assertEqual(existing_token.token_type, token_type)
@@ -89,7 +89,7 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that update_or_create_user_tokens creates new tokens when none exist.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         access_token = 'new_access_token'
         token_type = 'Bearer'
         expires_in = 3600
@@ -97,15 +97,16 @@ class SpotifyTokensTestCase(TestCase):
 
         mock_get_user_tokens.return_value = None
 
-        update_or_create_user_tokens(session_id, access_token, token_type, expires_in,
-                                     refresh_token)
+        update_or_create_user_tokens(username=username, access_token=access_token,
+                                     token_type=token_type, expires_in=expires_in,
+                                     refresh_token=refresh_token)
         expected_expires_in =(timezone.now()
                               + timedelta(seconds=expires_in)).replace(microsecond=0)
         actual_expires_in = mock_spotifytoken.call_args[1]['expires_in'].replace(microsecond=0)
         assert actual_expires_in == expected_expires_in
 
         mock_spotifytoken.assert_called_once_with(
-            user=session_id,
+            username=username,
             access_token=access_token,
             token_type=token_type,
             expires_in=mock_spotifytoken.call_args[1]['expires_in'],
@@ -135,15 +136,15 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that is_spotify_authenticated refreshes token when expired.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         token = MagicMock()
         token.expires_in = timezone.now() - timedelta(seconds=3600)
         mock_get_user_tokens.return_value = token
 
-        result = is_spotify_authenticated(session_id)
+        result = is_spotify_authenticated(username=username)
 
         self.assertTrue(result)
-        mock_refresh_token.assert_called_once_with(session_id=session_id)
+        mock_refresh_token.assert_called_once_with(username=username)
 
     @patch('accounts.utils.get_user_tokens')
     def test_is_spotify_authenticated_no_token(self, mock_get_user_tokens):
@@ -167,7 +168,7 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that refresh_spotify_token successfully refreshes the token.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         refresh_token = 'refresh_token'
         access_token = 'new_access_token'
         token_type = 'Bearer'
@@ -183,7 +184,7 @@ class SpotifyTokensTestCase(TestCase):
             'refresh_token': refresh_token
         }
 
-        refresh_spotify_token(session_id)
+        refresh_spotify_token(username)
 
         mock_load_dotenv.assert_called_once()
         mock_post.assert_called_once_with(
@@ -197,7 +198,7 @@ class SpotifyTokensTestCase(TestCase):
             timeout=10
         )
         mock_update_tokens.assert_called_once_with(
-            session_id=session_id,
+            username=username,
             access_token=access_token,
             token_type=token_type,
             expires_in=expires_in,
@@ -214,7 +215,7 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that refresh_spotify_token handles failure to refresh token.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         refresh_token = 'invalid_refresh_token'
 
         mock_get_user_tokens.return_value = MagicMock(refresh_token=refresh_token)
@@ -222,16 +223,16 @@ class SpotifyTokensTestCase(TestCase):
                                                'CLIENT_SECRET': 'client_secret'}.get(key)
         mock_post.return_value.json.return_value = {}  # Simulate failure
 
-        refresh_spotify_token(session_id)
+        refresh_spotify_token(username)
 
         mock_load_dotenv.assert_called_once()
         mock_post.assert_called_once()
         mock_update_tokens.assert_called_once_with(
-            session_id=session_id,
+            username=username,
             access_token=None,
             token_type=None,
             expires_in=None,
-            refresh_token=None
+            refresh_token=refresh_token
         )
 
     @patch('accounts.utils.post')
@@ -243,7 +244,7 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that refresh_spotify_token handles network errors gracefully.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         refresh_token = 'refresh_token'
 
         mock_get_user_tokens.return_value = MagicMock(refresh_token=refresh_token)
@@ -252,7 +253,7 @@ class SpotifyTokensTestCase(TestCase):
         mock_post.side_effect = RequestException("Network error")
 
         with self.assertRaises(RequestException):
-            refresh_spotify_token(session_id)
+            refresh_spotify_token(username)
 
         mock_load_dotenv.assert_called_once()
         mock_post.assert_called_once()
@@ -262,12 +263,12 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test get_user_tokens with an invalid session_id.
         """
-        session_id = None
+        username = None
         mock_objects.filter.return_value.exists.return_value = False
 
-        result = get_user_tokens(session_id)
+        result = get_user_tokens(username)
 
-        mock_objects.filter.assert_called_with(user=session_id)
+        mock_objects.filter.assert_called_with(username=username)
         self.assertIsNone(result)
 
     @patch('accounts.utils.get_user_tokens')
@@ -277,7 +278,7 @@ class SpotifyTokensTestCase(TestCase):
         """
         Test that refresh_spotify_token handles missing environment variables.
         """
-        session_id = 'test_session'
+        username = 'test_session'
         refresh_token = 'refresh_token'
 
         # Mock the return value of get_user_tokens
@@ -288,7 +289,7 @@ class SpotifyTokensTestCase(TestCase):
         # Clear environment variables
         with patch.dict('os.environ', {}, clear=True):
             with self.assertRaises(TypeError):
-                refresh_spotify_token(session_id)
+                refresh_spotify_token(username)
 
     # Add more test cases here when frontend is made
 

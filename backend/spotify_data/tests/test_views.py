@@ -107,7 +107,7 @@ def test_successful_user_update(mock_os, mock_load_env, session_id,
 
     # Create the token with a valid datetime for expires_in
     token_entry = SpotifyToken.objects.create(
-        user=session_id,
+        username=session_id,
         access_token=mock_token['access_token'],
         expires_in=timezone.now() + timezone.timedelta(seconds=3600)  # 1 hour from now
     )
@@ -152,9 +152,9 @@ def test_failed_user_data_fetch(request, session_id, mock_token, user):
     request.session.session_key = session_id
     request.user = user
 
-    token_entry = SpotifyToken(user=session_id, access_token=mock_token['access_token'],
+    token_entry = SpotifyToken(username=session_id, access_token=mock_token['access_token'],
                                expires_in=timezone.now() + timezone.timedelta(seconds=3600))
-    SpotifyToken.objects.create(user=session_id, **mock_token)
+    SpotifyToken.objects.create(username=session_id, **mock_token)
 
     with patch('accounts.views.is_spotify_authenticated', return_value=True), \
             patch('accounts.models.SpotifyToken.objects.get', return_value=token_entry), \
