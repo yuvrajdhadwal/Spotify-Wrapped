@@ -11,7 +11,6 @@ from ..utils import (get_spotify_user_data, get_user_favorite_artists, get_user_
 
 
 
-
 @pytest.mark.parametrize("status_code, expected_result", [
     (200, {'id': '123', 'display_name': 'Test User', 'email': 'test@example.com'}),
     (404, None),
