@@ -1,10 +1,9 @@
 """Tests methods from spotify_data/utils."""
 
-from unittest.mock import patch
 import unittest
+from unittest.mock import patch, Mock, MagicMock
 import pytest
 from groq import GroqError
-from unittest.mock import patch, Mock, MagicMock
 from ..utils import (get_spotify_user_data, get_user_favorite_artists, get_user_favorite_tracks,
                      get_top_genres, get_quirkiest_artists,
                      get_spotify_recommendations, create_groq_description)
@@ -32,7 +31,7 @@ def test_get_spotify_user_data(status_code, expected_result):
 
 
 @pytest.mark.parametrize("status_code, expected_result", [
-    (200, {'items': [{'name': 'Artist 1'}, {'name': 'Artist 2'}]}),
+    (200, [{'name': 'Artist 1'}, {'name': 'Artist 2'}]),
     (404, None),
 ])
 def test_get_user_favorite_artists(status_code, expected_result):
@@ -42,14 +41,14 @@ def test_get_user_favorite_artists(status_code, expected_result):
     with patch('requests.get') as mock_get:
         mock_response = mock_get.return_value
         mock_response.status_code = status_code
-        mock_response.json.return_value = {
-            'items': [{'name': 'Artist 1'}, {'name': 'Artist 2'}]} if status_code == 200 else {}
+        mock_response.json.return_value ={'items':
+            [{'name': 'Artist 1'}, {'name': 'Artist 2'}]} if status_code == 200 else {}
 
         result = get_user_favorite_artists(access_token, timelimit)
         assert result == expected_result
 
 @pytest.mark.parametrize("status_code, expected_result", [
-    (200, {'items': [{'name': 'Track 1'}, {'name': 'Track 2'}]}),
+    (200, [{'name': 'Track 1'}, {'name': 'Track 2'}]),
     (404, None),
 ])
 def test_get_user_favorite_tracks(status_code, expected_result):
@@ -74,15 +73,13 @@ class NonAPIFunctions(unittest.TestCase):
         Tests that artists are properly filtered by top genre
         """
         # Mock data for favorite artists
-        favorite_artists = {
-            'items': [
-                {'name': 'Artist A', 'genres': ['rock', 'pop']},
-                {'name': 'Artist B', 'genres': ['pop', 'dance']},
-                {'name': 'Artist C', 'genres': ['rock', 'indie']},
-                {'name': 'Artist D', 'genres': ['jazz']},
-                {'name': 'Artist E', 'genres': ['pop', 'jazz']},
-            ]
-        }
+        favorite_artists = [
+            {'name': 'Artist A', 'genres': ['rock', 'pop']},
+            {'name': 'Artist B', 'genres': ['pop', 'dance']},
+            {'name': 'Artist C', 'genres': ['rock', 'indie']},
+            {'name': 'Artist D', 'genres': ['jazz']},
+            {'name': 'Artist E', 'genres': ['pop', 'jazz']},
+        ]
 
         # Expected output: top 3 genres
         expected_output = ['pop', 'rock', 'jazz']
@@ -98,16 +95,14 @@ class NonAPIFunctions(unittest.TestCase):
         Tests that artists are properly filtered by lowest popularity
         """
         # Mock data for favorite artists with popularity scores
-        favorite_artists = {
-            'items': [
-                {'id': '1', 'name': 'Artist A', 'popularity': 50},
-                {'id': '2', 'name': 'Artist B', 'popularity': 20},
-                {'id': '3', 'name': 'Artist C', 'popularity': 30},
-                {'id': '4', 'name': 'Artist D', 'popularity': 10},
-                {'id': '5', 'name': 'Artist E', 'popularity': 60},
-                {'id': '6', 'name': 'Artist F', 'popularity': 5},
-            ]
-        }
+        favorite_artists = [
+            {'id': '1', 'name': 'Artist A', 'popularity': 50},
+            {'id': '2', 'name': 'Artist B', 'popularity': 20},
+            {'id': '3', 'name': 'Artist C', 'popularity': 30},
+            {'id': '4', 'name': 'Artist D', 'popularity': 10},
+            {'id': '5', 'name': 'Artist E', 'popularity': 60},
+            {'id': '6', 'name': 'Artist F', 'popularity': 5},
+        ]
 
         # Expected output: the 5 quirkiest artists (lowest popularity scores)
         expected_output = [
@@ -130,18 +125,15 @@ def test_get_spotify_recommendations(mock_get):
     """Test fetching song recommendations using Spotify API."""
     mock_user_token = "mock_access_token"
     seed_artists = ["artist_id_1"]
-    mock_response_data = {
-        "tracks": [
-            {
-                "id": "track_id_1",
-                "name": "Song 1",
-                "artists": [{"name": "Artist 1"}],
-                "album": {"name": "Album 1"},
-                "preview_url": "http://example.com/preview",
-                "external_urls": {"spotify": "http://example.com/song"}
-            }
-        ]
-    }
+    mock_response_data = {'tracks':
+        [{
+            "id": "track_id_1",
+            "name": "Song 1",
+            "artists": [{"name": "Artist 1"}],
+            "album": {"name": "Album 1"},
+            "preview_url": "http://example.com/preview",
+            "external_urls": {"spotify": "http://example.com/song"}
+        }]}
 
     mock_response = Mock()
     mock_response.json.return_value = mock_response_data
