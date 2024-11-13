@@ -129,7 +129,6 @@ def create_groq_description(groq_api_key, favorite_artists):
     Create a description of user tastes/ lifestyle based on favorite artists
 
     Args:
-        - groq_api_key: the groq api key
         - favorite_artists: List of favorite artists
         (dictionaries with 'id', 'name', and 'popularity')
 
