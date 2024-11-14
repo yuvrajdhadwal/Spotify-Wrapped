@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse
 from accounts.models import SpotifyToken  # Local imports
-from accounts.utils import is_spotify_authenticated
 from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_user_favorite_tracks,
                     get_top_genres, get_quirkiest_artists,
@@ -47,16 +46,10 @@ def update_or_add_spotify_user(request):
     """
 
     # Load environment variables for later use
-    session_id = request.session.session_key
-
-    if not is_spotify_authenticated(session_id):
-        return JsonResponse({'error': 'User not authenticated'}, status=403)
-
     user = request.user
-
     # Check for existing SpotifyToken
     try:
-        token_entry = SpotifyToken.objects.get(user=session_id) # pylint: disable=no-member
+        token_entry = SpotifyToken.objects.get(username=user.username) # pylint: disable=no-member
     except ObjectDoesNotExist:
         return HttpResponse("User add/update failed: missing access token", status=500)
 
