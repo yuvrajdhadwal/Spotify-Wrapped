@@ -3,8 +3,7 @@ Views for managing Spotify user data, including updating user profiles,
 fetching favorite tracks and artists, and generating dynamic descriptions using Groq API.
 """
 
-import os  # Standard library import
-
+import os
 from dotenv import load_dotenv  # Third-party imports
 from rest_framework import viewsets
 from django.core.exceptions import ObjectDoesNotExist
@@ -14,8 +13,9 @@ from accounts.models import SpotifyToken  # Local imports
 from accounts.utils import is_spotify_authenticated
 from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_user_favorite_tracks,
-                    get_top_genres, get_quirkiest_artists)
-from .models import Song, SpotifyUser
+                    get_top_genres, get_quirkiest_artists,
+                    create_groq_description, get_spotify_recommendations)
+from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
 from .serializers import SongSerializer, SpotifyUserSerializer
 
 
@@ -47,14 +47,7 @@ def update_or_add_spotify_user(request):
     """
 
     # Load environment variables for later use
-    load_dotenv()
     session_id = request.session.session_key
-
-    groq_api_key = os.getenv('GROQ_API_KEY')
-
-
-
-
 
     if not is_spotify_authenticated(session_id):
         return JsonResponse({'error': 'User not authenticated'}, status=403)
@@ -63,7 +56,7 @@ def update_or_add_spotify_user(request):
 
     # Check for existing SpotifyToken
     try:
-        token_entry = SpotifyToken.objects.get(user=session_id)
+        token_entry = SpotifyToken.objects.get(user=session_id) # pylint: disable=no-member
     except ObjectDoesNotExist:
         return HttpResponse("User add/update failed: missing access token", status=500)
 
@@ -73,11 +66,6 @@ def update_or_add_spotify_user(request):
     user_data = get_spotify_user_data(access_token)
 
     if user_data:
-        # Get user's favorite artists and tracks
-        favorite_artists_long = get_user_favorite_artists(access_token, 'long_term')
-
-
-
         # Update or create the SpotifyUser
         tracks_short = get_user_favorite_tracks(access_token, 'short_term')
         tracks_medium = get_user_favorite_tracks(access_token, 'medium_term')
@@ -113,9 +101,7 @@ def update_or_add_spotify_user(request):
                 'favorite_genres_long': genres_long,
                 'quirkiest_artists_short': quirky_short,
                 'quirkiest_artists_medium': quirky_medium,
-                'quirkiest_artists_long': quirky_long,
-                'llama_description': "placeholder",
-                'llama_songrecs': "placeholder"
+                'quirkiest_artists_long': quirky_long
             }
         )
 
@@ -124,3 +110,121 @@ def update_or_add_spotify_user(request):
 
 
     return JsonResponse({'error': 'Could not fetch user data from Spotify'}, status=500)
+
+def add_spotify_wrapped(request, term_selection):
+    """
+    Adds a Spotify Wrapped containing all necessary information to the user's profile.
+    Parameters:
+        - request: incoming web request.
+        - term_selection: short_term, medium_term, or long_term. User-selected.
+    """
+    load_dotenv()
+    groq_api_key = os.getenv('GROQ_API_KEY')
+
+    user = request.user
+    spotify_user = SpotifyUser.objects.get(user=user) # pylint: disable=no-member
+    favorite_artists = None
+    favorite_tracks = None
+    favorite_genres = None
+    quirkiest_artists = None
+    access_token = SpotifyToken.objects.get(user=spotify_user.id)
+    match term_selection:
+        case 'short_term':
+            favorite_artists = spotify_user.favorite_artists_short
+            favorite_tracks = spotify_user.favorite_tracks_short
+            favorite_genres = spotify_user.favorite_genres_short
+            quirkiest_artists = spotify_user.quirkiest_artists_short
+        case 'medium_term':
+            favorite_artists = spotify_user.favorite_artists_medium
+            favorite_tracks = spotify_user.favorite_tracks_medium
+            favorite_genres = spotify_user.favorite_genres_medium
+            quirkiest_artists = spotify_user.quirkiest_artists_medium
+        case 'long_term':
+            favorite_artists = spotify_user.favorite_artists_long
+            favorite_tracks = spotify_user.favorite_tracks_long
+            favorite_genres = spotify_user.favorite_genres_long
+            quirkiest_artists = spotify_user.quirkiest_artists_long
+    if favorite_artists is None:
+        return HttpResponse("Bad term selection", status=400)
+    wrapped = SpotifyWrapped.objects.create(  # pylint: disable=no-member
+        user=spotify_user.display_name,
+        favorite_artists=favorite_artists,
+        favorite_tracks=favorite_tracks,
+        favorite_genres=favorite_genres,
+        quirkiest_artists=quirkiest_artists,
+        llama_description=create_groq_description(groq_api_key, favorite_artists),
+        llama_songrecs=get_spotify_recommendations(access_token, favorite_artists,
+                                                   favorite_tracks, favorite_genres))
+    spotify_user.past_roasts.append(wrapped)
+    spotify_user.save(update_fields=['past_roasts'])
+    return JsonResponse({'spotify_wrapped': {'user': spotify_user.display_name}})
+
+
+def add_duo_wrapped(request, user2, term_selection):
+    """
+    Adds a Duo Wrapped containing all necessary information to both users' profiles.
+    Parameters:
+        - request: incoming web request.
+        - user2: display name of invited user.
+        - term_selection: short_term, medium_term, or long_term. Selected by user1.
+    """
+    load_dotenv()
+    groq_api_key = os.getenv('GROQ_API_KEY')
+
+    user1 = request.user
+    spotify_user1 = SpotifyUser.objects.get(user=user1) # pylint: disable=no-member
+    try:
+        spotify_user2 = SpotifyUser.objects.get(display_name=user2) # pylint: disable=no-member
+    except SpotifyUser.DoesNotExist: # pylint: disable=no-member
+        return HttpResponse("User display name not found", status=500)
+    favorite_artists = None
+    favorite_tracks = None
+    favorite_genres = None
+    quirkiest_artists = None
+    access_token = SpotifyToken.objects.get(user=spotify_user1.id)
+    match term_selection:
+        case 'short_term':
+            favorite_artists = (spotify_user1.favorite_artists_short
+                                + spotify_user2.favorite_artists_short)
+            favorite_tracks = (spotify_user1.favorite_tracks_short
+                               + spotify_user2.favorite_tracks_short)
+            favorite_genres = (spotify_user1.favorite_genres_short
+                               + spotify_user2.favorite_genres_short)
+            quirkiest_artists = (spotify_user1.quirkiest_artists_short
+                                 + spotify_user2.quirkiest_artists_short)
+        case 'medium_term':
+            favorite_artists = (spotify_user1.favorite_artists_medium
+                                + spotify_user2.favorite_artists_medium)
+            favorite_tracks = (spotify_user1.favorite_tracks_medium
+                               + spotify_user2.favorite_tracks_medium)
+            favorite_genres = (spotify_user1.favorite_genres_medium
+                               + spotify_user2.favorite_genres_medium)
+            quirkiest_artists = (spotify_user1.quirkiest_artists_medium
+                                 + spotify_user2.quirkiest_artists_medium)
+        case 'long_term':
+            favorite_artists = (spotify_user1.favorite_artists_long
+                                + spotify_user2.favorite_artists_long)
+            favorite_tracks = (spotify_user1.favorite_tracks_long
+                               + spotify_user2.favorite_tracks_long)
+            favorite_genres = (spotify_user1.favorite_genres_long
+                               + spotify_user2.favorite_genres_long)
+            quirkiest_artists = (spotify_user1.quirkiest_artists_long
+                                 + spotify_user2.quirkiest_artists_long)
+    if favorite_artists is None:
+        return HttpResponse("Bad term selection", status=400)
+    wrapped = DuoWrapped.objects.create(  # pylint: disable=no-member
+        user1=spotify_user1.display_name,
+        user2=spotify_user2.display_name,
+        favorite_artists=favorite_artists,
+        favorite_tracks=favorite_tracks,
+        quirkiest_artists=quirkiest_artists,
+        favorite_genres=favorite_genres,
+        llama_description=create_groq_description(groq_api_key, favorite_artists),
+        llama_songrecs=get_spotify_recommendations(access_token, favorite_artists,
+                                                   favorite_tracks, favorite_genres))
+    spotify_user1.past_roasts.append(wrapped)
+    spotify_user1.save(update_fields=['past_roasts'])
+    spotify_user2.past_roasts.append(wrapped)
+    spotify_user2.save(update_fields=['past_roasts'])
+    return JsonResponse({'duo_wrapped': {'user': spotify_user1.display_name,
+                                         'user2': spotify_user2.display_name}})

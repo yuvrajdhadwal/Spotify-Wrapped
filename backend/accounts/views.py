@@ -248,23 +248,18 @@ def sign_up(request):
     """
     if request.method == 'POST':
         form = RegisterForm(request.POST)
+        username = form.data.get('username')
+        password = form.data.get('password1')
+        if not 6 <= len(username) <= 26:
+            form.add_error('username', 'Username must be between 6 and 26 characters')
+        if not password or password.isspace():
+            form.add_error('password1', 'Password cannot be only empty characters')
+        if not 8 <= len(password) <= 26:
+            form.add_error('password1', 'Password must be between 8 and 26 characters')
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
-            password = form.cleaned_data.get('password1')
-            # print(password)
-            if not 6 <= len(user.username) <= 26:
-                # messages.error(request, 'Username must be between 6 and 26 characters')
-                return JsonResponse({'errors': 'Username must be between 6 and 26 characters'}, status=400)
-            if not password or password.isspace():
-                # messages.error(request, 'Password cannot be only empty characters')
-                return JsonResponse({'errors': 'Password cannot be only empty characters'}, status=400)
-            if not 6 <= len(password) <= 26:
-                # messages.error(request, 'Password must be between 6 and 26 characters')
-                return JsonResponse({'errors': 'Password must be between 6 and 26 characters'}, status=400)
             user.save()
-            # messages.success(request, "You have signed up successfully.")
             login(request, user)
             return JsonResponse({'message': 'sign-up sucessful'}, status=200)
-        # print('an error occured whatttt', form.errors)
         return JsonResponse({'errors': form.errors}, status=400)

@@ -47,11 +47,11 @@ def get_user_favorite_tracks(access_token, timelimit):
     }
     params = {
         'time_limit': timelimit,
-        'limit': 20
+        'limit': 5
     }
     response = requests.get('https://api.spotify.com/v1/me/top/tracks',
                             headers=headers, params=params, timeout=5)
-    return response.json() if response.status_code == 200 else None
+    return response.json()['items'] if response.status_code == 200 else None
 
 def get_user_favorite_artists(access_token, timelimit):
     """
@@ -75,11 +75,11 @@ def get_user_favorite_artists(access_token, timelimit):
     }
     params = {
         'time_limit': timelimit,
-        'limit': 20
+        'limit': 5
     }
     response = requests.get('https://api.spotify.com/v1/me/top/artists',
                             headers=headers, params=params, timeout=5)
-    return response.json() if response.status_code == 200 else None
+    return response.json()['items'] if response.status_code == 200 else None
 
 
 def get_top_genres(favorite_artists):
@@ -95,7 +95,7 @@ def get_top_genres(favorite_artists):
     genres = []
 
     # Extract genres from each artist
-    for artist in favorite_artists['items']:
+    for artist in favorite_artists:
         genres.extend(artist['genres'])
 
     # Count the occurrences of each genre
@@ -119,7 +119,7 @@ def get_quirkiest_artists(favorite_artists):
         A list of the 5 quirkiest artists based on popularity scores.
     """
     # Sort the artists by popularity (lower scores are quirkier)
-    sorted_artists = sorted(favorite_artists['items'], key=lambda x: x['popularity'])
+    sorted_artists = sorted(favorite_artists, key=lambda x: x['popularity'])
 
     # Return the top 5 quirkiest artists
     return sorted_artists[:5]
@@ -129,7 +129,6 @@ def create_groq_description(groq_api_key, favorite_artists):
     Create a description of user tastes/ lifestyle based on favorite artists
 
     Args:
-        - groq_api_key: the groq api key
         - favorite_artists: List of favorite artists
         (dictionaries with 'id', 'name', and 'popularity')
 
@@ -194,7 +193,7 @@ def get_spotify_recommendations(user_token, seed_artists=None,
     }
 
     params = {
-        "limit": 20,
+        "limit": 5,
     }
     if seed_artists:
         params["seed_artists"] = ",".join(seed_artists)
@@ -208,7 +207,7 @@ def get_spotify_recommendations(user_token, seed_artists=None,
         response = requests.get(SPOTIFY_RECOMMENDATIONS_URL,
                                 headers=headers, params=params, timeout=5)
         response.raise_for_status()
-        data = response.json()
+        data = response.json()['tracks']
 
         recommended_songs = [
             {
@@ -219,7 +218,7 @@ def get_spotify_recommendations(user_token, seed_artists=None,
                 "preview_url": track["preview_url"],
                 "external_url": track["external_urls"]["spotify"]
             }
-            for track in data["tracks"]
+            for track in data
         ]
         return recommended_songs
 
