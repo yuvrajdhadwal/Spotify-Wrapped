@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { logError } from './utils/logger';
+import Button from './Components/Button';
 
 export default function Home() {
   const router = useRouter();
@@ -37,15 +38,10 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-7xl font-bold mb-4 text-black">spotify roaster</h1>
       <h2 className="text-4xl mb-8 text-black">your music taste has never been so embarrassing</h2>
-      <button
-        className="bg-spUIGreen text-white px-6 py-3 rounded-full hover:bg-spGreen"
-        onClick={handleLoginClick}
-      >
-        Login with Spotify Roaster
-      </button>
+      <Button text = "login" method = {handleLoginClick}/>
     </div>
   );
 }
