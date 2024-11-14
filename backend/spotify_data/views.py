@@ -47,16 +47,14 @@ def update_or_add_spotify_user(request):
     """
 
     # Load environment variables for later use
-    session_id = request.session.session_key
-
-    if not is_spotify_authenticated(session_id):
-        return JsonResponse({'error': 'User not authenticated'}, status=403)
-
     user = request.user
+
+    if not is_spotify_authenticated(user.username):
+        return JsonResponse({'error': 'User not authenticated'}, status=403)
 
     # Check for existing SpotifyToken
     try:
-        token_entry = SpotifyToken.objects.get(user=session_id) # pylint: disable=no-member
+        token_entry = SpotifyToken.objects.get(username=user.username) # pylint: disable=no-member
     except ObjectDoesNotExist:
         return HttpResponse("User add/update failed: missing access token", status=500)
 
