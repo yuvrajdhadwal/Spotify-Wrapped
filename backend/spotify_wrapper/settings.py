@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-7@)zwf&&t*a0$88govqyb&sug*$lr&lb%sgo8cmn(i)(exn=wh"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True #turn this off when we deploy
 
 ALLOWED_HOSTS = []
 
@@ -68,6 +68,8 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = "spotify_wrapper.urls"
+
+ALLOWED_HOSTS = [".vercel.app", "localhost"] #Add the Vercel domain to the allowed hosts
 
 TEMPLATES = [
     {
