@@ -10,7 +10,7 @@ router.register(r'songs', SongViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('updateuser/<str:session_id>', update_or_add_spotify_user,
+    path('updateuser', update_or_add_spotify_user,
          name='update_or_add_spotify_user'),
     path('addwrapped/<str:term_selection>', add_spotify_wrapped, name='add_spotify_wrapped'),
     path('addduo/<str:term_selection>/<str:user2>', add_duo_wrapped, name='add_duo_wrapped')
