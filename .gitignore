@@ -1,5 +1,6 @@
 #backend ignores
-/.idea
+/backend/.idea
+/node_modules
 .env
 .venv
 **/__pycache__/

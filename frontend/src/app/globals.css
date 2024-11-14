@@ -7,14 +7,14 @@
   --foreground: #171717;
 }
 
-/* dark mode config
+/* dark mode config 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
-*/
+}*/
+
 body {
   color: var(--foreground);
   background-color: var(--background);
