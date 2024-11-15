@@ -17,7 +17,7 @@ Functions:
     - sign_up: Registers a new user, validates username and password criteria, and logs them in.
 """
 import os
-
+import secrets
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse, redirect, render
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -76,11 +76,16 @@ class AuthURL(APIView):
             return Response({'error': 'Missing environment variables'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        state = generate_state()
+        request.session['spotify_auth_state'] = state
+
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scope,
             'response_type': 'code',
             'redirect_uri': redirect_uri,
-            'client_id': client_id
+            'client_id': client_id,
+            'state': state,
+            'show_dialog': 'true'
         }).prepare().url
 
         return redirect(url)
@@ -108,6 +113,12 @@ def spotify_callback(request, format=None):
     """
     load_dotenv()
     code = request.GET.get('code')
+    returned_state = request.GET.get('state')
+    stored_state = request.session.get('spotify_auth_state')
+    print('code', code)
+
+    if returned_state != stored_state:
+        return HttpResponse("Authentication Failed: State Mismatch")
 
     if not code:
         return HttpResponse("Authentication Failed: Missing code parameter")
@@ -263,3 +274,6 @@ def sign_up(request):
             login(request, user)
             return JsonResponse({'message': 'sign-up sucessful'}, status=200)
         return JsonResponse({'errors': form.errors}, status=400)
+
+def generate_state():
+    return secrets.token_urlsafe(16)
