@@ -12,6 +12,7 @@ Functions:
 """
 from datetime import timedelta
 import os
+import secrets
 from django.utils import timezone
 from dotenv import load_dotenv
 from requests import post
@@ -129,3 +130,6 @@ def refresh_spotify_token(username):
     update_or_create_user_tokens(username=username, access_token=access_token,
                                  token_type=token_type, refresh_token=refresh_token,
                                  expires_in=expires_in)
+
+def generate_state():
+    return secrets.token_urlsafe(16)

@@ -17,7 +17,6 @@ Functions:
     - sign_up: Registers a new user, validates username and password criteria, and logs them in.
 """
 import os
-import secrets
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse, redirect, render
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -30,7 +29,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from requests import Request, post
-from .utils import update_or_create_user_tokens, is_spotify_authenticated
+from .utils import update_or_create_user_tokens, is_spotify_authenticated, generate_state
 
 from .forms import LoginForm, RegisterForm
 
@@ -275,5 +274,6 @@ def sign_up(request):
             return JsonResponse({'message': 'sign-up sucessful'}, status=200)
         return JsonResponse({'errors': form.errors}, status=400)
 
-def generate_state():
-    return secrets.token_urlsafe(16)
+def get_username(request):
+    username = request.user.username
+    return JsonResponse({'username': username})
