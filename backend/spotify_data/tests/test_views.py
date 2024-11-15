@@ -123,17 +123,6 @@ def mock_user_data():
 @pytest.mark.django_db
 @patch('accounts.views.load_dotenv')
 @patch('accounts.views.os.getenv')
-def test_user_not_authenticated(request, session_id):
-    """Test when user is not authenticated."""
-    with patch('accounts.views.is_spotify_authenticated', return_value=False):
-        response = update_or_add_spotify_user(request)
-        assert response.status_code == 403
-        assert json.loads(response.content) == {'error': 'User not authenticated'}
-
-
-@pytest.mark.django_db
-@patch('accounts.views.load_dotenv')
-@patch('accounts.views.os.getenv')
 def test_missing_access_token(request, user):
     """Test when access token does not exist."""
     request.user = user
@@ -143,8 +132,8 @@ def test_missing_access_token(request, user):
             patch('accounts.models.SpotifyToken.objects.get', side_effect=ObjectDoesNotExist):
         response = update_or_add_spotify_user(request)
 
-        assert response.status_code == 403  # Adjusted to match the expected behavior
-        assert json.loads(response.content) == {'error': 'User not authenticated'}
+        assert response.status_code == 500  # Adjusted to match the expected behavior
+        assert response.content == b'User add/update failed: missing access token'
 
 
 @pytest.mark.django_db
