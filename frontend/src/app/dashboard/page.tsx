@@ -77,12 +77,7 @@ export default function Dashboard() {
                <Heading1 text="Username again? Yikes"/>
            </div>
            <div className="flex-grow flex items-center">
-               <button
-                   className="lowercase text-2xl px-6 py-3 border-2 border-amber-950 rounded-2xl bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
-                   onClick={handleLogoutClick}
-               >
-                   Sign out
-               </button>
+               <Button text={"Sign Out"} method={handleLogoutClick}/>
            </div>
            <div id="radio-group" className="flex-grow flex items-center space-x-4">
                <BodyText text="Choose a time range:"/>
