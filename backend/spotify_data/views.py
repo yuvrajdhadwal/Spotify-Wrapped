@@ -58,6 +58,8 @@ def update_or_add_spotify_user(request):
     # Fetch user data from Spotify API
     user_data = get_spotify_user_data(access_token)
 
+    print(user_data)
+
     if user_data:
         # Update or create the SpotifyUser
         tracks_short = get_user_favorite_tracks(access_token, 'short_term')
