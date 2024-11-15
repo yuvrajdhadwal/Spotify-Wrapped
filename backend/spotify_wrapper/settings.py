@@ -25,9 +25,6 @@ SECRET_KEY = "django-insecure-7@)zwf&&t*a0$88govqyb&sug*$lr&lb%sgo8cmn(i)(exn=wh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True #turn this off when we deploy
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,10 +53,12 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # The default port for next.js apps
+    'https://spotify-wrapped-frontend.vercel.app', #vercel
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
+    'https://spotify-wrapped-frontend.vercel.app', #vercel
 ]
 
 CORS_ALLOW_CREDENTIALS = True
