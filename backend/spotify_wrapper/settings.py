@@ -56,10 +56,12 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # The default port for next.js apps
+    'https://spotify-wrapped-frontend.vercel.app', #vercel
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
+    'https://spotify-wrapped-frontend.vercel.app', #vercel
 ]
 
 CORS_ALLOW_CREDENTIALS = True
