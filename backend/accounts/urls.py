@@ -22,7 +22,7 @@ Usage:
 """
 from django.urls import path
 from .views import AuthURL, spotify_callback, IsAuthenticated, sign_in, sign_out
-from .views import sign_up, get_csrf_token, get_username
+from .views import sign_up, get_csrf_token, get_username, delete_account
 
 # URL patterns for handling Spotify authentication.
 urlpatterns = [
@@ -32,6 +32,7 @@ urlpatterns = [
     path("login/", sign_in, name="login"),
     path("logout/", sign_out, name="logout"),
     path("register/", sign_up, name='register'),
-    path('get-csrf-token/', get_csrf_token, name='get_csrf_token'),
-    path('get-username/', get_username, name='get_username'),
+    path('get-csrf-token/', get_csrf_token, name='get-csrf-token'),
+    path('get-username/', get_username, name='get-username'),
+    path('delete-account/', delete_account, name='delete-account')
 ]

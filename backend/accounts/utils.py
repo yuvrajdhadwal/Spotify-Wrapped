@@ -132,4 +132,9 @@ def refresh_spotify_token(username):
                                  expires_in=expires_in)
 
 def generate_state():
+    '''Generates state for Spotify Encryption for more security'''
     return secrets.token_urlsafe(16)
+
+def delete_user_data(username):
+    '''Deletes user data from spotify token database'''
+    SpotifyToken.objects.filter(username=username).delete()
