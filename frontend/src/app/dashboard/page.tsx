@@ -19,6 +19,33 @@ import login from '../login/page';
 export default function Dashboard() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [username, setUsername] = useState<string>('');
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/spotify/get-username/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setUsername(data.username);
+        } catch (error) {
+            console.error('Error fetching username:', error);
+            setUsername('Guest');
+        }
+    };
+
+    fetchUsername();
+}, []);
 
   //check that user is logged in
   useEffect(() => {
@@ -60,7 +87,7 @@ export default function Dashboard() {
       if (response.ok) {
         router.push('/');
         const data = await response.json();
-        logInfo('Login Successful:', data);
+        logInfo('Logout Successful:', data);
       } else if (response.status === 400) {
         logInfo('Response:', response);
       } else {
@@ -71,13 +98,33 @@ export default function Dashboard() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+        const response = await fetch ('http://localhost:8000/spotify/delete-account/', {
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            router.push('/')
+            logInfo('response', response)
+        } else {
+            logError('Response', response)
+        }
+    } catch (error) {
+        logError('Error', error)
+    }
+  }
+
    return (
        <div className="flex flex-col items-center p-6 space-y-6 min-h-screen">
            <div className="flex-grow flex items-center">
-               <Heading1 text="Username again? Yikes"/>
+            <Heading1 text={`${username} again? Yikes`} />
            </div>
            <div className="flex-grow flex items-center">
                <Button text={"Sign Out"} method={handleLogoutClick}/>
+           </div>
+           <div className="flex-grow flex items-center">
+                <Button text={"Delete Account"} method={handleDeleteAccount}/>
            </div>
            <div id="radio-group" className="flex-grow flex items-center space-x-4">
                <BodyText text="Choose a time range:"/>
