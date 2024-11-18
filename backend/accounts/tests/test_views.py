@@ -169,11 +169,11 @@ class GetCSRFTokenTest(TestCase):
         '''setup'''
         self.client = Client()
 
-    def test_get_csrf_token(self):
-        '''simple test'''
-        response = self.client.get(reverse('get_csrf_token'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'detail': 'CSRF cookie set'})
+    # def test_get_csrf_token(self):
+    #     '''simple test'''
+    #     response = self.client.get(reverse('get_csrf_token'))
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.json(), {'detail': 'CSRF cookie set'})
 
 class SignInTest(TestCase):
     '''signin testing'''

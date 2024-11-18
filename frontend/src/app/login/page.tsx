@@ -1,11 +1,12 @@
 'use client';
 import React from 'react';
 import LoginForm from '../Components/LoginForm';
+import Heading1 from '../Components/Heading1';
 
 const login = () => {
   return (
     <div>
-      <h1>Log Into Spotify Roaster!</h1>
+      <Heading1 text = {"Log Into Spotify Roaster"}/>
       <LoginForm />
     </div>
   );

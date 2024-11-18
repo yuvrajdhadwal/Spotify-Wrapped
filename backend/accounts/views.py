@@ -17,11 +17,10 @@ Functions:
     - sign_up: Registers a new user, validates username and password criteria, and logs them in.
 """
 import os
-import secrets
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse, redirect, render
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
@@ -30,7 +29,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from requests import Request, post
-from .utils import update_or_create_user_tokens, is_spotify_authenticated
+from .utils import update_or_create_user_tokens, is_spotify_authenticated, generate_state, delete_user_data
 
 from .forms import LoginForm, RegisterForm
 
@@ -275,5 +274,19 @@ def sign_up(request):
             return JsonResponse({'message': 'sign-up sucessful'}, status=200)
         return JsonResponse({'errors': form.errors}, status=400)
 
-def generate_state():
-    return secrets.token_urlsafe(16)
+def get_username(request):
+    '''Gets the username of the user for frontend'''
+    username = request.user.username
+    return JsonResponse({'username': username})
+
+def delete_account(request):
+    '''Tries to delete the account of the user and user data'''
+    try:
+        user = request.user
+        delete_user_data(user.username)
+        user.delete()
+        return JsonResponse({'message': 'Account successfully deleted'}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User does not exist'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': e.message}, status=500)
