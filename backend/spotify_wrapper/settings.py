@@ -68,7 +68,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = "spotify_wrapper.urls"
 
-ALLOWED_HOSTS = [".vercel.app", "localhost"] #Add the Vercel domain to the allowed hosts
+ALLOWED_HOSTS = ["spotify-wrapped-frontend.vercel.app", "localhost"] #Add the Vercel domain to the allowed hosts
 
 TEMPLATES = [
     {
