@@ -69,10 +69,12 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = "spotify_wrapper.urls"
+CORS_ALLOW_ALL_ORIGINS = True
 
-ALLOWED_HOSTS = ["spotify-wrapped-frontend.vercel.app",
-                 "localhost"
-                 "spotify-wrapped-backend.vercel.app",
+ALLOWED_HOSTS = [
+    "spotify-wrapped-frontend.vercel.app",
+    "localhost"
+    "spotify-wrapped-backend.vercel.app",
 ]
 
 TEMPLATES = [
