@@ -52,7 +52,7 @@ const SignupForm: React.FC = () => {
 
         try {
             //const response = await fetch('http://localhost:8000/spotify/register/', {
-            const response = await fetch('https://spotify-wrapped-frontend.vercel.app/spotify/register/', {
+            const response = await fetch('https://spotify-wrapped-backend.vercel.app/spotify/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
