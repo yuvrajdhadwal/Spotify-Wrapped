@@ -256,6 +256,14 @@ def sign_up(request):
     Returns:
         JsonResponse: JSON response with success or error messages.
     """
+    if request.method == 'OPTIONS':
+        response = JsonResponse({'detail': 'CORS preflight'})
+        response['Access-Control-Allow-Origin'] = '*'
+        response['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-CSRFToken'
+        response['Access-Control-Allow-Credentials'] = 'true'
+        return response
+
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         username = form.data.get('username')
