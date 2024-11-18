@@ -2,6 +2,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { logError } from '../utils/logger';
 import { logInfo } from '../utils/logger';
+import Button from "./Button";
 
 interface FormData {
   username: string;
@@ -18,7 +19,7 @@ const getCookie = (name: string): string | null => {
 };
 
 const LoginForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({ username: '', password: '' });
+  const [formData, setFormData] = useState<FormData>({username: '', password: ''});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
@@ -26,14 +27,14 @@ const LoginForm: React.FC = () => {
     fetch('http://localhost:8000/spotify/get-csrf-token/', {
       credentials: 'include',
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-      })
-      .catch((error) => {
-        logError('Error fetching CSRF token:', error);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+        })
+        .catch((error) => {
+          logError('Error fetching CSRF token:', error);
+        });
   }, []);
 
   const handleSignupRedirect = () => {
@@ -41,14 +42,14 @@ const LoginForm: React.FC = () => {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const {name, value} = e.target;
+    setFormData({...formData, [name]: value});
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const csrfToken = getCookie('csrftoken');
-  
+
     try {
       const response = await fetch('http://localhost:8000/spotify/login/', {
         method: 'POST',
@@ -62,7 +63,7 @@ const LoginForm: React.FC = () => {
         }),
         credentials: 'include',
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         logInfo('Login sucessful:', data);
@@ -79,28 +80,29 @@ const LoginForm: React.FC = () => {
       setErrorMessage('An unexpected error occurred. Please try again.');
     }
   };
-  
+
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Username:</label>
-        <input type="text" name="username" value={formData.username} onChange={handleChange} />
-      </div>
-      <div>
-        <label>Password:</label>
-        <input type="password" name="password" value={formData.password} onChange={handleChange} />
-      </div>
-      <button type="submit">Login</button>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-    <div>
-    <button type="button" onClick={handleSignupRedirect} style={{marginTop: '10px'}}>
-        Don't Have An Account? Sign Up!
-      </button>
-    </div>
-      
-    </form>
-  );
+      <>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Username:</label>
+          <input type="text" name="username" value={formData.username} onChange={handleChange} className={"border-2"}/>
+        </div>
+        <div>
+          <label>Password:</label>
+          <input type="password" name="password" value={formData.password} onChange={handleChange} className={"border-2"}/>
+        </div>
+        <Button text={"Login"} method={() => null}/>
+        {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
+      </form>
+  <div>
+    <Button text={"Don't Have An Account? Sign Up!"} method={handleSignupRedirect}/>
+  </div>
+  </>
+
+)
+  ;
 };
 
 export default LoginForm;

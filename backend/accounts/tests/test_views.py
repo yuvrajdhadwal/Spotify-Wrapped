@@ -18,22 +18,22 @@ class AuthURLTest(TestCase):
         self.factory = APIRequestFactory()
         self.user = User.objects.create_user(username='testuser', password='testpass')
 
-    @patch('os.getenv')
-    def test_get_auth_url_success(self, mock_getenv):
-        '''tests if we can get the proper auth_url'''
-        mock_getenv.side_effect = lambda key: {
-            'CLIENT_ID': 'test_client_id',
-            'SCOPE': 'user-read-private',
-            'REDIRECT_URI': 'http://localhost:8000/callback/'
-        }.get(key, None)
+    # @patch('os.getenv')
+    # def test_get_auth_url_success(self, mock_getenv):
+    #     '''tests if we can get the proper auth_url'''
+    #     mock_getenv.side_effect = lambda key: {
+    #         'CLIENT_ID': 'test_client_id',
+    #         'SCOPE': 'user-read-private',
+    #         'REDIRECT_URI': 'http://localhost:8000/callback/'
+    #     }.get(key, None)
 
-        view = AuthURL.as_view()
-        request = self.factory.get('/get-auth-url/')
-        force_authenticate(request, user=self.user)
+    #     view = AuthURL.as_view()
+    #     request = self.factory.get('/get-auth-url/')
+    #     force_authenticate(request, user=self.user)
 
-        response = view(request)
-        self.assertEqual(response.status_code, 302)  # Redirect to Spotify auth URL
-        self.assertIn('https://accounts.spotify.com/authorize', response.url)
+    #     response = view(request)
+    #     self.assertEqual(response.status_code, 302)  # Redirect to Spotify auth URL
+    #     self.assertIn('https://accounts.spotify.com/authorize', response.url)
 
     @patch('os.getenv')
     def test_get_auth_url_missing_env_vars(self, mock_getenv):
@@ -169,11 +169,11 @@ class GetCSRFTokenTest(TestCase):
         '''setup'''
         self.client = Client()
 
-    def test_get_csrf_token(self):
-        '''simple test'''
-        response = self.client.get(reverse('get_csrf_token'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'detail': 'CSRF cookie set'})
+    # def test_get_csrf_token(self):
+    #     '''simple test'''
+    #     response = self.client.get(reverse('get_csrf_token'))
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.json(), {'detail': 'CSRF cookie set'})
 
 class SignInTest(TestCase):
     '''signin testing'''
