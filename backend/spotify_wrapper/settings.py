@@ -64,13 +64,33 @@ CSRF_TRUSTED_ORIGINS = [
     'https://spotify-wrapped-backend.vercel.app',
 ]
 
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = "spotify_wrapper.urls"
-CORS_ALLOW_ALL_ORIGINS = True
 
 ALLOWED_HOSTS = [
     "spotify-wrapped-frontend.vercel.app",

@@ -57,6 +57,7 @@ const SignupForm: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': csrfToken || '',
+                    'Accept': 'application/json',
                 },
                 body: new URLSearchParams({
                     username: formData.username,
@@ -65,6 +66,7 @@ const SignupForm: React.FC = () => {
                     password2: formData.password2,
                 }),
                 credentials: 'include',
+                mode: 'cors'
             });
 
             if (response.ok) {
