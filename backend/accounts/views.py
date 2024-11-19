@@ -195,10 +195,7 @@ class IsAuthenticated(APIView):
 @csrf_exempt
 def get_csrf_token(request):
     """Ensures that a CSRF token is set for frontend requests."""
-    response = JsonResponse({"detail": "CSRF cookie set"})
-    response["Access-Control-Allow-Origin"] = "https://spotify-wrapped-frontend.vercel.app"
-    response["Access-Control-Allow-Credentials"] = "true"
-    return response
+    return JsonResponse({"detail": "CSRF cookie set"});
 
 def sign_in(request):
     """
@@ -260,13 +257,6 @@ def sign_up(request):
     Returns:
         JsonResponse: JSON response with success or error messages.
     """
-    if request.method == 'OPTIONS':  #csrf pre flight checks
-        response = JsonResponse({'detail': 'CORS preflight'})
-        response["Access-Control-Allow-Origin"] = "https://spotify-wrapped-frontend.vercel.app"
-        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
-        response["Access-Control-Allow-Credentials"] = "true"
-        return response
 
     if request.method == 'POST':
         form = RegisterForm(request.POST)
