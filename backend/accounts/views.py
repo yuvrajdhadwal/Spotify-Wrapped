@@ -195,7 +195,8 @@ class IsAuthenticated(APIView):
 @csrf_exempt
 def get_csrf_token(request):
     """Ensures that a CSRF token is set for frontend requests."""
-    return JsonResponse({"detail": "CSRF cookie set"});
+    response = JsonResponse({"detail": "CSRF cookie set"})
+    return response
 
 def sign_in(request):
     """

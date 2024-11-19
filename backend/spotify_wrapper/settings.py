@@ -66,7 +66,7 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOW_METHODS = ["*"]
 CORS_ALLOW_HEADERS = ["*"]
 
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True #change this to false when we deploy
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -78,6 +78,7 @@ ALLOWED_HOSTS = [
     "spotify-wrapped-frontend.vercel.app",
     "localhost"
     "spotify-wrapped-backend.vercel.app",
+    '.vercel.app',
 ]
 
 TEMPLATES = [
