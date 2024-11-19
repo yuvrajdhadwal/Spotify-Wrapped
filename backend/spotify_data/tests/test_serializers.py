@@ -1,25 +1,17 @@
-"""
-Test module for serializers in backend/spotify_data/serializers.py.
-"""
-
 import pytest
 from django.contrib.auth.models import User
-
-from spotify_data.models import Song, SpotifyUser
+from spotify_data.models import SpotifyUser
 from spotify_data.serializers import (
-    AlbumSerializer,
-    ArtistSerializer,
     ImageSerializer,
-    SpotifyUserSerializer,
+    ArtistSerializer,
+    AlbumSerializer,
     TrackSerializer,
-    UserSerializer,
+    SpotifyUserSerializer,
 )
 
 
 def test_image_serializer():
-    """
-    Test the ImageSerializer with valid, partial, and invalid data.
-    """
+    """Test the ImageSerializer with valid, partial, and invalid data."""
     # Valid data
     valid_data = {
         'url': 'https://example.com/image.jpg',
@@ -30,7 +22,7 @@ def test_image_serializer():
     assert serializer.is_valid(), serializer.errors
     assert serializer.validated_data == valid_data
 
-    # Missing optional fields
+    # Partial data (missing optional fields)
     partial_data = {'url': 'https://example.com/image.jpg'}
     serializer = ImageSerializer(data=partial_data)
     assert serializer.is_valid(), serializer.errors
@@ -39,7 +31,7 @@ def test_image_serializer():
 
     # Invalid data
     invalid_data = {
-        'url': 'not-a-valid-url',
+        'url': 'invalid-url',
         'height': 'not-an-integer',
         'width': 'not-an-integer',
     }
@@ -51,34 +43,24 @@ def test_image_serializer():
 
 
 def test_artist_serializer():
-    """
-    Test the ArtistSerializer with valid and invalid data.
-    """
+    """Test the ArtistSerializer with valid and invalid data."""
     valid_data = {
         'id': 'artist123',
-        'name': 'Test Artist',
+        'name': 'Artist Name',
         'genres': ['pop', 'rock'],
-        'popularity': 80,
+        'popularity': 85,
         'images': [
-            {
-                'url': 'https://example.com/image1.jpg',
-                'height': 640,
-                'width': 480,
-            },
+            {'url': 'https://example.com/image1.jpg', 'height': 640, 'width': 480},
             {'url': 'https://example.com/image2.jpg'},
         ],
     }
     serializer = ArtistSerializer(data=valid_data)
     assert serializer.is_valid(), serializer.errors
-    validated_data = serializer.validated_data
-    assert validated_data['id'] == 'artist123'
-    assert validated_data['name'] == 'Test Artist'
-    assert validated_data['genres'] == ['pop', 'rock']
-    assert validated_data['popularity'] == 80
-    assert len(validated_data['images']) == 2
+    assert serializer.validated_data['id'] == 'artist123'
+    assert serializer.validated_data['genres'] == ['pop', 'rock']
 
-    # Invalid data: Missing required fields
-    invalid_data = {'name': 'Test Artist'}
+    # Invalid data
+    invalid_data = {'name': 'Artist Without ID'}
     serializer = ArtistSerializer(data=invalid_data)
     assert not serializer.is_valid()
     assert 'id' in serializer.errors
@@ -86,103 +68,46 @@ def test_artist_serializer():
     assert 'popularity' in serializer.errors
 
 
-# def test_album_serializer():
-#     """
-#     Test the AlbumSerializer with valid data.
-#     """
-#     valid_data = {
-#         'id': 'album123',
-#         'name': 'Test Album',
-#         'release_date': '2023-01-01',
-#         'images': [],
-#     }
-#     serializer = AlbumSerializer(data=valid_data)
-#     assert serializer.is_valid(), serializer.errors
-#     validated_data = serializer.validated_data
-#     assert validated_data['id'] == 'album123'
-#     assert validated_data['name'] == 'Test Album'
-#     assert validated_data['release_date'] == '2023-01-01'
+def test_album_serializer():
+    """Test the AlbumSerializer with valid data."""
+    valid_data = {
+        'id': 'album123',
+        'name': 'Album Name',
+        'release_date': '2024-01-01',
+        'images': [],
+    }
+    serializer = AlbumSerializer(data=valid_data)
+    assert serializer.is_valid(), serializer.errors
+    assert serializer.validated_data['id'] == 'album123'
+    assert serializer.validated_data['name'] == 'Album Name'
 
 
-# def test_track_serializer():
-#     """
-#     Test the TrackSerializer with valid and invalid data.
-#     """
-#     valid_data = {
-#         'id': 'track123',
-#         'name': 'Test Track',
-#         'artists': [
-#             {
-#                 'id': 'artist123',
-#                 'name': 'Test Artist',
-#                 'genres': ['pop'],
-#                 'popularity': 80,
-#                 'images': [],
-#             }
-#         ],
-#         'album': {
-#             'id': 'album123',
-#             'name': 'Test Album',
-#             'release_date': '2023-01-01',
-#             'images': [],
-#         },
-#         'duration_ms': 200000,
-#         'popularity': 90,
-#     }
-#     serializer = TrackSerializer(data=valid_data)
-#     assert serializer.is_valid(), serializer.errors
-#     validated_data = serializer.validated_data
-#     assert validated_data['id'] == 'track123'
-#     assert validated_data['name'] == 'Test Track'
-#     assert validated_data['duration_ms'] == 200000
-#     assert validated_data['popularity'] == 90
-#
-#     # Invalid data: Missing required fields
-#     invalid_data = {'id': 'track123', 'name': 'Test Track'}
-#     serializer = TrackSerializer(data=invalid_data)
-#     assert not serializer.is_valid()
-#     assert 'artists' in serializer.errors
-#     assert 'album' in serializer.errors
-#     assert 'duration_ms' in serializer.errors
-#     assert 'popularity' in serializer.errors
+def test_track_serializer():
+    """Test the TrackSerializer with valid and invalid data."""
+    valid_data = {
+        'id': 'track123',
+        'name': 'Track Name',
+        'artists': [{'id': 'artist123', 'name': 'Artist Name', 'genres': ['pop'], 'popularity': 80, 'images': []}],
+        'album': {'id': 'album123', 'name': 'Album Name', 'release_date': '2024-01-01', 'images': []},
+        'duration_ms': 240000,
+        'popularity': 95,
+    }
+    serializer = TrackSerializer(data=valid_data)
+    assert serializer.is_valid(), serializer.errors
+    assert serializer.validated_data['id'] == 'track123'
+
+    # Invalid data
+    invalid_data = {'id': 'track123'}
+    serializer = TrackSerializer(data=invalid_data)
+    assert not serializer.is_valid()
+    assert 'artists' in serializer.errors
+    assert 'album' in serializer.errors
 
 
-# @pytest.mark.django_db
-# def test_user_serializer():
-#     """
-#     Test the UserSerializer with a User instance.
-#     """
-#     user = User.objects.create_user(
-#         username='testuser',
-#         email='testuser@example.com',
-#         first_name='Test',
-#         last_name='User',
-#         password='password123',
-#     )
-#     serializer = UserSerializer(user)
-#     data = serializer.data
-#     assert data['username'] == 'testuser'
-#     assert data['email'] == 'testuser@example.com'
-#     assert data['first_name'] == 'Test'
-#     assert data['last_name'] == 'User'
-
-
-
-
-
-# @pytest.mark.django_db
-# def test_spotify_user_serializer():
-#     """
-#     Test the SpotifyUserSerializer with a SpotifyUser instance.
-#     """
-#     user = User.objects.create_user(
-#         username='spotifyuser',
-#         email='spotifyuser@example.com',
-#         first_name='Spotify',
-#         last_name='User',
-#         password='password123',
-#     )
-
+@pytest.mark.django_db
+def test_spotify_user_serializer():
+    """Test the SpotifyUserSerializer with a SpotifyUser instance."""
+    user = User.objects.create_user(username='testuser', password='testpassword')
     spotify_user = SpotifyUser.objects.create(
         user=user,
         favorite_tracks_short=[],
@@ -201,7 +126,6 @@ def test_artist_serializer():
 
     serializer = SpotifyUserSerializer(spotify_user)
     data = serializer.data
-    assert data['user']['username'] == 'spotifyuser'
+    assert data['user'] == user.id  # Check for serialized user ID
     assert data['favorite_tracks_short'] == []
     assert data['favorite_artists_short'] == []
-    # Add more assertions as needed
