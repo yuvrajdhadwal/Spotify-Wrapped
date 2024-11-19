@@ -126,7 +126,7 @@ export default function Dashboard() {
            <div className="flex-grow flex items-center">
                 <Button text={"Delete Account"} method={handleDeleteAccount}/>
            </div>
-           <form className={"flex flex-grow flex-col"}>
+           <form className={"flex flex-grow flex-col"} action = "/wrapped/title/" method = "POST">
                <div id="radio-group" className="flex-row flex items-center space-x-4 mt-10">
                    <BodyText text="Choose a time range:"/>
                    <Radio name="time_range" value="short_term" text="Past Month"/>
@@ -134,8 +134,8 @@ export default function Dashboard() {
                    <Radio name="time_range" value="long_term" text="Past Year"/>
                </div>
                <div className={"flex items-center justify-center flex-col"}>
-               <input type="text" placeholder="(Optional) Friend's Username" className="lowercase p-2 border rounded mt-4"/>
-               <Button text="Generate Roast" url="/wrapped/title" extraClasses={"mt-10"}/>
+               <input name="other_user" type="text" placeholder="(Optional) Friend's Username" className="lowercase p-2 border rounded mt-4"/>
+               <Button text="Generate Roast" method={()=> null} extraClasses={"mt-10"}/>
                </div>
            </form>
            <div id="nav-buttons" className="flex items-center space-x-4">
