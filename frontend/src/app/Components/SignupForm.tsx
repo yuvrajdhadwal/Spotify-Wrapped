@@ -31,6 +31,10 @@ const SignupForm: React.FC = () => {
         //fetch('http://localhost:8000/spotify/get-csrf-token/', {
         fetch('https://spotify-wrapped-backend.vercel.app/spotify/get-csrf-token/', {
             credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Origin': 'https://spotify-wrapped-frontend.vercel.app'
+            },
         })
         .then((response) => {
             if (!response.ok) {
@@ -59,6 +63,7 @@ const SignupForm: React.FC = () => {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': csrfToken || '',
                     'Accept': 'application/json',
+                    'Origin': 'https://spotify-wrapped-frontend.vercel.app'
                 },
                 body: new URLSearchParams({
                     username: formData.username,
