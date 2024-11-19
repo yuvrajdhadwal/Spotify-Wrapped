@@ -64,7 +64,14 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_METHODS = ["*"]
-CORS_ALLOW_HEADERS = ["*"]
+CORS_ALLOW_HEADERS = [
+    'Content-Type',
+    'Authorization',
+    'X-CSRFToken',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+]
 
 CORS_ALLOW_ALL_ORIGINS = False #change this to false when we deploy
 CORS_ALLOW_CREDENTIALS = True
@@ -84,8 +91,7 @@ ALLOWED_HOSTS = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates']
-        ,
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
