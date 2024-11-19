@@ -28,7 +28,8 @@ const SignupForm: React.FC = () => {
     const router = useRouter()
 
     useEffect(() => {
-        fetch('http://localhost:8000/spotify/get-csrf-token/', {
+        //fetch('http://localhost:8000/spotify/get-csrf-token/', {
+        fetch('https://spotify-wrapped-backend.vercel.app/spotify/get-csrf-token/', {
             credentials: 'include',
         })
         .then((response) => {
