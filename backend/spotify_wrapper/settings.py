@@ -54,13 +54,19 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # The default port for next.js apps
     'https://spotify-wrapped-frontend.vercel.app', #vercel
+    'https://spotify-wrapped-backend.vercel.app',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'https://spotify-wrapped-frontend.vercel.app', #vercel
+    'https://spotify-wrapped-backend.vercel.app',
 ]
 
+CORS_ALLOW_METHODS = ["*"]
+CORS_ALLOW_HEADERS = ["*"]
+
+CORS_ALLOW_ALL_ORIGINS = False #change this to false when we deploy
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -68,7 +74,12 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = "spotify_wrapper.urls"
 
-ALLOWED_HOSTS = [".vercel.app", "localhost"] #Add the Vercel domain to the allowed hosts
+ALLOWED_HOSTS = [
+    "spotify-wrapped-frontend.vercel.app",
+    "localhost",
+    "spotify-wrapped-backend.vercel.app",
+    '.vercel.app',
+]
 
 TEMPLATES = [
     {

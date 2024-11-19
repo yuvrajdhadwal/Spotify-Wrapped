@@ -19,7 +19,7 @@ Functions:
 import os
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse, redirect, render
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -194,7 +194,8 @@ class IsAuthenticated(APIView):
 @ensure_csrf_cookie
 def get_csrf_token(request):
     """Ensures that a CSRF token is set for frontend requests."""
-    return JsonResponse({'detail': 'CSRF cookie set'})
+    response = JsonResponse({"detail": "CSRF cookie set"})
+    return response
 
 def sign_in(request):
     """
@@ -241,7 +242,7 @@ def sign_out(request):
     # messages.success(request, f'You are now logged out.')
     return JsonResponse({'message': 'Logged Out'}, status=200)
 
-
+@csrf_exempt
 def sign_up(request):
     """
     Registers a new user, validates username and password criteria, and logs them in.
@@ -256,6 +257,7 @@ def sign_up(request):
     Returns:
         JsonResponse: JSON response with success or error messages.
     """
+
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         username = form.data.get('username')
