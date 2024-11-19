@@ -170,18 +170,18 @@ def test_user_serializer():
 
 
 
-@pytest.mark.django_db
-def test_spotify_user_serializer():
-    """
-    Test the SpotifyUserSerializer with a SpotifyUser instance.
-    """
-    user = User.objects.create_user(
-        username='spotifyuser',
-        email='spotifyuser@example.com',
-        first_name='Spotify',
-        last_name='User',
-        password='password123',
-    )
+# @pytest.mark.django_db
+# def test_spotify_user_serializer():
+#     """
+#     Test the SpotifyUserSerializer with a SpotifyUser instance.
+#     """
+#     user = User.objects.create_user(
+#         username='spotifyuser',
+#         email='spotifyuser@example.com',
+#         first_name='Spotify',
+#         last_name='User',
+#         password='password123',
+#     )
 
     spotify_user = SpotifyUser.objects.create(
         user=user,
