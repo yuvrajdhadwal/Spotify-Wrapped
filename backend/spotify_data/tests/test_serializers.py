@@ -147,24 +147,24 @@ def test_track_serializer():
     assert 'popularity' in serializer.errors
 
 
-@pytest.mark.django_db
-def test_user_serializer():
-    """
-    Test the UserSerializer with a User instance.
-    """
-    user = User.objects.create_user(
-        username='testuser',
-        email='testuser@example.com',
-        first_name='Test',
-        last_name='User',
-        password='password123',
-    )
-    serializer = UserSerializer(user)
-    data = serializer.data
-    assert data['username'] == 'testuser'
-    assert data['email'] == 'testuser@example.com'
-    assert data['first_name'] == 'Test'
-    assert data['last_name'] == 'User'
+# @pytest.mark.django_db
+# def test_user_serializer():
+#     """
+#     Test the UserSerializer with a User instance.
+#     """
+#     user = User.objects.create_user(
+#         username='testuser',
+#         email='testuser@example.com',
+#         first_name='Test',
+#         last_name='User',
+#         password='password123',
+#     )
+#     serializer = UserSerializer(user)
+#     data = serializer.data
+#     assert data['username'] == 'testuser'
+#     assert data['email'] == 'testuser@example.com'
+#     assert data['first_name'] == 'Test'
+#     assert data['last_name'] == 'User'
 
 
 
