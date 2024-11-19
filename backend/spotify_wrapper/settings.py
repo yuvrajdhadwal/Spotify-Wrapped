@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-7@)zwf&&t*a0$88govqyb&sug*$lr&lb%sgo8cmn(i)(exn=wh"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False #turn this off when we deploy
+DEBUG = True #turn this off when we deploy
 
 # Application definition
 
@@ -63,10 +63,10 @@ CSRF_TRUSTED_ORIGINS = [
     'https://spotify-wrapped-backend.vercel.app',
 ]
 
-CORS_ALLOW_METHODS = ["*"]
-CORS_ALLOW_HEADERS = ["*"]
+#CORS_ALLOW_METHODS = ["*"]
+#CORS_ALLOW_HEADERS = ["*"]
 
-CORS_ALLOW_ALL_ORIGINS = True #change this to false when we deploy
+CORS_ALLOW_ALL_ORIGINS = False #change this to false when we deploy
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -76,7 +76,7 @@ ROOT_URLCONF = "spotify_wrapper.urls"
 
 ALLOWED_HOSTS = [
     "spotify-wrapped-frontend.vercel.app",
-    "localhost"
+    "localhost",
     "spotify-wrapped-backend.vercel.app",
     '.vercel.app',
 ]
