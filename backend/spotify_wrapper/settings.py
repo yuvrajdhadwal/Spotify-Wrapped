@@ -84,6 +84,7 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'

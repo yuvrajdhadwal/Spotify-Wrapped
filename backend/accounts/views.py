@@ -191,10 +191,14 @@ class IsAuthenticated(APIView):
             is_authenticated = False
         return Response({'status':  is_authenticated}, status=status.HTTP_200_OK)
 
-@ensure_csrf_cookie
+#@ensure_csrf_cookie
+@csrf_exempt
 def get_csrf_token(request):
     """Ensures that a CSRF token is set for frontend requests."""
-    return JsonResponse({'detail': 'CSRF cookie set'})
+    response = JsonResponse({"detail": "CSRF cookie set"})
+    response["Access-Control-Allow-Origin"] = "https://spotify-wrapped-frontend.vercel.app"
+    response["Access-Control-Allow-Credentials"] = "true"
+    return response
 
 def sign_in(request):
     """
