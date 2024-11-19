@@ -82,12 +82,13 @@ const SpotifyUserPage = () => {
                     console.error("Failed to fetch SpotifyUser data");
                     return;
                 }
-                const data = await response.json();
+                let data = await response.json();
+                console.log(data);
 
                 (document.getElementById("display_name") as HTMLElement).innerText = `Display Name: ${data.display_name}`;
                 (document.getElementById("email") as HTMLElement).innerText = `Email: ${data.email}`;
                 (document.getElementById("profile_image") as HTMLImageElement).src = data.profile_image_url;
-
+                data = data.spotify_user;
                 displayList("favorite_tracks_short", data.favorite_tracks_short);
                 displayList("favorite_tracks_medium", data.favorite_tracks_medium);
                 displayList("favorite_tracks_long", data.favorite_tracks_long);
@@ -120,9 +121,9 @@ const SpotifyUserPage = () => {
             container.innerHTML = "";
 
             if (items && items.length > 0) {
-                items.forEach((item: string) => {
+                items.forEach((item: any) => {
                     const listItem = document.createElement("li");
-                    listItem.innerText = item;
+                    listItem.innerText = item.name;
                     container.appendChild(listItem);
                 });
             } else {
