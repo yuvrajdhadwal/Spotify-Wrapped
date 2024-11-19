@@ -191,8 +191,7 @@ class IsAuthenticated(APIView):
             is_authenticated = False
         return Response({'status':  is_authenticated}, status=status.HTTP_200_OK)
 
-#@ensure_csrf_cookie
-@csrf_exempt
+@ensure_csrf_cookie
 def get_csrf_token(request):
     """Ensures that a CSRF token is set for frontend requests."""
     response = JsonResponse({"detail": "CSRF cookie set"})
