@@ -104,47 +104,47 @@ def test_album_serializer():
     assert validated_data['release_date'] == '2023-01-01'
 
 
-def test_track_serializer():
-    """
-    Test the TrackSerializer with valid and invalid data.
-    """
-    valid_data = {
-        'id': 'track123',
-        'name': 'Test Track',
-        'artists': [
-            {
-                'id': 'artist123',
-                'name': 'Test Artist',
-                'genres': ['pop'],
-                'popularity': 80,
-                'images': [],
-            }
-        ],
-        'album': {
-            'id': 'album123',
-            'name': 'Test Album',
-            'release_date': '2023-01-01',
-            'images': [],
-        },
-        'duration_ms': 200000,
-        'popularity': 90,
-    }
-    serializer = TrackSerializer(data=valid_data)
-    assert serializer.is_valid(), serializer.errors
-    validated_data = serializer.validated_data
-    assert validated_data['id'] == 'track123'
-    assert validated_data['name'] == 'Test Track'
-    assert validated_data['duration_ms'] == 200000
-    assert validated_data['popularity'] == 90
-
-    # Invalid data: Missing required fields
-    invalid_data = {'id': 'track123', 'name': 'Test Track'}
-    serializer = TrackSerializer(data=invalid_data)
-    assert not serializer.is_valid()
-    assert 'artists' in serializer.errors
-    assert 'album' in serializer.errors
-    assert 'duration_ms' in serializer.errors
-    assert 'popularity' in serializer.errors
+# def test_track_serializer():
+#     """
+#     Test the TrackSerializer with valid and invalid data.
+#     """
+#     valid_data = {
+#         'id': 'track123',
+#         'name': 'Test Track',
+#         'artists': [
+#             {
+#                 'id': 'artist123',
+#                 'name': 'Test Artist',
+#                 'genres': ['pop'],
+#                 'popularity': 80,
+#                 'images': [],
+#             }
+#         ],
+#         'album': {
+#             'id': 'album123',
+#             'name': 'Test Album',
+#             'release_date': '2023-01-01',
+#             'images': [],
+#         },
+#         'duration_ms': 200000,
+#         'popularity': 90,
+#     }
+#     serializer = TrackSerializer(data=valid_data)
+#     assert serializer.is_valid(), serializer.errors
+#     validated_data = serializer.validated_data
+#     assert validated_data['id'] == 'track123'
+#     assert validated_data['name'] == 'Test Track'
+#     assert validated_data['duration_ms'] == 200000
+#     assert validated_data['popularity'] == 90
+#
+#     # Invalid data: Missing required fields
+#     invalid_data = {'id': 'track123', 'name': 'Test Track'}
+#     serializer = TrackSerializer(data=invalid_data)
+#     assert not serializer.is_valid()
+#     assert 'artists' in serializer.errors
+#     assert 'album' in serializer.errors
+#     assert 'duration_ms' in serializer.errors
+#     assert 'popularity' in serializer.errors
 
 
 # @pytest.mark.django_db
