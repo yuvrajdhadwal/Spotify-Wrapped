@@ -4,9 +4,8 @@ type ButtonProps = {
     text: string;
     url?: string;
     method?: (...args: any[]) => any;
+    extraClasses?: string;
 }
-
-// button needs to work as both form submitters and links... separate components? extend one class?
 
 /**
  * Returns a React element containing a styled button tag with the given text and
@@ -20,7 +19,8 @@ function Button(props: ButtonProps) {
         window.location.href = props.url ? props.url : "";
     };
     const clickMethod = props.method ? props.method : handleClick;
-    return (<button onClick={clickMethod} className="lowercase text-2xl px-6 py-3 border-2 border-amber-950 rounded-2xl bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg">
+    const classes = props.extraClasses + " lowercase text-2xl px-6 py-3 border-2 border-amber-950 rounded-2xl bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg";
+    return (<button onClick={clickMethod} className={classes}>
         {props.text}
     </button>);
 }
