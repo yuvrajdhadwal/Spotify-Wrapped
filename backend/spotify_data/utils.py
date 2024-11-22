@@ -24,9 +24,6 @@ def get_spotify_user_data(access_token):
         'Content-Type': 'application/json'
     }
     response = requests.get('https://api.spotify.com/v1/me', headers=headers, timeout=5)
-    print(headers)
-    print(response.status_code)
-    print(response.text)
     return response.json() if response.status_code == 200 else None
 
 def get_user_favorite_tracks(access_token, timelimit):
@@ -50,8 +47,8 @@ def get_user_favorite_tracks(access_token, timelimit):
         'Content-Type': 'application/x-www-form-urlencoded'
     }
     params = {
-        'time_limit': timelimit,
-        'limit': 5
+        'time_range': timelimit,
+        'limit': 20
     }
     response = requests.get('https://api.spotify.com/v1/me/top/tracks',
                             headers=headers, params=params, timeout=5)
@@ -78,8 +75,8 @@ def get_user_favorite_artists(access_token, timelimit):
         'Content-Type': 'application/x-www-form-urlencoded'
     }
     params = {
-        'time_limit': timelimit,
-        'limit': 5
+        'time_range': timelimit,
+        'limit': 20
     }
     response = requests.get('https://api.spotify.com/v1/me/top/artists',
                             headers=headers, params=params, timeout=5)
