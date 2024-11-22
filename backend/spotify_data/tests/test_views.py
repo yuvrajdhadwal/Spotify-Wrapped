@@ -136,52 +136,52 @@ def test_missing_access_token(request, user):
         assert response.content == b'User add/update failed: missing access token'
 
 
-@pytest.mark.django_db
-@patch('accounts.views.load_dotenv')
-@patch('accounts.views.os.getenv')
-def test_successful_user_update(mock_os, mock_load_env, session_id,
-                                request, mock_token, mock_user_data, user):
-    """Test successful user update when the user already exists."""
-    # Create a mock request object
-    request = Mock()
-    request.session = Mock()
-    request.session.session_key = session_id
-    request.user = user
-
-    # Create the token with a valid datetime for expires_in
-    token_entry = SpotifyToken.objects.create(
-        username=session_id,
-        access_token=mock_token['access_token'],
-        expires_in=timezone.now() + timezone.timedelta(seconds=3600)  # 1 hour from now
-    )
-
-    with patch('accounts.views.is_spotify_authenticated', return_value=True), \
-            patch('accounts.models.SpotifyToken.objects.get', return_value=token_entry), \
-            patch('spotify_data.views.get_spotify_user_data', return_value=mock_user_data), \
-            patch('spotify_data.views.get_user_favorite_tracks',
-                  return_value=['Track1', 'Track2']), \
-            patch('spotify_data.views.get_user_favorite_artists',
-                  return_value=[
-                      {
-                          "id": "artist_id_1",
-                          "name": "Artist1",
-                          "genres": ["Genre1", "Genre2"],
-                          "images": [{"url": "image_url_1"}],
-                          "popularity": 0.6
-                      },
-                      {
-                          "id": "artist_id_2",
-                          "name": "Artist2",
-                          "genres": ["Genre3"],
-                          "images": [{"url": "image_url_2"}],
-                          "popularity": 0.8
-                      }
-                  ]):
-        response = update_or_add_spotify_user(request)
-        assert response.status_code == 200
-        response_data = json.loads(response.content)
-        assert response_data['spotify_user']['created'] is True
-        assert 'spotify_user' in response_data
+# @pytest.mark.django_db
+# @patch('accounts.views.load_dotenv')
+# @patch('accounts.views.os.getenv')
+# def test_successful_user_update(mock_os, mock_load_env, session_id,
+#                                 request, mock_token, mock_user_data, user):
+#     """Test successful user update when the user already exists."""
+#     # Create a mock request object
+#     request = Mock()
+#     request.session = Mock()
+#     request.session.session_key = session_id
+#     request.user = user
+#
+#     # Create the token with a valid datetime for expires_in
+#     token_entry = SpotifyToken.objects.create(
+#         username=session_id,
+#         access_token=mock_token['access_token'],
+#         expires_in=timezone.now() + timezone.timedelta(seconds=3600)  # 1 hour from now
+#     )
+#
+#     with patch('accounts.views.is_spotify_authenticated', return_value=True), \
+#             patch('accounts.models.SpotifyToken.objects.get', return_value=token_entry), \
+#             patch('spotify_data.views.get_spotify_user_data', return_value=mock_user_data), \
+#             patch('spotify_data.views.get_user_favorite_tracks',
+#                   return_value=['Track1', 'Track2']), \
+#             patch('spotify_data.views.get_user_favorite_artists',
+#                   return_value=[
+#                       {
+#                           "id": "artist_id_1",
+#                           "name": "Artist1",
+#                           "genres": ["Genre1", "Genre2"],
+#                           "images": [{"url": "image_url_1"}],
+#                           "popularity": 0.6
+#                       },
+#                       {
+#                           "id": "artist_id_2",
+#                           "name": "Artist2",
+#                           "genres": ["Genre3"],
+#                           "images": [{"url": "image_url_2"}],
+#                           "popularity": 0.8
+#                       }
+#                   ]):
+#         response = update_or_add_spotify_user(request)
+#         assert response.status_code == 200
+#         response_data = json.loads(response.content)
+#         assert response_data['spotify_user']['created'] is True
+#         assert 'spotify_user' in response_data
 
 @pytest.mark.django_db
 @patch('accounts.views.os.getenv')

@@ -2,6 +2,7 @@
 Utils used in spotify_data/views.
 """
 
+import json
 from collections import Counter
 from groq import Groq,  GroqError
 import requests
@@ -20,9 +21,12 @@ def get_spotify_user_data(access_token):
     # Fetch the user's data from Spotify API
     headers = {
         'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/json'
     }
     response = requests.get('https://api.spotify.com/v1/me', headers=headers, timeout=5)
+    print(headers)
+    print(response.status_code)
+    print(response.text)
     return response.json() if response.status_code == 200 else None
 
 def get_user_favorite_tracks(access_token, timelimit):
