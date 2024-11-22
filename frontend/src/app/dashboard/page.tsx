@@ -116,30 +116,29 @@ export default function Dashboard() {
   }
 
    return (
-       <div className="flex flex-col items-center p-6 space-y-6 min-h-screen">
-           <div className="flex-grow flex items-center">
-            <Heading1 text={`${username} again? Yikes`} />
+       <div className="flex flex-col items-center p-6 space-y-6 min-h-screen justify-center">
+           <div>
+               <Heading1 text={`${username} again? Yikes`}/>
            </div>
-           <div className="flex-grow flex items-center">
+           <div className={"items-center justify-center"}>
                <Button text={"Sign Out"} method={handleLogoutClick}/>
            </div>
            <div className="flex-grow flex items-center">
                 <Button text={"Delete Account"} method={handleDeleteAccount}/>
            </div>
-           <div id="radio-group" className="flex-grow flex items-center space-x-4">
-               <BodyText text="Choose a time range:"/>
-               <Radio name="time_range" value="short_term" text="Past Month"/>
-               <Radio name="time_range" value="medium_term" text="Past 6 Months"/>
-               <Radio name="time_range" value="long_term" text="Past Year"/>
-           </div>
-           <div className="flex-grow flex items-center">
-               <Button text="Roast Me" url="/wrapped/title"/>
-           </div>
-           <div id="duo-input" className="flex-grow flex items-center space-x-4">
-               <input type="text" placeholder="Friend's Username" className="lowercase p-2 border rounded"/>
-               <Button text="Roast Us" url="/wrapped/title"/>
-           </div>
-           <div id="nav-buttons" className="flex-grow flex items-center space-x-4 mt-auto">
+           <form className={"flex flex-grow flex-col"} action = "/wrapped/title/" method = "POST">
+               <div id="radio-group" className="flex-row flex items-center space-x-4 mt-10">
+                   <BodyText text="Choose a time range:"/>
+                   <Radio name="time_range" value="short_term" text="Past Month"/>
+                   <Radio name="time_range" value="medium_term" text="Past 6 Months"/>
+                   <Radio name="time_range" value="long_term" text="Past Year"/>
+               </div>
+               <div className={"flex items-center justify-center flex-col"}>
+               <input name="other_user" type="text" placeholder="(Optional) Friend's Username" className="lowercase p-2 border rounded mt-4"/>
+               <Button text="Generate Roast" method={()=> null} extraClasses={"mt-10"}/>
+               </div>
+           </form>
+           <div id="nav-buttons" className="flex items-center space-x-4">
                <Button text="Past Roasts" url="/history/"/>
                <Button text="Duo Requests" url="/requests/"/>
            </div>
