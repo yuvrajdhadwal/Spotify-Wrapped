@@ -42,7 +42,7 @@ class ArtistSerializer(serializers.Serializer):
     """
     id = serializers.CharField()
     name = serializers.CharField()
-    genres = serializers.ListField(child=serializers.CharField())
+    genres = serializers.ListField()
     popularity = serializers.IntegerField()
     images = ImageSerializer(many=True, required=False)
 
@@ -71,19 +71,19 @@ class SpotifyUserSerializer(serializers.ModelSerializer):
     Serializer for the SpotifyUser model, including nested user data
     and expanded JSONFields.
     """
-    user = UserSerializer(read_only=True)
-    favorite_tracks_short = TrackSerializer(many=True)
-    favorite_tracks_medium = TrackSerializer(many=True)
-    favorite_tracks_long = TrackSerializer(many=True)
-    favorite_artists_short = ArtistSerializer(many=True)
-    favorite_artists_medium = ArtistSerializer(many=True)
-    favorite_artists_long = ArtistSerializer(many=True)
-    favorite_genres_short = serializers.ListField(child=serializers.CharField())
-    favorite_genres_medium = serializers.ListField(child=serializers.CharField())
-    favorite_genres_long = serializers.ListField(child=serializers.CharField())
-    quirkiest_artists_short = ArtistSerializer(many=True)
-    quirkiest_artists_medium = ArtistSerializer(many=True)
-    quirkiest_artists_long = ArtistSerializer(many=True)
+    # user = UserSerializer(read_only=True)
+    # favorite_tracks_short = TrackSerializer(many=True)
+    # favorite_tracks_medium = TrackSerializer(many=True)
+    # favorite_tracks_long = TrackSerializer(many=True)
+    # favorite_artists_short = ArtistSerializer(many=True)
+    # favorite_artists_medium = ArtistSerializer(many=True)
+    # favorite_artists_long = ArtistSerializer(many=True)
+    # favorite_genres_short = serializers.ListField(child=serializers.CharField())
+    # favorite_genres_medium = serializers.ListField(child=serializers.CharField())
+    # favorite_genres_long = serializers.ListField(child=serializers.CharField())
+    # quirkiest_artists_short = ArtistSerializer(many=True)
+    # quirkiest_artists_medium = ArtistSerializer(many=True)
+    # quirkiest_artists_long = ArtistSerializer(many=True)
 
     class Meta: # pylint: disable=too-few-public-methods
         """
@@ -92,30 +92,30 @@ class SpotifyUserSerializer(serializers.ModelSerializer):
         model = SpotifyUser
         fields = '__all__'
 
-    class SpotifyWrappedSerializer(serializers.ModelSerializer):
-        """
-        Serializer for SpotifyWrapped model, including term selection.
-        """
-        user = UserSerializer(read_only=True)
-        favorite_tracks = TrackSerializer(many=True)
-        favorite_artists = ArtistSerializer(many=True)
-        favorite_genres = serializers.ListField(child=serializers.CharField())
-        quirkiest_artists = ArtistSerializer(many=True)
-        term_selection = serializers.ChoiceField(choices=[
-            ('short_term', 'Short Term'),
-            ('medium_term', 'Medium Term'),
-            ('long_term', 'Long Term')
-        ])
-
-        class Meta: # pylint: disable=too-few-public-methods
-            """
-            SpotifyWrapped metadata.
-            """
-            model = SpotifyWrapped
-            fields = [
-                'user', 'favorite_tracks', 'favorite_artists', 'favorite_genres',
-                'quirkiest_artists', 'term_selection'
-            ]
+    # class SpotifyWrappedSerializer(serializers.ModelSerializer):
+    #     """
+    #     Serializer for SpotifyWrapped model, including term selection.
+    #     """
+    #     user = UserSerializer(read_only=True)
+    #     favorite_tracks = TrackSerializer(many=True)
+    #     favorite_artists = ArtistSerializer(many=True)
+    #     favorite_genres = serializers.ListField(child=serializers.CharField())
+    #     quirkiest_artists = ArtistSerializer(many=True)
+    #     term_selection = serializers.ChoiceField(choices=[
+    #         ('short_term', 'Short Term'),
+    #         ('medium_term', 'Medium Term'),
+    #         ('long_term', 'Long Term')
+    #     ])
+    #
+    #     class Meta: # pylint: disable=too-few-public-methods
+    #         """
+    #         SpotifyWrapped metadata.
+    #         """
+    #         model = SpotifyWrapped
+    #         fields = [
+    #             'user', 'favorite_tracks', 'favorite_artists', 'favorite_genres',
+    #             'quirkiest_artists', 'term_selection'
+    #         ]
 
 class DuoWrappedSerializer(SpotifyUserSerializer):
     """
