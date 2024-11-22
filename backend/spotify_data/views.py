@@ -15,7 +15,7 @@ from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_top_genres, get_quirkiest_artists,
                     create_groq_description, get_spotify_recommendations)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
-from .serializers import SongSerializer, SpotifyUserSerializer
+from .serializers import SongSerializer, SpotifyUserSerializer, TrackSerializer, ArtistSerializer
 
 
 
@@ -58,6 +58,8 @@ def update_or_add_spotify_user(request):
     # Fetch user data from Spotify API
     user_data = get_spotify_user_data(access_token)
 
+    print(user_data)
+
     if user_data:
         # Update or create the SpotifyUser
         tracks_short = get_user_favorite_tracks(access_token, 'short_term')
@@ -97,9 +99,8 @@ def update_or_add_spotify_user(request):
                 'quirkiest_artists_long': quirky_long
             }
         )
-
-        return JsonResponse({'spotify_user': {'id': spotify_user.spotify_id,
-                                              'created': created}})
+        print('spotifu user artists', spotify_user.favorite_artists_short)
+        return JsonResponse({'spotify_user': SpotifyUserSerializer(spotify_user).data})
 
 
     return JsonResponse({'error': 'Could not fetch user data from Spotify'}, status=500)
