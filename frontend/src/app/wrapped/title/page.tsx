@@ -83,12 +83,11 @@ const SpotifyUserPage = () => {
                     return;
                 }
                 let data = await response.json();
-                console.log(data);
-
+                data = data.spotify_user;
                 (document.getElementById("display_name") as HTMLElement).innerText = `Display Name: ${data.display_name}`;
                 (document.getElementById("email") as HTMLElement).innerText = `Email: ${data.email}`;
                 (document.getElementById("profile_image") as HTMLImageElement).src = data.profile_image_url;
-                data = data.spotify_user;
+
                 displayList("favorite_tracks_short", data.favorite_tracks_short);
                 displayList("favorite_tracks_medium", data.favorite_tracks_medium);
                 displayList("favorite_tracks_long", data.favorite_tracks_long);
@@ -97,9 +96,9 @@ const SpotifyUserPage = () => {
                 displayList("favorite_artists_medium", data.favorite_artists_medium);
                 displayList("favorite_artists_long", data.favorite_artists_long);
 
-                displayList("favorite_genres_short", data.favorite_genres_short);
-                displayList("favorite_genres_medium", data.favorite_genres_medium);
-                displayList("favorite_genres_long", data.favorite_genres_long);
+                displayStringList("favorite_genres_short", data.favorite_genres_short);
+                displayStringList("favorite_genres_medium", data.favorite_genres_medium);
+                displayStringList("favorite_genres_long", data.favorite_genres_long);
 
                 displayList("quirkiest_artists_short", data.quirkiest_artists_short);
                 displayList("quirkiest_artists_medium", data.quirkiest_artists_medium);
@@ -109,6 +108,7 @@ const SpotifyUserPage = () => {
                 (document.getElementById("llama_songrecs") as HTMLElement).innerText = data.llama_songrecs;
 
                 displayList("past_roasts", data.past_roasts);
+
             } catch (error) {
                 console.error("Error fetching SpotifyUser data:", error);
             }
@@ -124,6 +124,25 @@ const SpotifyUserPage = () => {
                 items.forEach((item: any) => {
                     const listItem = document.createElement("li");
                     listItem.innerText = item.name;
+                    container.appendChild(listItem);
+                });
+            } else {
+                container.innerText = "No data available";
+            }
+        }
+
+
+
+           function displayStringList(elementId: string, items: string[]): void {
+            const container = document.getElementById(elementId) as HTMLElement | null;
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            if (items && items.length > 0) {
+                items.forEach((item: string) => {
+                    const listItem = document.createElement("li");
+                    listItem.innerText = item;
                     container.appendChild(listItem);
                 });
             } else {

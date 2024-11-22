@@ -133,7 +133,7 @@ export default function Dashboard() {
                <Radio name="time_range" value="long_term" text="Past Year"/>
            </div>
            <div className="flex-grow flex items-center">
-               <Button text="Roast Me" url="/wrapped/title/"/>
+               <Button text="Roast Me" url="/wrapped/title"/>
            </div>
            <div id="duo-input" className="flex-grow flex items-center space-x-4">
                <input type="text" placeholder="Friend's Username" className="lowercase p-2 border rounded"/>
