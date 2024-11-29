@@ -2,7 +2,6 @@
 Utils used in spotify_data/views.
 """
 
-import json
 from collections import Counter
 from groq import Groq,  GroqError
 import requests
@@ -142,7 +141,7 @@ def create_groq_description(groq_api_key, favorite_artists):
 
     client = Groq(api_key=groq_api_key)
     description_prompt = (
-        f"Describe how someone who listens to artists like {', '.join(favorite_artists)} "
+        f"Describe how someone who listens to artists like {favorite_artists} "
         "tends to act, think, and dress."
     )
 
@@ -151,9 +150,7 @@ def create_groq_description(groq_api_key, favorite_artists):
             messages=[
                 {
                     "role": "system",
-                    "content": ("You are a music analyst who "
-                                "describes user behavior based on their music tastes.",
-                                )
+                    "content": "You are a music analyst who roasts and insults the user (use 2nd perspective) behavior based on their music tastes in less than 100 words."
                 },
                 {
                     "role": "user",

@@ -15,12 +15,8 @@ from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_top_genres, get_quirkiest_artists,
                     create_groq_description, get_spotify_recommendations)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
-from .serializers import (SongSerializer, SpotifyUserSerializer, TrackSerializer,
-                          ArtistSerializer, DuoWrappedSerializer, SpotifyWrappedSerializer)
-
-
-
-
+from .serializers import (SongSerializer, SpotifyUserSerializer,
+                          DuoWrappedSerializer, SpotifyWrappedSerializer)
 
 # pylint: disable=too-many-ancestors
 class SongViewSet(viewsets.ModelViewSet):
@@ -219,3 +215,85 @@ def add_duo_wrapped(request, user2, term_selection):
     spotify_user2.past_roasts.append(wrapped)
     spotify_user2.save(update_fields=['past_roasts'])
     return JsonResponse({'duo_wrapped': DuoWrappedSerializer(wrapped).data})
+
+def display_artists(request):
+    '''Displays artists for the frontend depending on the timeframe'''
+    load_dotenv()
+    user = request.user
+    timeframe = request.GET.get('timeframe')
+
+    try:
+        user_data = SpotifyUser.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return HttpResponse("User grab failed: no data", status=500)
+
+    if timeframe == '0':
+        artists = user_data.favorite_artists_short[:5]
+    elif timeframe == '1':
+        artists = user_data.favorite_artists_medium[:5]
+    else:
+        artists = user_data.favorite_artists_long[:5]
+
+    out = []
+    for artist in artists:
+        artist_info = {
+            'name': artist['name'],
+            'image': artist['images'][0]['url'],
+            'desc': create_groq_description(os.getenv('GROQ_API_KEY'), artist['name'])
+        }
+        out.append(artist_info)
+    return JsonResponse(out, safe=False, status=200)
+
+def display_genres(request):
+    '''Displays the genres for the frontend depending on the timeframe'''
+    load_dotenv()
+    user = request.user
+    timeframe = request.GET.get('timeframe')
+
+    try:
+        user_data = SpotifyUser.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return HttpResponse("User grab failed: no data", status=500)
+
+    if timeframe == '0':
+        genres = user_data.favorite_genres_short[:5]
+    elif timeframe == '1':
+        genres = user_data.favorite_genres_medium[:5]
+    else:
+        genres = user_data.favorite_genres_long[:5]
+
+    out = {
+        'genres': ', '.join(genres),
+        'desc': create_groq_description(os.getenv('GROQ_API_KEY'), ', '.join(genres))
+    }
+    return JsonResponse(out, safe=False, status=200)
+
+def display_songs(request):
+    '''Displays the songs for the frontend depending on the timeframe'''
+    load_dotenv()
+    user = request.user
+    timeframe = request.GET.get('timeframe')
+
+    try:
+        user_data = SpotifyUser.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return HttpResponse("User grab failed: no data", status=500)
+
+    if timeframe == '0':
+        tracks = user_data.favorite_tracks_short[:5]
+    elif timeframe == '1':
+        tracks = user_data.favorite_tracks_medium[:5]
+    else:
+        tracks = user_data.favorite_tracks_long[:5]
+
+    out = []
+    for track in tracks:
+        artist_info = {
+            'name': track['name'],
+            'artist': track['artists'][0]['name'],
+            'image': track['album']['images'][0]['url'],
+            'desc': create_groq_description(os.getenv('GROQ_API_KEY'),
+                                            track['name'] + ' by ' + track['artists'][0]['name'])
+        }
+        out.append(artist_info)
+    return JsonResponse(out, safe=False, status=200)
