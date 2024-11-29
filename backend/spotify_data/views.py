@@ -15,7 +15,8 @@ from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_top_genres, get_quirkiest_artists,
                     create_groq_description, get_spotify_recommendations)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
-from .serializers import SongSerializer, SpotifyUserSerializer, TrackSerializer, ArtistSerializer
+from .serializers import (SongSerializer, SpotifyUserSerializer, TrackSerializer,
+                          ArtistSerializer, DuoWrappedSerializer, SpotifyWrappedSerializer)
 
 
 

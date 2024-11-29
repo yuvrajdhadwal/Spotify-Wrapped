@@ -123,6 +123,7 @@ class DuoWrappedSerializer(SpotifyUserSerializer):
     """
     Serializer for DuoWrapped model, extending SpotifyWrapped.
     """
+    user1 = UserSerializer(read_only=True)
     user2 = UserSerializer(read_only=True)
 
     class Meta: # pylint: disable=too-few-public-methods
