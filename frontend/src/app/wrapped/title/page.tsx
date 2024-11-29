@@ -6,6 +6,9 @@ const SpotifyUserPage = () => {
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
+        // on click, moves you to the artists page
+        document.body.addEventListener('click', () => {window.location.href = "./artists/"});
+
         const container = containerRef.current;
         if (!container) {
             console.error("Container not found: spotifyUserContainer");
@@ -84,6 +87,7 @@ const SpotifyUserPage = () => {
                 }
                 let data = await response.json();
                 data = data.spotify_user;
+                console.log(data);
                 (document.getElementById("display_name") as HTMLElement).innerText = `Display Name: ${data.display_name}`;
                 (document.getElementById("email") as HTMLElement).innerText = `Email: ${data.email}`;
                 (document.getElementById("profile_image") as HTMLImageElement).src = data.profile_image_url;

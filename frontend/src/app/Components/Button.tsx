@@ -12,7 +12,9 @@ type ButtonProps = {
  * which redirects the user to the given URL when clicked
  *
  * @param props.text the text to be displayed on the button
- * @param props.url the url that the user should be directed to when the button is clicked
+ * @param props.url the url that the user should be directed to when the button is clicked. optional
+ * @param props.method the function that executes on button click. optional (redirect to url by default)
+ * @param props.extraClasses any other extra styling classes. optional
  */
 function Button(props: ButtonProps) {
     const handleClick = () => {

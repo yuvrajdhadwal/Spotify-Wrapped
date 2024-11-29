@@ -19,5 +19,5 @@ body {
   color: var(--foreground);
   background-color: var(--background);
   font-family: "Comic Sans MS", "Comic Neue", sans-serif;
-  @apply flex flex-col items-center justify-center min-h-screen lowercase text-3xl;
+  @apply lowercase text-3xl;
 }
