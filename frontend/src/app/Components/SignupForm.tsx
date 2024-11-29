@@ -3,6 +3,8 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { logError } from '../utils/logger';
 import { logInfo } from '../utils/logger';
 import login from '../login/page';
+import Input from "@/app/Components/Input";
+import Button from "@/app/Components/Button";
 
 interface FormData {
     username: string
@@ -106,25 +108,13 @@ const SignupForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Username:</label>
-                <input type="text" name="username" value={formData.username} onChange={handleChange} />
-            </div>
-            <div>
-                <label>Email:</label>
-                <input type="text" name="email" value={formData.email} onChange={handleChange} />
-            </div>
-            <div>
-                <label>Password:</label>
-                <input type="password" name="password1" value={formData.password1} onChange={handleChange} />
-            </div>
-            <div>
-                <label>Retype Password:</label>
-                <input type="password" name="password2" value={formData.password2} onChange={handleChange} />
-            </div>
-            <button type="submit">Sign Up!</button>
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+        <form onSubmit={handleSubmit} className={"mt-5"}>
+            <Input label={"Username:"} type={"text"} name={"username"} value={formData.username} onChange={handleChange}/>
+            <Input label={"Email:"} type={"text"} name={"email"} value={formData.email} onChange={handleChange}/>
+            <Input label={"Password:"} type={"password"} name={"password1"} value={formData.password1} onChange={handleChange}/>
+            <Input label={"Retype Password:"} type={"password"} name={"password2"} value={formData.password2} onChange={handleChange}/>
+            <p className={"text-red-600"}>{errorMessage}</p>
+            <Button text={"Sign Up!"} method={() => null} extraClasses={"mt-2"}/>
         </form>
     )
 }

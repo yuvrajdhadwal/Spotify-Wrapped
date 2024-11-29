@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { logError } from '../utils/logger';
 import { logInfo } from '../utils/logger';
 import Button from "./Button";
+import Input from "./Input";
 
 interface FormData {
   username: string;
@@ -84,17 +85,11 @@ const LoginForm: React.FC = () => {
 
   return (
       <>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
-          <input type="text" name="username" value={formData.username} onChange={handleChange} className={"border-2"}/>
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" name="password" value={formData.password} onChange={handleChange} className={"border-2"}/>
-        </div>
-        <Button text={"Login"} method={() => null}/>
-        {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
+      <form onSubmit={handleSubmit} className={"justify-stretch"}>
+        <Input label={"Username:"} type={"text"} name={"username"} value={formData.username} onChange={handleChange}/>
+        <Input label={"Password:"} type={"password"} name={"password"} value={formData.password} onChange={handleChange}/>
+        <p className={"text-red-600"}>{errorMessage}</p>
+        <Button text={"Login"} method={() => null} extraClasses={"mt-2"}/>
       </form>
   <div>
     <Button text={"Don't Have An Account? Sign Up!"} method={handleSignupRedirect}/>
