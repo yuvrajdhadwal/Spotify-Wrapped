@@ -269,3 +269,31 @@ def display_genres(request):
         'desc': create_groq_description(os.getenv('GROQ_API_KEY'), ', '.join(genres))
     }
     return JsonResponse(out, safe=False, status=200)
+
+def display_songs(request):
+    load_dotenv()
+    user = request.user
+    timeframe = request.GET.get('timeframe')
+
+    try:
+        user_data = SpotifyUser.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return HttpResponse("User grab failed: no data", status=500)
+    
+    if timeframe == '0':
+        tracks = user_data.favorite_tracks_short[:5]
+    elif timeframe == '1':
+        tracks = user_data.favorite_tracks_medium[:5]
+    else:
+        tracks = user_data.favorite_tracks_long[:5]
+
+    out = []
+    for track in tracks:
+        artist_info = {
+            'name': track['name'],
+            'artist': track['artists'][0]['name'],
+            'image': track['album']['images'][0]['url'],
+            'desc': create_groq_description(os.getenv('GROQ_API_KEY'), track['name'] + ' by ' + track['artists'][0]['name'])
+        }
+        out.append(artist_info)
+    return JsonResponse(out, safe=False, status=200)

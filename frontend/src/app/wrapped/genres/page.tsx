@@ -1,6 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 
+document.addEventListener('click', () => {window.location.href = "./tracks/"});
+
 export default function Genres() {
     const [genres, setGenres] = useState<any[]>([]);
     const [desc, setDesc] = useState<any[]>([]);
