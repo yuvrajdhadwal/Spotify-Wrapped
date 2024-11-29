@@ -15,7 +15,8 @@ from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_top_genres, get_quirkiest_artists,
                     create_groq_description, get_spotify_recommendations)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
-from .serializers import SongSerializer, SpotifyUserSerializer, TrackSerializer, ArtistSerializer
+from .serializers import (SongSerializer, SpotifyUserSerializer, TrackSerializer,
+                          ArtistSerializer, DuoWrappedSerializer, SpotifyWrappedSerializer)
 
 
 
@@ -148,7 +149,7 @@ def add_spotify_wrapped(request, term_selection):
                                                    favorite_tracks, favorite_genres))
     spotify_user.past_roasts.append(wrapped)
     spotify_user.save(update_fields=['past_roasts'])
-    return JsonResponse({'spotify_wrapped': {'user': spotify_user.display_name}})
+    return JsonResponse({'spotify_wrapped': SpotifyWrappedSerializer(wrapped).data})
 
 
 def add_duo_wrapped(request, user2, term_selection):
@@ -217,5 +218,4 @@ def add_duo_wrapped(request, user2, term_selection):
     spotify_user1.save(update_fields=['past_roasts'])
     spotify_user2.past_roasts.append(wrapped)
     spotify_user2.save(update_fields=['past_roasts'])
-    return JsonResponse({'duo_wrapped': {'user': spotify_user1.display_name,
-                                         'user2': spotify_user2.display_name}})
+    return JsonResponse({'duo_wrapped': DuoWrappedSerializer(wrapped).data})
