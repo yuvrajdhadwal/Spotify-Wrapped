@@ -13,7 +13,8 @@ from accounts.models import SpotifyToken  # Local imports
 from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_user_favorite_tracks,
                     get_top_genres, get_quirkiest_artists,
-                    create_groq_description, get_spotify_recommendations)
+                    create_groq_description, get_spotify_recommendations,
+                    create_groq_quirky)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
 from .serializers import (SongSerializer, SpotifyUserSerializer,
                           DuoWrappedSerializer, SpotifyWrappedSerializer)
@@ -297,3 +298,29 @@ def display_songs(request):
         }
         out.append(artist_info)
     return JsonResponse(out, safe=False, status=200)
+
+def display_quirky(request):
+    '''Displays the songs for the frontend depending on the timeframe'''
+    load_dotenv()
+    user = request.user
+    timeframe = request.GET.get('timeframe')
+
+    try:
+        user_data = SpotifyUser.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return HttpResponse("User grab failed: no data", status=500)
+
+    if timeframe == '0':
+        tracks = user_data.quirkiest_artists_short[:5]
+    elif timeframe == '1':
+        tracks = user_data.quirkiest_artists_medium[:5]
+    else:
+        tracks = user_data.quirkiest_artists_long[:5]
+    print(tracks[0]['name'])
+    out = []
+    for track in tracks:
+        out.append(track['name'])
+
+    desc = create_groq_quirky(os.getenv('GROQ_API_KEY'),
+                                            ', '.join(out))
+    return JsonResponse(desc, safe=False, status=200)
