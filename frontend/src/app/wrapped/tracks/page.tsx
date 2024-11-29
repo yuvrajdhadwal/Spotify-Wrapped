@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Track from "@/app/Components/Track";
 
-document.addEventListener('click', () => {window.location.href = "./title/"});
+document.addEventListener('click', () => {window.location.href = "./quirky/"});
 
 export default function Tracks() {
     const [tracks, setTracks] = useState<any[]>([]);

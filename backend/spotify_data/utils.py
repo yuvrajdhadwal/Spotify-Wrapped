@@ -223,3 +223,46 @@ def get_spotify_recommendations(user_token, seed_artists=None,
     except requests.exceptions.RequestException as e:
         print(f"Error fetching recommendations: {e}")
         return []
+
+def create_groq_quirky(groq_api_key, favorite_artists):
+    """
+    Create a description of user tastes/ lifestyle based on favorite artists
+
+    Args:
+        - favorite_artists: List of favorite artists
+        (dictionaries with 'id', 'name', and 'popularity')
+
+    Returns:
+        - llama_description: the description construced by the LLM
+
+    """
+    if not groq_api_key:
+        raise GroqError("GROQ_API_KEY environment variable is not set.")
+
+    client = Groq(api_key=groq_api_key)
+    description_prompt = (
+        f"Describe how someone who only listens to artists like {favorite_artists} "
+        "just to be quirky and stand out from the crowd tends to act, think, and dress."
+    )
+
+    try:
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a music analyst who roasts and insults the user (use 2nd perspective) behavior based on their music tastes in less than 100 words."
+                },
+                {
+                    "role": "user",
+                    "content": description_prompt
+                }
+            ],
+            model="llama3-8b-8192",
+        )
+
+        llama_description = response.choices[0].message.content
+    except KeyError as e:
+        llama_description = f"Key error: {str(e)}"
+    except Exception as e:
+        llama_description = f"Description unavailable due to API error: {str(e)}"  # pylint: disable=broad-exception-caught
+    return llama_description
