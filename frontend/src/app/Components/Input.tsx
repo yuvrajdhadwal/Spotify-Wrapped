@@ -20,8 +20,8 @@ type InputProps = {
 function Input(props: InputProps) {
     return (
         <div className={"mb-2 justify-end items-end"}>
-            <label className={"mr-2"}>{props.label}</label>
-            <input type={props.type} name={props.name} value={props.value} onChange={props.onChange} className={"border-2"}/>
+            <label className={"mr-2 w-64 inline-block text-right"}>{props.label}</label>
+            <input type={props.type} name={props.name} value={props.value} onChange={props.onChange} className={"border-2 mr-40"}/>
         </div>
     );
 }
