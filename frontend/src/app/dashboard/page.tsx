@@ -1,147 +1,125 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Button from '../Components/Button';
-import Heading1 from '../Components/Heading1'
+import Heading1 from '../Components/Heading1';
 import Radio from "../Components/Radio";
 import BodyText from "@/app/Components/BodyText";
 import { getCookie } from "@/utils";
-import { logError } from '../utils/logger';
-import { logInfo } from '../utils/logger';
-import login from '../login/page';
-
-
-/*type DashProps = {
-    username: string;
-}*/
-//unused for now but will use later
+import { logError, logInfo } from '../utils/logger';
 
 export default function Dashboard() {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [username, setUsername] = useState<string>('');
+    const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [username, setUsername] = useState<string>('Guest');
+    const [timeframe, setTimeframe] = useState<number>(2);
 
-  useEffect(() => {
-    const fetchUsername = async () => {
-        try {
-            const response = await fetch('http://localhost:8000/spotify/get-username/', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            });
+    // Fetch username from backend
+    useEffect(() => {
+        const fetchUsername = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/spotify/get-username/', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setUsername(data.username);
+            } catch (error) {
+                console.error('Error fetching username:', error);
             }
+        };
 
-            const data = await response.json();
-            setUsername(data.username);
-        } catch (error) {
-            console.error('Error fetching username:', error);
-            setUsername('Guest');
+        fetchUsername();
+    }, []);
+
+    // Load `timeRange` from localStorage
+    useEffect(() => {
+        const storedTimeframe = localStorage.getItem("timeRange");
+        if (storedTimeframe) {
+            setTimeframe(parseInt(storedTimeframe, 10));
         }
+    }, []);
+
+    // Check authentication
+    useEffect(() => {
+        fetch('http://localhost:8000/spotify/is-authenticated/', { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.status) {
+                    logInfo('Not authenticated', data);
+                    window.location.href = 'http://localhost:8000/spotify/get-auth-url/';
+                } else {
+                    setIsAuthenticated(true);
+                }
+            })
+            .catch(error => {
+                logError('Error:', error);
+                router.push('/');
+            });
+    }, [router]);
+
+    if (!isAuthenticated) {
+        return null; // Render a loading spinner or a fallback UI here
+    }
+
+    const handleSelection = (value: number) => {
+        setTimeframe(value); // Update state
+        localStorage.setItem("timeRange", value.toString()); // Save to localStorage
     };
+    
+    return (
+        <div className="flex flex-col items-center p-6 space-y-6 min-h-screen justify-center">
+            <Heading1 text={`${username} again? Yikes`} />
+            <Button text={"Sign Out"} method={() => {}} />
+            <Button text={"Delete Account"} method={() => {}} />
 
-    fetchUsername();
-}, []);
+            <form className={"flex flex-grow flex-col"} action="/wrapped/title/" method="POST">
+                <div id="radio-group" className="flex-row flex items-center space-x-4 mt-10">
+                    <BodyText text="Choose a time range:" />
+                    <Radio
+                        name="time_range"
+                        value="short_term"
+                        text="Past Month"
+                        onChange={() => handleSelection(0)}
+                        checked={timeframe === 0}
+                    />
+                    <Radio
+                        name="time_range"
+                        value="medium_term"
+                        text="Past 6 Months"
+                        onChange={() => handleSelection(1)}
+                        checked={timeframe === 1}
+                    />
+                    <Radio
+                        name="time_range"
+                        value="long_term"
+                        text="Past Year"
+                        onChange={() => handleSelection(2)}
+                        checked={timeframe === 2}
+                    />
+                </div>
+                <input
+                    name="other_user"
+                    type="text"
+                    placeholder="(Optional) Friend's Username"
+                    className="lowercase p-2 border rounded mt-4"
+                />
+                <Button text="Generate Roast" method={() => null} extraClasses="mt-10" />
+            </form>
 
-  //check that user is logged in
-  useEffect(() => {
-    // Check if the user is authenticated
-    fetch('http://localhost:8000/spotify/is-authenticated/', { credentials: 'include' })
-        .then(response => response.json())
-      .then(data => {
-        if (!data.status) {
-            logInfo('hold on a second', data)
-            window.location.href = 'http://localhost:8000/spotify/get-auth-url/';
-            setIsAuthenticated(true);
-        } else {
-            setIsAuthenticated(true);
-        }
-      })
-      .catch(error => {
-        logError('Error:', error);
-        router.push('/');
-      });
-  }, [router]);
-
-  if (!isAuthenticated) {
-    return null; // or a loading spinner
-  }
-
-  const handleLogoutClick = async () => {
-    const csrfToken = getCookie('csrftoken');
-
-    try {
-      const response = await fetch('http://localhost:8000/spotify/logout/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': csrfToken || '',
-        },
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        router.push('/');
-        const data = await response.json();
-        logInfo('Logout Successful:', data);
-      } else if (response.status === 400) {
-        logInfo('Response:', response);
-      } else {
-        logInfo('Response:', response);
-      }
-    } catch (error) {
-        logError('Error:', error);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    try {
-        const response = await fetch ('http://localhost:8000/spotify/delete-account/', {
-            credentials: 'include'
-        });
-
-        if (response.ok) {
-            router.push('/')
-            logInfo('response', response)
-        } else {
-            logError('Response', response)
-        }
-    } catch (error) {
-        logError('Error', error)
-    }
-  }
-
-   return (
-       <div className="flex flex-col items-center p-6 space-y-6 min-h-screen justify-center">
-           <div>
-               <Heading1 text={`${username} again? Yikes`}/>
-           </div>
-           <div className={"items-center justify-center"}>
-               <Button text={"Sign Out"} method={handleLogoutClick}/>
-           </div>
-           <div className="flex-grow flex items-center">
-                <Button text={"Delete Account"} method={handleDeleteAccount}/>
-           </div>
-           <form className={"flex flex-grow flex-col"} action = "/wrapped/title/" method = "POST">
-               <div id="radio-group" className="flex-row flex items-center space-x-4 mt-10">
-                   <BodyText text="Choose a time range:"/>
-                   <Radio name="time_range" value="short_term" text="Past Month"/>
-                   <Radio name="time_range" value="medium_term" text="Past 6 Months"/>
-                   <Radio name="time_range" value="long_term" text="Past Year"/>
-               </div>
-               <div className={"flex items-center justify-center flex-col"}>
-               <input name="other_user" type="text" placeholder="(Optional) Friend's Username" className="lowercase p-2 border rounded mt-4"/>
-               <Button text="Generate Roast" method={()=> null} extraClasses={"mt-10"}/>
-               </div>
-           </form>
-           <div id="nav-buttons" className="flex items-center space-x-4">
-               <Button text="Past Roasts" url="/history/"/>
-               <Button text="Duo Requests" url="/requests/"/>
-           </div>
-       </div>
-   );
+            <div id="nav-buttons" className="flex items-center space-x-4">
+                <Button text="Past Roasts" url="/history/" />
+                <Button text="Duo Requests" url="/requests/" />
+            </div>
+        </div>
+    );
 }

@@ -238,6 +238,7 @@ def display_artists_1(request):
         artists = user_data.favorite_artists_long[:5]
 
     out = []
+    print(timeframe)
     for artist in artists:
         artist_info = {
             'name': artist['name'],

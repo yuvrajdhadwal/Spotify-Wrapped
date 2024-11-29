@@ -9,11 +9,21 @@ export default function Artists() {
     const [artists, setArtists] = useState<any[]>([]);
 
     // FIX ME
-    const timeframe = 2;
+    const [timeRange, setTimeRange] = useState<number>(() => {
+        // Load the initial value from localStorage or default to 2
+        return parseInt(localStorage.getItem("timeRange") || "2", 10);
+    });
+
+    useEffect(() => {
+        const storedTimeRange = localStorage.getItem("timeRange");
+        if (storedTimeRange) {
+            setTimeRange(parseInt(storedTimeRange, 10));
+        }
+    }, []);
 
     async function fetchFavoriteArtists(): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displayartists1?timeframe=${timeframe}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displayartists1?timeframe=${timeRange}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
