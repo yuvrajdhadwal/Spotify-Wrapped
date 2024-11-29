@@ -4,11 +4,11 @@ import React, { useEffect, useState } from 'react';
 // import Heading2 from "@/app/Components/Heading2";
 import Artist from "@/app/Components/Artist";
 
+document.addEventListener('click', () => {window.location.href = "./genres/"});
+
 export default function Artists() {
-    const longDesc = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ultricies pellentesque lobortis. Etiam luctus neque volutpat enim pulvinar vulputate. Praesent rhoncus faucibus magna a venenatis.";
     const [artists, setArtists] = useState<any[]>([]);
 
-    // FIX ME
     const [timeRange, setTimeRange] = useState<number>(() => {
         // Load the initial value from localStorage or default to 2
         return parseInt(localStorage.getItem("timeRange") || "2", 10);
@@ -23,7 +23,7 @@ export default function Artists() {
 
     async function fetchFavoriteArtists(): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displayartists1?timeframe=${timeRange}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displayartists?timeframe=${timeRange}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

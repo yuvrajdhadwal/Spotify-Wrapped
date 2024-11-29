@@ -220,7 +220,7 @@ def add_duo_wrapped(request, user2, term_selection):
     spotify_user2.save(update_fields=['past_roasts'])
     return JsonResponse({'duo_wrapped': DuoWrappedSerializer(wrapped).data})
 
-def display_artists_1(request):
+def display_artists(request):
     load_dotenv()
     user = request.user
     timeframe = request.GET.get('timeframe')
@@ -238,7 +238,6 @@ def display_artists_1(request):
         artists = user_data.favorite_artists_long[:5]
 
     out = []
-    print(timeframe)
     for artist in artists:
         artist_info = {
             'name': artist['name'],
@@ -246,4 +245,27 @@ def display_artists_1(request):
             'desc': create_groq_description(os.getenv('GROQ_API_KEY'), artist['name'])
         }
         out.append(artist_info)
+    return JsonResponse(out, safe=False, status=200)
+
+def display_genres(request):
+    load_dotenv()
+    user = request.user
+    timeframe = request.GET.get('timeframe')
+
+    try:
+        user_data = SpotifyUser.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return HttpResponse("User grab failed: no data", status=500)
+    
+    if timeframe == '0':
+        genres = user_data.favorite_genres_short[:5]
+    elif timeframe == '1':
+        genres = user_data.favorite_genres_medium[:5]
+    else:
+        genres = user_data.favorite_genres_long[:5]
+
+    out = {
+        'genres': ', '.join(genres),
+        'desc': create_groq_description(os.getenv('GROQ_API_KEY'), ', '.join(genres))
+    }
     return JsonResponse(out, safe=False, status=200)

@@ -151,7 +151,7 @@ def create_groq_description(groq_api_key, favorite_artists):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a music analyst who roasts and insults user behavior based on their music tastes in less than 100 words."
+                    "content": "You are a music analyst who roasts and insults the user (use 2nd perspective) behavior based on their music tastes in less than 100 words."
                 },
                 {
                     "role": "user",
