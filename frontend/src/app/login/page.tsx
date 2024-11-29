@@ -6,7 +6,7 @@ import Heading1 from '../Components/Heading1';
 const login = () => {
   return (
     <div className={"flex flex-col items-center justify-center min-h-screen"}>
-      <Heading1 text = {"Log Into Spotify Roaster"}/>
+      <Heading1 text = {"Login to Spotify Roaster"}/>
       <LoginForm />
     </div>
   );

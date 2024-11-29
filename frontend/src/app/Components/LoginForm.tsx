@@ -85,14 +85,17 @@ const LoginForm: React.FC = () => {
 
   return (
       <>
-      <form onSubmit={handleSubmit} className={"justify-stretch"}>
-        <Input label={"Username:"} type={"text"} name={"username"} value={formData.username} onChange={handleChange}/>
-        <Input label={"Password:"} type={"password"} name={"password"} value={formData.password} onChange={handleChange}/>
-        <p className={"text-red-600"}>{errorMessage}</p>
-        <Button text={"Login"} method={() => null} extraClasses={"mt-2"}/>
-      </form>
-  <div>
-    <Button text={"Don't Have An Account? Sign Up!"} method={handleSignupRedirect}/>
+        <form onSubmit={handleSubmit} className={"justify-stretch mt-4"}>
+          <Input label={"Username:"} type={"text"} name={"username"} value={formData.username} onChange={handleChange}/>
+          <Input label={"Password:"} type={"password"} name={"password"} value={formData.password}
+                 onChange={handleChange}/>
+          <p className={"text-red-600"}>{errorMessage}</p>
+          <div className={"w-full flex"}>
+            <Button text={"Login"} method={() => null} extraClasses={"mt-2 ml-auto mr-auto mb-10"}/>
+          </div>
+        </form>
+        <div>
+          <Button text={"Don't Have An Account? Sign Up!"} method={handleSignupRedirect}/>
   </div>
   </>
 

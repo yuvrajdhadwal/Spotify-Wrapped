@@ -114,7 +114,9 @@ const SignupForm: React.FC = () => {
             <Input label={"Password:"} type={"password"} name={"password1"} value={formData.password1} onChange={handleChange}/>
             <Input label={"Retype Password:"} type={"password"} name={"password2"} value={formData.password2} onChange={handleChange}/>
             <p className={"text-red-600"}>{errorMessage}</p>
-            <Button text={"Sign Up!"} method={() => null} extraClasses={"mt-2"}/>
+            <div className={"w-full flex"}>
+            <Button text={"Sign Up!"} method={() => null} extraClasses={"mt-2 mr-auto ml-auto"}/>
+            </div>
         </form>
     )
 }
