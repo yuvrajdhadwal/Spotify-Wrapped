@@ -9,8 +9,7 @@ from django.shortcuts import HttpResponse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from spotify_data.views import update_or_add_spotify_user, add_spotify_wrapped, add_duo_wrapped
-from spotify_data.models import SpotifyUser, SpotifyWrapped, DuoWrapped
-from spotify_data.serializers import SpotifyWrappedSerializer, DuoWrappedSerializer
+from spotify_data.models import SpotifyUser, SpotifyWrapped
 from accounts.models import SpotifyToken
 
 

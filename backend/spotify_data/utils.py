@@ -2,7 +2,6 @@
 Utils used in spotify_data/views.
 """
 
-import json
 from collections import Counter
 from groq import Groq,  GroqError
 import requests
