@@ -92,30 +92,32 @@ class SpotifyUserSerializer(serializers.ModelSerializer):
         model = SpotifyUser
         fields = '__all__'
 
-    # class SpotifyWrappedSerializer(serializers.ModelSerializer):
-    #     """
-    #     Serializer for SpotifyWrapped model, including term selection.
-    #     """
-    #     user = UserSerializer(read_only=True)
-    #     favorite_tracks = TrackSerializer(many=True)
-    #     favorite_artists = ArtistSerializer(many=True)
-    #     favorite_genres = serializers.ListField(child=serializers.CharField())
-    #     quirkiest_artists = ArtistSerializer(many=True)
-    #     term_selection = serializers.ChoiceField(choices=[
-    #         ('short_term', 'Short Term'),
-    #         ('medium_term', 'Medium Term'),
-    #         ('long_term', 'Long Term')
-    #     ])
-    #
-    #     class Meta: # pylint: disable=too-few-public-methods
-    #         """
-    #         SpotifyWrapped metadata.
-    #         """
-    #         model = SpotifyWrapped
-    #         fields = [
-    #             'user', 'favorite_tracks', 'favorite_artists', 'favorite_genres',
-    #             'quirkiest_artists', 'term_selection'
-    #         ]
+
+
+
+class SpotifyWrappedSerializer(serializers.ModelSerializer):
+    """
+    Serializer for SpotifyWrapped model, including term selection.
+    """
+    favorite_tracks = TrackSerializer(many=True)
+    favorite_artists = ArtistSerializer(many=True)
+    favorite_genres = serializers.ListField(child=serializers.CharField())
+    quirkiest_artists = ArtistSerializer(many=True)
+    term_selection = serializers.ChoiceField(choices=[
+                 ('short_term', 'Short Term'),
+                 ('medium_term', 'Medium Term'),
+                 ('long_term', 'Long Term')
+             ])
+    llama_description = serializers.CharField()
+    llama_songrecs = serializers.JSONField()
+
+    class Meta:
+        """
+        SpotifyWrapped metadata.
+        """
+        model = SpotifyWrapped
+        fields = '__all__'
+
 
 class DuoWrappedSerializer(SpotifyUserSerializer):
     """
