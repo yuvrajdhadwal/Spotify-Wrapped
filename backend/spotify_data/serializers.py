@@ -28,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
-class ImageSerializer(serializers.Serializer):
+class ImageSerializer(serializers.Serializer): # pylint: disable=abstract-method
     """
     Serializer for image data in artist profiles.
     """
@@ -36,7 +36,7 @@ class ImageSerializer(serializers.Serializer):
     height = serializers.IntegerField(required=False, allow_null=True, default=None)
     width = serializers.IntegerField(required=False, allow_null=True, default=None)
 
-class ArtistSerializer(serializers.Serializer):
+class ArtistSerializer(serializers.Serializer): # pylint: disable=abstract-method
     """
     Serializer for artist data stored in JSONFields.
     """
@@ -47,7 +47,7 @@ class ArtistSerializer(serializers.Serializer):
     images = ImageSerializer(many=True, required=False)
 
 
-class AlbumSerializer(serializers.Serializer):
+class AlbumSerializer(serializers.Serializer): # pylint: disable=abstract-method
     """
     Serializer for album data in track information.
     """
@@ -56,7 +56,7 @@ class AlbumSerializer(serializers.Serializer):
     release_date = serializers.CharField()
     images = ImageSerializer(many=True, required=False)
 
-class TrackSerializer(serializers.Serializer):
+class TrackSerializer(serializers.Serializer): # pylint: disable=abstract-method
     """
     Serializer for track data stored in JSONFields.
     """
@@ -105,13 +105,14 @@ class SpotifyWrappedSerializer(serializers.ModelSerializer):
     quirkiest_artists = ArtistSerializer(many=True)
     favorite_genres = serializers.ListField(child=serializers.CharField())
     term_selection = serializers.ChoiceField(
-        choices=[('short_term', 'Short Term'), ('medium_term', 'Medium Term'), ('long_term', 'Long Term')],
+        choices=[('short_term', 'Short Term'), ('medium_term', 'Medium Term'),
+                 ('long_term', 'Long Term')],
     )
     llama_description = serializers.CharField()
     llama_songrecs = serializers.JSONField()
     datetime_created = serializers.CharField()
 
-    class Meta:
+    class Meta: # pylint: disable=too-few-public-methods
         """
         SpotifyWrapped metadata.
         """

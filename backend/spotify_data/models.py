@@ -1,10 +1,10 @@
 """
 Models for Spotify Roasted database.
 """
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from .utils import datetime_to_str
-from datetime import datetime
 
 class Song(models.Model):
     """

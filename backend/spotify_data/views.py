@@ -14,7 +14,7 @@ from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_user_favorite_tracks,
                     get_top_genres, get_quirkiest_artists,
                     create_groq_description, get_spotify_recommendations,
-                    create_groq_quirky, str_to_datetime)
+                    create_groq_quirky)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
 from .serializers import (SongSerializer, SpotifyUserSerializer,
                           DuoWrappedSerializer, SpotifyWrappedSerializer)
@@ -117,7 +117,6 @@ def add_spotify_wrapped(request):
     favorite_tracks = None
     favorite_genres = None
     quirkiest_artists = None
-    access_token = SpotifyToken.objects.get(user=user.username)
     match term_selection:
         case '0':
             favorite_artists = spotify_user.favorite_artists_short

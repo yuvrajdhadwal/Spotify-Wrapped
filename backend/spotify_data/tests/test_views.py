@@ -1,22 +1,20 @@
 """Unit tests for spotify_data/views (adding and updating users)."""
 
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 import json
+from datetime import datetime
 import pytest
 from django.contrib.auth.models import User
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import HttpResponse
 from django.utils import timezone
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from backend.spotify_data.utils import datetime_to_str
+from accounts.models import SpotifyToken
 from spotify_data.views import update_or_add_spotify_user, add_spotify_wrapped, add_duo_wrapped
 from spotify_data.models import SpotifyUser, SpotifyWrapped
-from accounts.models import SpotifyToken
-from unittest.mock import patch, MagicMock
-from datetime import datetime
-
-from backend.spotify_data.utils import datetime_to_str
 
 
 def mock_getenv_side_effect(key):
@@ -277,7 +275,6 @@ def test_add_spotify_wrapped_short_term(mock_create_wrapped, mock_get_recommenda
     assert mock_request.GET.get('termselection') == '0'
 
     # Call the function
-    from spotify_data.views import add_spotify_wrapped
     response = add_spotify_wrapped(mock_request)
 
     # Assertions
@@ -360,7 +357,6 @@ def test_add_spotify_wrapped_medium_term(mock_create_wrapped, mock_get_recommend
     assert mock_request.GET.get('termselection') == '1'
 
     # Call the function
-    from spotify_data.views import add_spotify_wrapped
     response = add_spotify_wrapped(mock_request)
 
     # Assertions
@@ -445,7 +441,6 @@ def test_add_spotify_wrapped_long_term(mock_create_wrapped, mock_get_recommendat
     assert mock_request.GET.get('termselection') == '2'
 
     # Call the function
-    from spotify_data.views import add_spotify_wrapped
     response = add_spotify_wrapped(mock_request)
 
     # Assertions
@@ -509,7 +504,6 @@ def test_add_duo_wrapped_short_term(mock_create_duo, mock_get_recommendations,
     """
     Test successful creation of short-term DuoWrapped
     """
-    from datetime import datetime
 
     # Define a mock datetime
     mock_datetime_created = datetime(2024, 11, 29, 12, 0, 0, 123456)
@@ -581,7 +575,6 @@ def test_add_duo_wrapped_short_term(mock_create_duo, mock_get_recommendations,
     }
 
     # Call the function
-    from spotify_data.views import add_duo_wrapped
     response = add_duo_wrapped(mock_request)
 
     # Assertions
@@ -622,7 +615,6 @@ def test_add_duo_wrapped_medium_term(mock_create_duo, mock_get_recommendations,
     """
     Test successful creation of short-term DuoWrapped
     """
-    from datetime import datetime
 
     # Define a mock datetime
     mock_datetime_created = datetime(2024, 11, 29, 12, 0, 0, 123456)
@@ -694,7 +686,6 @@ def test_add_duo_wrapped_medium_term(mock_create_duo, mock_get_recommendations,
     }
 
     # Call the function
-    from spotify_data.views import add_duo_wrapped
     response = add_duo_wrapped(mock_request)
 
     # Assertions
@@ -735,7 +726,6 @@ def test_add_duo_wrapped_long_term(mock_create_duo, mock_get_recommendations,
     """
     Test successful creation of short-term DuoWrapped
     """
-    from datetime import datetime
 
     # Define a mock datetime
     mock_datetime_created = datetime(2024, 11, 29, 12, 0, 0, 123456)
@@ -807,7 +797,6 @@ def test_add_duo_wrapped_long_term(mock_create_duo, mock_get_recommendations,
     }
 
     # Call the function
-    from spotify_data.views import add_duo_wrapped
     response = add_duo_wrapped(mock_request)
 
     # Assertions
@@ -864,10 +853,13 @@ class DisplayArtistsViewTest(TestCase):
         self.spotify_wrapped_short = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='short_term',
-            favorite_artists=[{'name': 'Artist Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Short',
+                               'images': [{'url': 'http://example.com/short.jpg'}]}],
+            favorite_tracks=[{'name': 'Track Short',
+                              'images': [{'url': 'http://example.com/short.jpg'}]}],
             favorite_genres=['Genre Short'],
-            quirkiest_artists=[{'name': 'Quirky Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Short',
+                                'images': [{'url': 'http://example.com/short.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtshort,
@@ -875,10 +867,13 @@ class DisplayArtistsViewTest(TestCase):
         self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='medium_term',
-            favorite_artists=[{'name': 'Artist Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Medium',
+                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            favorite_tracks=[{'name': 'Track Medium',
+                              'images': [{'url': 'http://example.com/medium.jpg'}]}],
             favorite_genres=['Genre Medium'],
-            quirkiest_artists=[{'name': 'Quirky Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Medium',
+                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtmedium,
@@ -886,10 +881,13 @@ class DisplayArtistsViewTest(TestCase):
         self.spotify_wrapped_long = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='long_term',
-            favorite_artists=[{'name': 'Artist Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Long',
+                               'images': [{'url': 'http://example.com/long.jpg'}]}],
+            favorite_tracks=[{'name': 'Track Long',
+                              'images': [{'url': 'http://example.com/long.jpg'}]}],
             favorite_genres=['Genre Long'],
-            quirkiest_artists=[{'name': 'Quirky Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Long',
+                                'images': [{'url': 'http://example.com/long.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtlong,
@@ -958,10 +956,13 @@ class DisplayGenresViewTest(TestCase):
         self.spotify_wrapped_short = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='short_term',
-            favorite_artists=[{'name': 'Artist Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Short',
+                               'images': [{'url': 'http://example.com/short.jpg'}]}],
+            favorite_tracks=[{'name': 'Track Short',
+                              'images': [{'url': 'http://example.com/short.jpg'}]}],
             favorite_genres=['Genre Short'],
-            quirkiest_artists=[{'name': 'Quirky Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Short',
+                                'images': [{'url': 'http://example.com/short.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtshort,
@@ -969,10 +970,13 @@ class DisplayGenresViewTest(TestCase):
         self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='medium_term',
-            favorite_artists=[{'name': 'Artist Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Medium',
+                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            favorite_tracks=[{'name': 'Track Medium',
+                              'images': [{'url': 'http://example.com/medium.jpg'}]}],
             favorite_genres=['Genre Medium'],
-            quirkiest_artists=[{'name': 'Quirky Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Medium',
+                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtmedium,
@@ -980,10 +984,13 @@ class DisplayGenresViewTest(TestCase):
         self.spotify_wrapped_long = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='long_term',
-            favorite_artists=[{'name': 'Artist Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Long',
+                               'images': [{'url': 'http://example.com/long.jpg'}]}],
+            favorite_tracks=[{'name': 'Track Long',
+                              'images': [{'url': 'http://example.com/long.jpg'}]}],
             favorite_genres=['Genre Long'],
-            quirkiest_artists=[{'name': 'Quirky Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Long',
+                                'images': [{'url': 'http://example.com/long.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtlong,
@@ -1049,14 +1056,16 @@ class DisplaySongsViewTest(TestCase):
         self.spotify_wrapped_short = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='short_term',
-            favorite_artists=[{'name': 'Artist Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Short',
+                               'images': [{'url': 'http://example.com/short.jpg'}]}],
             favorite_tracks=[{
                 'name': 'Track Short',
                 'artists': [{'name': 'Artist Short'}],
                 'album': {'images': [{'url': 'http://example.com/track_short.jpg'}]}
             }],
             favorite_genres=['Genre Short'],
-            quirkiest_artists=[{'name': 'Quirky Short', 'images': [{'url': 'http://example.com/short.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Short',
+                                'images': [{'url': 'http://example.com/short.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtshort,
@@ -1064,14 +1073,16 @@ class DisplaySongsViewTest(TestCase):
         self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='medium_term',
-            favorite_artists=[{'name': 'Artist Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Medium',
+                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
             favorite_tracks=[{
                 'name': 'Track Medium',
                 'artists': [{'name': 'Artist Medium'}],
                 'album': {'images': [{'url': 'http://example.com/track_medium.jpg'}]}
             }],
             favorite_genres=['Genre Medium'],
-            quirkiest_artists=[{'name': 'Quirky Medium', 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Medium',
+                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtmedium,
@@ -1079,14 +1090,16 @@ class DisplaySongsViewTest(TestCase):
         self.spotify_wrapped_long = SpotifyWrapped.objects.create(
             user=self.user,
             term_selection='long_term',
-            favorite_artists=[{'name': 'Artist Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
+            favorite_artists=[{'name': 'Artist Long',
+                               'images': [{'url': 'http://example.com/long.jpg'}]}],
             favorite_tracks=[{
                 'name': 'Track Long',
                 'artists': [{'name': 'Artist Long'}],
                 'album': {'images': [{'url': 'http://example.com/track_long.jpg'}]}
             }],
             favorite_genres=['Genre Long'],
-            quirkiest_artists=[{'name': 'Quirky Long', 'images': [{'url': 'http://example.com/long.jpg'}]}],
+            quirkiest_artists=[{'name': 'Quirky Long',
+                                'images': [{'url': 'http://example.com/long.jpg'}]}],
             llama_description='Generated description',
             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
             datetime_created=self.dtlong,
