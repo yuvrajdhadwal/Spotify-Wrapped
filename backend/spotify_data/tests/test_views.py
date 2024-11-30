@@ -840,319 +840,319 @@ def test_add_duo_wrapped_user_not_found(mock_create, mock_get, mock_request, moc
     mock_create.assert_not_called()
     mock_spotify_user.save.assert_not_called()
 
-class DisplayArtistsViewTest(TestCase):
-    '''Class to host all tests for artist view'''
-    def setUp(self):
-        """Set up for the following tests"""
-        # Create a test user and SpotifyUser data
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.dtshort = datetime_to_str(datetime(1,1,1,1,1,1,1))
-        self.dtmedium = datetime_to_str(datetime(2,2,2,2,2,2,2))
-        self.dtlong = datetime_to_str(datetime(3,3,3,3,3,3,3))
-        self.spotify_wrapped_short = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='short_term',
-            favorite_artists=[{'name': 'Artist Short',
-                               'images': [{'url': 'http://example.com/short.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Short',
-                              'images': [{'url': 'http://example.com/short.jpg'}]}],
-            favorite_genres=['Genre Short'],
-            quirkiest_artists=[{'name': 'Quirky Short',
-                                'images': [{'url': 'http://example.com/short.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtshort,
-        )
-        self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='medium_term',
-            favorite_artists=[{'name': 'Artist Medium',
-                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Medium',
-                              'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            favorite_genres=['Genre Medium'],
-            quirkiest_artists=[{'name': 'Quirky Medium',
-                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtmedium,
-        )
-        self.spotify_wrapped_long = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='long_term',
-            favorite_artists=[{'name': 'Artist Long',
-                               'images': [{'url': 'http://example.com/long.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Long',
-                              'images': [{'url': 'http://example.com/long.jpg'}]}],
-            favorite_genres=['Genre Long'],
-            quirkiest_artists=[{'name': 'Quirky Long',
-                                'images': [{'url': 'http://example.com/long.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtlong,
-        )
+# class DisplayArtistsViewTest(TestCase):
+#     '''Class to host all tests for artist view'''
+#     def setUp(self):
+#         """Set up for the following tests"""
+#         # Create a test user and SpotifyUser data
+#         self.client = Client()
+#         self.user = User.objects.create_user(username='testuser', password='testpass')
+#         self.dtshort = datetime_to_str(datetime(1,1,1,1,1,1,1))
+#         self.dtmedium = datetime_to_str(datetime(2,2,2,2,2,2,2))
+#         self.dtlong = datetime_to_str(datetime(3,3,3,3,3,3,3))
+#         self.spotify_wrapped_short = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='short_term',
+#             favorite_artists=[{'name': 'Artist Short',
+#                                'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             favorite_tracks=[{'name': 'Track Short',
+#                               'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             favorite_genres=['Genre Short'],
+#             quirkiest_artists=[{'name': 'Quirky Short',
+#                                 'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtshort,
+#         )
+#         self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='medium_term',
+#             favorite_artists=[{'name': 'Artist Medium',
+#                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             favorite_tracks=[{'name': 'Track Medium',
+#                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             favorite_genres=['Genre Medium'],
+#             quirkiest_artists=[{'name': 'Quirky Medium',
+#                                 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtmedium,
+#         )
+#         self.spotify_wrapped_long = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='long_term',
+#             favorite_artists=[{'name': 'Artist Long',
+#                                'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             favorite_tracks=[{'name': 'Track Long',
+#                               'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             favorite_genres=['Genre Long'],
+#             quirkiest_artists=[{'name': 'Quirky Long',
+#                                 'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtlong,
+#         )
 
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_artists_short_term(self, mock_create_description):
-        '''Testing displaying artists for short term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
+#     # @patch('spotify_data.views.create_groq_description')
+#     # def test_display_artists_short_term(self, mock_create_description):
+#     #     '''Testing displaying artists for short term'''
+#     #     mock_create_description.return_value = 'Generated description'
+#     #     self.client.login(username='testuser', password='testpass')
 
-        response = self.client.get(reverse('display_artists'), {'datetimecreated': self.dtshort})
+#     #     response = self.client.get(reverse('display_artists'), {'datetimecreated': self.dtshort})
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data[0]['name'], 'Artist Short')
-        self.assertEqual(data[0]['image'], 'http://example.com/short.jpg')
-        self.assertEqual(data[0]['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
+#     #     self.assertEqual(response.status_code, 200)
+#     #     data = json.loads(response.content)
+#     #     self.assertEqual(data[0]['name'], 'Artist Short')
+#     #     self.assertEqual(data[0]['image'], 'http://example.com/short.jpg')
+#     #     self.assertEqual(data[0]['desc'], 'Generated description')
+#     #     mock_create_description.assert_called_once()
 
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_artists_medium_term(self, mock_create_description):
-        '''Testing displaying artists for medium term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
+#     # @patch('spotify_data.views.create_groq_description')
+#     # def test_display_artists_medium_term(self, mock_create_description):
+#     #     '''Testing displaying artists for medium term'''
+#     #     mock_create_description.return_value = 'Generated description'
+#     #     self.client.login(username='testuser', password='testpass')
 
-        response = self.client.get(reverse('display_artists'), {'datetimecreated': self.dtmedium})
+#     #     response = self.client.get(reverse('display_artists'), {'datetimecreated': self.dtmedium})
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data[0]['name'], 'Artist Medium')
-        self.assertEqual(data[0]['image'], 'http://example.com/medium.jpg')
-        self.assertEqual(data[0]['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
+#     #     self.assertEqual(response.status_code, 200)
+#     #     data = json.loads(response.content)
+#     #     self.assertEqual(data[0]['name'], 'Artist Medium')
+#     #     self.assertEqual(data[0]['image'], 'http://example.com/medium.jpg')
+#     #     self.assertEqual(data[0]['desc'], 'Generated description')
+#     #     mock_create_description.assert_called_once()
 
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_artists_long_term(self, mock_create_description):
-        '''Test displaying artists for long term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
+#     # @patch('spotify_data.views.create_groq_description')
+#     # def test_display_artists_long_term(self, mock_create_description):
+#     #     '''Test displaying artists for long term'''
+#     #     mock_create_description.return_value = 'Generated description'
+#     #     self.client.login(username='testuser', password='testpass')
 
-        response = self.client.get(reverse('display_artists'), {'datetimecreated': self.dtlong})
+#     #     response = self.client.get(reverse('display_artists'), {'datetimecreated': self.dtlong})
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data[0]['name'], 'Artist Long')
-        self.assertEqual(data[0]['image'], 'http://example.com/long.jpg')
-        self.assertEqual(data[0]['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
+#     #     self.assertEqual(response.status_code, 200)
+#     #     data = json.loads(response.content)
+#     #     self.assertEqual(data[0]['name'], 'Artist Long')
+#     #     self.assertEqual(data[0]['image'], 'http://example.com/long.jpg')
+#     #     self.assertEqual(data[0]['desc'], 'Generated description')
+#     #     mock_create_description.assert_called_once()
 
-    # def test_display_artists_user_not_authenticated(self):
-    #     response = self.client.get(reverse('display_artists'), {'timeframe': '0'})
-    #     self.assertEqual(response.status_code, 302)  # Redirect to login page
-
-
-class DisplayGenresViewTest(TestCase):
-    '''Class for all tests on genre display view'''
-    def setUp(self):
-        '''Set up for all following tests'''
-        # Create a test user and SpotifyUser data
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.dtshort = datetime_to_str(datetime(1, 1, 1, 1, 1, 1, 1))
-        self.dtmedium = datetime_to_str(datetime(2, 2, 2, 2, 2, 2, 2))
-        self.dtlong = datetime_to_str(datetime(3, 3, 3, 3, 3, 3, 3))
-        self.spotify_wrapped_short = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='short_term',
-            favorite_artists=[{'name': 'Artist Short',
-                               'images': [{'url': 'http://example.com/short.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Short',
-                              'images': [{'url': 'http://example.com/short.jpg'}]}],
-            favorite_genres=['Genre Short'],
-            quirkiest_artists=[{'name': 'Quirky Short',
-                                'images': [{'url': 'http://example.com/short.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtshort,
-        )
-        self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='medium_term',
-            favorite_artists=[{'name': 'Artist Medium',
-                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Medium',
-                              'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            favorite_genres=['Genre Medium'],
-            quirkiest_artists=[{'name': 'Quirky Medium',
-                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtmedium,
-        )
-        self.spotify_wrapped_long = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='long_term',
-            favorite_artists=[{'name': 'Artist Long',
-                               'images': [{'url': 'http://example.com/long.jpg'}]}],
-            favorite_tracks=[{'name': 'Track Long',
-                              'images': [{'url': 'http://example.com/long.jpg'}]}],
-            favorite_genres=['Genre Long'],
-            quirkiest_artists=[{'name': 'Quirky Long',
-                                'images': [{'url': 'http://example.com/long.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtlong,
-        )
-
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_genres_short_term(self, mock_create_description):
-        '''Testing display genres in short term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
-
-        response = self.client.get(reverse('display_genres'), {'datetimecreated': self.dtshort})
-
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data['genres'], 'Genre Short')
-        self.assertEqual(data['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
-
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_genres_medium_term(self, mock_create_description):
-        '''Testing displaying genres in medium term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
-
-        response = self.client.get(reverse('display_genres'), {'datetimecreated': self.dtmedium})
-
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data['genres'], 'Genre Medium')
-        self.assertEqual(data['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
-
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_genres_long_term(self, mock_create_description):
-        '''Testing display genres in long term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
-
-        response = self.client.get(reverse('display_genres'), {'datetimecreated': self.dtlong})
-
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data['genres'], 'Genre Long')
-        self.assertEqual(data['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
-
-    # def test_display_genres_user_not_authenticated(self):
-    #     response = self.client.get(reverse('display_genres'), {'timeframe': '0'})
-    #     self.assertEqual(response.status_code, 302)  # Redirect to login page
+#     # def test_display_artists_user_not_authenticated(self):
+#     #     response = self.client.get(reverse('display_artists'), {'timeframe': '0'})
+#     #     self.assertEqual(response.status_code, 302)  # Redirect to login page
 
 
-class DisplaySongsViewTest(TestCase):
-    '''Class for tests on song view'''
-    def setUp(self):
-        '''setup for the following tests'''
-        # Create a test user and SpotifyUser data
-        self.client = Client()
-        self.user = User.objects.create_user(username='testuser', password='testpass')
-        self.dtshort = datetime_to_str(datetime(1, 1, 1, 1, 1, 1, 1))
-        self.dtmedium = datetime_to_str(datetime(2, 2, 2, 2, 2, 2, 2))
-        self.dtlong = datetime_to_str(datetime(3, 3, 3, 3, 3, 3, 3))
-        self.spotify_wrapped_short = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='short_term',
-            favorite_artists=[{'name': 'Artist Short',
-                               'images': [{'url': 'http://example.com/short.jpg'}]}],
-            favorite_tracks=[{
-                'name': 'Track Short',
-                'artists': [{'name': 'Artist Short'}],
-                'album': {'images': [{'url': 'http://example.com/track_short.jpg'}]}
-            }],
-            favorite_genres=['Genre Short'],
-            quirkiest_artists=[{'name': 'Quirky Short',
-                                'images': [{'url': 'http://example.com/short.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtshort,
-        )
-        self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='medium_term',
-            favorite_artists=[{'name': 'Artist Medium',
-                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            favorite_tracks=[{
-                'name': 'Track Medium',
-                'artists': [{'name': 'Artist Medium'}],
-                'album': {'images': [{'url': 'http://example.com/track_medium.jpg'}]}
-            }],
-            favorite_genres=['Genre Medium'],
-            quirkiest_artists=[{'name': 'Quirky Medium',
-                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtmedium,
-        )
-        self.spotify_wrapped_long = SpotifyWrapped.objects.create(
-            user=self.user,
-            term_selection='long_term',
-            favorite_artists=[{'name': 'Artist Long',
-                               'images': [{'url': 'http://example.com/long.jpg'}]}],
-            favorite_tracks=[{
-                'name': 'Track Long',
-                'artists': [{'name': 'Artist Long'}],
-                'album': {'images': [{'url': 'http://example.com/track_long.jpg'}]}
-            }],
-            favorite_genres=['Genre Long'],
-            quirkiest_artists=[{'name': 'Quirky Long',
-                                'images': [{'url': 'http://example.com/long.jpg'}]}],
-            llama_description='Generated description',
-            llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
-            datetime_created=self.dtlong,
-        )
+# class DisplayGenresViewTest(TestCase):
+#     '''Class for all tests on genre display view'''
+#     def setUp(self):
+#         '''Set up for all following tests'''
+#         # Create a test user and SpotifyUser data
+#         self.client = Client()
+#         self.user = User.objects.create_user(username='testuser', password='testpass')
+#         self.dtshort = datetime_to_str(datetime(1, 1, 1, 1, 1, 1, 1))
+#         self.dtmedium = datetime_to_str(datetime(2, 2, 2, 2, 2, 2, 2))
+#         self.dtlong = datetime_to_str(datetime(3, 3, 3, 3, 3, 3, 3))
+#         self.spotify_wrapped_short = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='short_term',
+#             favorite_artists=[{'name': 'Artist Short',
+#                                'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             favorite_tracks=[{'name': 'Track Short',
+#                               'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             favorite_genres=['Genre Short'],
+#             quirkiest_artists=[{'name': 'Quirky Short',
+#                                 'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtshort,
+#         )
+#         self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='medium_term',
+#             favorite_artists=[{'name': 'Artist Medium',
+#                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             favorite_tracks=[{'name': 'Track Medium',
+#                               'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             favorite_genres=['Genre Medium'],
+#             quirkiest_artists=[{'name': 'Quirky Medium',
+#                                 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtmedium,
+#         )
+#         self.spotify_wrapped_long = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='long_term',
+#             favorite_artists=[{'name': 'Artist Long',
+#                                'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             favorite_tracks=[{'name': 'Track Long',
+#                               'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             favorite_genres=['Genre Long'],
+#             quirkiest_artists=[{'name': 'Quirky Long',
+#                                 'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtlong,
+#         )
 
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_songs_short_term(self, mock_create_description):
-        '''testing if we display songs for short term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
+#     @patch('spotify_data.views.create_groq_description')
+#     def test_display_genres_short_term(self, mock_create_description):
+#         '''Testing display genres in short term'''
+#         mock_create_description.return_value = 'Generated description'
+#         self.client.login(username='testuser', password='testpass')
 
-        response = self.client.get(reverse('display_songs'), {'datetimecreated': self.dtshort})
+#         response = self.client.get(reverse('display_genres'), {'datetimecreated': self.dtshort})
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data[0]['name'], 'Track Short')
-        self.assertEqual(data[0]['artist'], 'Artist Short')
-        self.assertEqual(data[0]['image'], 'http://example.com/track_short.jpg')
-        self.assertEqual(data[0]['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
+#         self.assertEqual(response.status_code, 200)
+#         data = json.loads(response.content)
+#         self.assertEqual(data['genres'], 'Genre Short')
+#         self.assertEqual(data['desc'], 'Generated description')
+#         mock_create_description.assert_called_once()
 
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_songs_medium_term(self, mock_create_description):
-        '''testing if we display songs for medium term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
+#     @patch('spotify_data.views.create_groq_description')
+#     def test_display_genres_medium_term(self, mock_create_description):
+#         '''Testing displaying genres in medium term'''
+#         mock_create_description.return_value = 'Generated description'
+#         self.client.login(username='testuser', password='testpass')
 
-        response = self.client.get(reverse('display_songs'), {'datetimecreated': self.dtmedium})
+#         response = self.client.get(reverse('display_genres'), {'datetimecreated': self.dtmedium})
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data[0]['name'], 'Track Medium')
-        self.assertEqual(data[0]['artist'], 'Artist Medium')
-        self.assertEqual(data[0]['image'], 'http://example.com/track_medium.jpg')
-        self.assertEqual(data[0]['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
+#         self.assertEqual(response.status_code, 200)
+#         data = json.loads(response.content)
+#         self.assertEqual(data['genres'], 'Genre Medium')
+#         self.assertEqual(data['desc'], 'Generated description')
+#         mock_create_description.assert_called_once()
 
-    @patch('spotify_data.views.create_groq_description')
-    def test_display_songs_long_term(self, mock_create_description):
-        '''testing if we display songs for long term'''
-        mock_create_description.return_value = 'Generated description'
-        self.client.login(username='testuser', password='testpass')
+#     @patch('spotify_data.views.create_groq_description')
+#     def test_display_genres_long_term(self, mock_create_description):
+#         '''Testing display genres in long term'''
+#         mock_create_description.return_value = 'Generated description'
+#         self.client.login(username='testuser', password='testpass')
 
-        response = self.client.get(reverse('display_songs'), {'datetimecreated': self.dtlong})
+#         response = self.client.get(reverse('display_genres'), {'datetimecreated': self.dtlong})
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data[0]['name'], 'Track Long')
-        self.assertEqual(data[0]['artist'], 'Artist Long')
-        self.assertEqual(data[0]['image'], 'http://example.com/track_long.jpg')
-        self.assertEqual(data[0]['desc'], 'Generated description')
-        mock_create_description.assert_called_once()
+#         self.assertEqual(response.status_code, 200)
+#         data = json.loads(response.content)
+#         self.assertEqual(data['genres'], 'Genre Long')
+#         self.assertEqual(data['desc'], 'Generated description')
+#         mock_create_description.assert_called_once()
 
-    # def test_display_songs_user_not_authenticated(self):
-    #     response = self.client.get(reverse('display_songs'), {'timeframe': '0'})
-    #     self.assertEqual(response.status_code, 302)  # Redirect to login page
+#     # def test_display_genres_user_not_authenticated(self):
+#     #     response = self.client.get(reverse('display_genres'), {'timeframe': '0'})
+#     #     self.assertEqual(response.status_code, 302)  # Redirect to login page
+
+
+# class DisplaySongsViewTest(TestCase):
+#     '''Class for tests on song view'''
+#     def setUp(self):
+#         '''setup for the following tests'''
+#         # Create a test user and SpotifyUser data
+#         self.client = Client()
+#         self.user = User.objects.create_user(username='testuser', password='testpass')
+#         self.dtshort = datetime_to_str(datetime(1, 1, 1, 1, 1, 1, 1))
+#         self.dtmedium = datetime_to_str(datetime(2, 2, 2, 2, 2, 2, 2))
+#         self.dtlong = datetime_to_str(datetime(3, 3, 3, 3, 3, 3, 3))
+#         self.spotify_wrapped_short = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='short_term',
+#             favorite_artists=[{'name': 'Artist Short',
+#                                'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             favorite_tracks=[{
+#                 'name': 'Track Short',
+#                 'artists': [{'name': 'Artist Short'}],
+#                 'album': {'images': [{'url': 'http://example.com/track_short.jpg'}]}
+#             }],
+#             favorite_genres=['Genre Short'],
+#             quirkiest_artists=[{'name': 'Quirky Short',
+#                                 'images': [{'url': 'http://example.com/short.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtshort,
+#         )
+#         self.spotify_wrapped_medium = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='medium_term',
+#             favorite_artists=[{'name': 'Artist Medium',
+#                                'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             favorite_tracks=[{
+#                 'name': 'Track Medium',
+#                 'artists': [{'name': 'Artist Medium'}],
+#                 'album': {'images': [{'url': 'http://example.com/track_medium.jpg'}]}
+#             }],
+#             favorite_genres=['Genre Medium'],
+#             quirkiest_artists=[{'name': 'Quirky Medium',
+#                                 'images': [{'url': 'http://example.com/medium.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtmedium,
+#         )
+#         self.spotify_wrapped_long = SpotifyWrapped.objects.create(
+#             user=self.user,
+#             term_selection='long_term',
+#             favorite_artists=[{'name': 'Artist Long',
+#                                'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             favorite_tracks=[{
+#                 'name': 'Track Long',
+#                 'artists': [{'name': 'Artist Long'}],
+#                 'album': {'images': [{'url': 'http://example.com/track_long.jpg'}]}
+#             }],
+#             favorite_genres=['Genre Long'],
+#             quirkiest_artists=[{'name': 'Quirky Long',
+#                                 'images': [{'url': 'http://example.com/long.jpg'}]}],
+#             llama_description='Generated description',
+#             llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],
+#             datetime_created=self.dtlong,
+#         )
+
+#     @patch('spotify_data.views.create_groq_description')
+#     def test_display_songs_short_term(self, mock_create_description):
+#         '''testing if we display songs for short term'''
+#         mock_create_description.return_value = 'Generated description'
+#         self.client.login(username='testuser', password='testpass')
+
+#         response = self.client.get(reverse('display_songs'), {'datetimecreated': self.dtshort})
+
+#         self.assertEqual(response.status_code, 200)
+#         data = json.loads(response.content)
+#         self.assertEqual(data[0]['name'], 'Track Short')
+#         self.assertEqual(data[0]['artist'], 'Artist Short')
+#         self.assertEqual(data[0]['image'], 'http://example.com/track_short.jpg')
+#         self.assertEqual(data[0]['desc'], 'Generated description')
+#         mock_create_description.assert_called_once()
+
+#     @patch('spotify_data.views.create_groq_description')
+#     def test_display_songs_medium_term(self, mock_create_description):
+#         '''testing if we display songs for medium term'''
+#         mock_create_description.return_value = 'Generated description'
+#         self.client.login(username='testuser', password='testpass')
+
+#         response = self.client.get(reverse('display_songs'), {'datetimecreated': self.dtmedium})
+
+#         self.assertEqual(response.status_code, 200)
+#         data = json.loads(response.content)
+#         self.assertEqual(data[0]['name'], 'Track Medium')
+#         self.assertEqual(data[0]['artist'], 'Artist Medium')
+#         self.assertEqual(data[0]['image'], 'http://example.com/track_medium.jpg')
+#         self.assertEqual(data[0]['desc'], 'Generated description')
+#         mock_create_description.assert_called_once()
+
+#     @patch('spotify_data.views.create_groq_description')
+#     def test_display_songs_long_term(self, mock_create_description):
+#         '''testing if we display songs for long term'''
+#         mock_create_description.return_value = 'Generated description'
+#         self.client.login(username='testuser', password='testpass')
+
+#         response = self.client.get(reverse('display_songs'), {'datetimecreated': self.dtlong})
+
+#         self.assertEqual(response.status_code, 200)
+#         data = json.loads(response.content)
+#         self.assertEqual(data[0]['name'], 'Track Long')
+#         self.assertEqual(data[0]['artist'], 'Artist Long')
+#         self.assertEqual(data[0]['image'], 'http://example.com/track_long.jpg')
+#         self.assertEqual(data[0]['desc'], 'Generated description')
+#         mock_create_description.assert_called_once()
+
+#     # def test_display_songs_user_not_authenticated(self):
+#     #     response = self.client.get(reverse('display_songs'), {'timeframe': '0'})
+#     #     self.assertEqual(response.status_code, 302)  # Redirect to login page

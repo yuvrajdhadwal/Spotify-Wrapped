@@ -110,7 +110,7 @@ def add_spotify_wrapped(request):
     load_dotenv()
     groq_api_key = os.getenv('GROQ_API_KEY')
     term_selection = request.GET.get('termselection')
-
+    print(term_selection)
     user = request.user
     spotify_user = SpotifyUser.objects.get(user=user) # pylint: disable=no-member
     favorite_artists = None
@@ -224,10 +224,9 @@ def add_duo_wrapped(request):
 def display_artists(request):
     '''Displays artists for the frontend depending on the timeframe'''
     load_dotenv()
-    dtstr = request.GET.get('datetimecreated')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.get(datetime_created=dtstr)
+        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
 
@@ -246,10 +245,9 @@ def display_artists(request):
 def display_genres(request):
     '''Displays the genres for the frontend depending on the timeframe'''
     load_dotenv()
-    dtstr = request.GET.get('datetimecreated')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.get(datetime_created=dtstr)
+        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
 
@@ -264,10 +262,9 @@ def display_genres(request):
 def display_songs(request):
     '''Displays the songs for the frontend depending on the timeframe'''
     load_dotenv()
-    dtstr = request.GET.get('datetimecreated')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.get(datetime_created=dtstr)
+        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
 
@@ -288,10 +285,9 @@ def display_songs(request):
 def display_quirky(request):
     '''Displays the songs for the frontend depending on the timeframe'''
     load_dotenv()
-    dtstr = request.GET.get('datetimecreated')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.create(datetime_created=dtstr)
+        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
 
