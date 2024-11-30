@@ -6,14 +6,117 @@ const SpotifyUserPage = () => {
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        // on click, moves you to the artists page
-        document.addEventListener('click', () => {window.location.href = "./artists/"});
+        // Navigate to the artists page on document click
+        const handleClick = () => {
+            window.location.href = "./artists/";
+        };
+        document.addEventListener("click", handleClick);
 
-        const container = containerRef.current;
-        if (!container) {
-            console.error("Container not found: spotifyUserContainer");
-            return;
+        // Cleanup to avoid memory leaks
+        return () => {
+            document.removeEventListener("click", handleClick);
+        };
+    }, []);
+
+    useEffect(() => {
+        // Check the `id` value in localStorage and fetch data if needed
+        const id = localStorage.getItem("id");
+
+        if (id === "-1") {
+            fetchAndDisplaySpotifyUser().catch(console.error);
         }
+    }, []); // Empty dependency array ensures this runs only once on component mount    
+
+    const fetchAndDisplaySpotifyUser = async (): Promise<void> => {
+        try {
+            // Fetch user data
+            const response = await fetch(`http://localhost:8000/spotify_data/updateuser`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                console.error("Failed to fetch SpotifyUser data");
+                return;
+            }
+
+            let data = await response.json();
+            data = data.spotify_user;
+            console.log(data);
+
+            // Fetch Spotify Wrapped data
+            const termselection = localStorage.getItem("timeRange") || "1";
+            const wrappedResponse = await fetch(
+                `http://localhost:8000/spotify_data/addwrapped/?termselection=${encodeURIComponent(termselection)}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                }
+            );
+
+            let wrappedData = await wrappedResponse.json();
+            wrappedData = wrappedData.spotify_wrapped;
+            console.log(wrappedData);
+
+            // Save the `id` to localStorage
+            localStorage.setItem("id", wrappedData.id);
+        } catch (error) {
+            console.error("Error fetching SpotifyUser data:", error);
+        }
+    };
+
+    return (
+        <div id="spotifyUserContainer" ref={containerRef}>
+            {/* This is where the content will be appended */}
+            <h1>let's see what we are working with...</h1>
+            <p>Click anywhere on the screen to progress to the next slide</p>
+            <img
+                src="..\..\images\fire graphics.png"
+                alt="fire graphic"
+                style={{ maxWidth: "100%", height: "auto", marginTop: "20px" }}
+            />
+        </div>
+    );
+};
+
+export default SpotifyUserPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // function createSection(title: string, id: string): void {
         //     const section = document.createElement("div");
@@ -71,68 +174,7 @@ const SpotifyUserPage = () => {
 
         // createSection("Past Roasts", "past_roasts");
 
-        async function fetchAndDisplaySpotifyUser(): Promise<void> {
-            try {
-                const response = await fetch(`http://localhost:8000/spotify_data/updateuser`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include'
-                });
-
-                if (!response.ok) {
-                    console.error("Failed to fetch SpotifyUser data");
-                    return;
-                }
-                let data = await response.json();
-                data = data.spotify_user;
-                console.log(data);
-
-                const termselection = localStorage.getItem("timeRange") ||  '1';
-                const wrapped_response = await fetch(`http://localhost:8000/spotify_data/addwrapped/?termselection=${encodeURIComponent(termselection)}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include'
-                });
-
-                let wrapped_data = await wrapped_response.json();
-                wrapped_data = wrapped_data.spotify_wrapped;
-                console.log(wrapped_data)
-                localStorage.setItem("datetimeCreated", wrapped_data.datetime_created);
-                // (document.getElementById("display_name") as HTMLElement).innerText = `Display Name: ${data.display_name}`;
-                // (document.getElementById("email") as HTMLElement).innerText = `Email: ${data.email}`;
-                // (document.getElementById("profile_image") as HTMLImageElement).src = data.profile_image_url;
-
-                // displayList("favorite_tracks_short", data.favorite_tracks_short);
-                // displayList("favorite_tracks_medium", data.favorite_tracks_medium);
-                // displayList("favorite_tracks_long", data.favorite_tracks_long);
-
-                // displayList("favorite_artists_short", data.favorite_artists_short);
-                // displayList("favorite_artists_medium", data.favorite_artists_medium);
-                // displayList("favorite_artists_long", data.favorite_artists_long);
-
-                // displayStringList("favorite_genres_short", data.favorite_genres_short);
-                // displayStringList("favorite_genres_medium", data.favorite_genres_medium);
-                // displayStringList("favorite_genres_long", data.favorite_genres_long);
-
-                // displayList("quirkiest_artists_short", data.quirkiest_artists_short);
-                // displayList("quirkiest_artists_medium", data.quirkiest_artists_medium);
-                // displayList("quirkiest_artists_long", data.quirkiest_artists_long);
-
-                // (document.getElementById("llama_description") as HTMLElement).innerText = data.llama_description;
-                // (document.getElementById("llama_songrecs") as HTMLElement).innerText = data.llama_songrecs;
-
-                // displayList("past_roasts", data.past_roasts);
-
-            } catch (error) {
-                console.error("Error fetching SpotifyUser data:", error);
-            }
-        }
-
-        // function displayList(elementId: string, items: string[]): void {
+                // function displayList(elementId: string, items: string[]): void {
         //     const container = document.getElementById(elementId) as HTMLElement | null;
         //     if (!container) return;
 
@@ -168,21 +210,27 @@ const SpotifyUserPage = () => {
         //     }
         // }
 
-        fetchAndDisplaySpotifyUser().catch(console.error);
-    }, []); // Empty dependency array means this only runs once on mount
+                        // (document.getElementById("display_name") as HTMLElement).innerText = `Display Name: ${data.display_name}`;
+                // (document.getElementById("email") as HTMLElement).innerText = `Email: ${data.email}`;
+                // (document.getElementById("profile_image") as HTMLImageElement).src = data.profile_image_url;
 
-    return (
-        <div id="spotifyUserContainer" ref={containerRef}>
-            {/* This is where the content will be appended */}
-            <h1>let's see what we are working with...</h1>
-            <p>click anywhere on the screen to progress to the next slide</p>
-            <img 
-                src="..\..\images\fire graphics.png" 
-                alt="fire graphic" 
-                style={{ maxWidth: "100%", height: "auto", marginTop: "20px" }}
-                />
-        </div>
-    );
-};
+                // displayList("favorite_tracks_short", data.favorite_tracks_short);
+                // displayList("favorite_tracks_medium", data.favorite_tracks_medium);
+                // displayList("favorite_tracks_long", data.favorite_tracks_long);
 
-export default SpotifyUserPage;
+                // displayList("favorite_artists_short", data.favorite_artists_short);
+                // displayList("favorite_artists_medium", data.favorite_artists_medium);
+                // displayList("favorite_artists_long", data.favorite_artists_long);
+
+                // displayStringList("favorite_genres_short", data.favorite_genres_short);
+                // displayStringList("favorite_genres_medium", data.favorite_genres_medium);
+                // displayStringList("favorite_genres_long", data.favorite_genres_long);
+
+                // displayList("quirkiest_artists_short", data.quirkiest_artists_short);
+                // displayList("quirkiest_artists_medium", data.quirkiest_artists_medium);
+                // displayList("quirkiest_artists_long", data.quirkiest_artists_long);
+
+                // (document.getElementById("llama_description") as HTMLElement).innerText = data.llama_description;
+                // (document.getElementById("llama_songrecs") as HTMLElement).innerText = data.llama_songrecs;
+
+                // displayList("past_roasts", data.past_roasts);

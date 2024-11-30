@@ -14,6 +14,10 @@ export default function Dashboard() {
     const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [username, setUsername] = useState<string>('Guest');
     const [timeframe, setTimeframe] = useState<number>(2);
+    
+    useEffect(() => {
+        localStorage.setItem("id", "-1");
+    }, []);
 
     // Fetch username from backend
     useEffect(() => {
