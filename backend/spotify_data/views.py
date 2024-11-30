@@ -112,7 +112,8 @@ def add_spotify_wrapped(request):
     term_selection = request.GET.get('termselection')
     print(term_selection)
     user = request.user
-    spotify_user = SpotifyUser.objects.get(user=user) # pylint: disable=no-member
+    print(user.username)
+    spotify_user = SpotifyUser.objects.get(display_name=user.username) # pylint: disable=no-member
     favorite_artists = None
     favorite_tracks = None
     favorite_genres = None
@@ -343,7 +344,8 @@ def display_history(request):
     user = request.user
 
     try:
-        user_data = SpotifyUser.objects.get(user=user)
+        print(user.username)
+        user_data = SpotifyUser.objects.get(display_name=user.username)
     except ObjectDoesNotExist:
         return HttpResponse("User grab failed: no data", status=500)
     
