@@ -1,12 +1,11 @@
 import React from "react";
-import BodyText from "@/app/Components/BodyText";
 
 type RadioProps = {
     name: string;
     value: string;
     text: string;
-    onChange?: () => void; 
-    checked?: boolean;     
+    onChange?: () => void;
+    checked?: boolean;
 };
 
 /**
@@ -20,7 +19,7 @@ type RadioProps = {
  */
 const Radio: React.FC<RadioProps> = ({ name, value, text, onChange, checked }) => (
     <label>
-        <input type="radio" name={name} value={value} onChange={onChange} checked={checked} />
+        <input type="radio" name={name} value={value} onChange={onChange} checked={checked} className={"mr-2 w-5 h-5"} />
         {text}
     </label>
 );

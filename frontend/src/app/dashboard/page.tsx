@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Button from '../Components/Button';
 import Heading1 from '../Components/Heading1';
 import Radio from "../Components/Radio";
-import BodyText from "@/app/Components/BodyText";
 import { getCookie } from "@/utils";
 import { logError, logInfo } from '../utils/logger';
 
@@ -83,12 +82,14 @@ export default function Dashboard() {
     return (
         <div className="flex flex-col items-center p-6 space-y-6 min-h-screen justify-center">
             <Heading1 text={`${username} again? Yikes`} />
-            <Button text={"Sign Out"} method={() => {}} />
-            <Button text={"Delete Account"} method={() => {}} />
+            <div className={"flex-row"}>
+            <Button text={"Sign Out"} extraClasses={"mr-10"} faded={true} small={true} method={() => {}} />
+            <Button text={"Delete Account"} faded={true} small={true} method={() => {}} />
+            </div>
 
             <form className={"flex flex-grow flex-col"} action="/wrapped/title/" method="POST">
-                <div id="radio-group" className="flex-row flex items-center space-x-4 mt-10">
-                    <BodyText text="Choose a time range:" />
+                <div id="radio-group" className="flex flex-col items-start mt-8 ml-auto mr-auto">
+                    <p>choose a time range:</p>
                     <Radio
                         name="time_range"
                         value="short_term"
@@ -115,14 +116,14 @@ export default function Dashboard() {
                     name="other_user"
                     type="text"
                     placeholder="(Optional) Friend's Username"
-                    className="lowercase p-2 border rounded mt-4"
+                    className="lowercase p-2 border rounded mt-8 text-center"
                 />
-                <Button text="Generate Roast" method={() => null} extraClasses="mt-10" />
+                <Button text="Generate Roast" method={() => null} extraClasses="mt-10 w-64 ml-auto mr-auto" />
             </form>
 
             <div id="nav-buttons" className="flex items-center space-x-4">
-                <Button text="Past Roasts" url="/history/" />
-                <Button text="Duo Requests" url="/requests/" />
+                <Button text="Past Roasts" small={true} url="/history/" />
+                <Button text="Duo Requests" small={true} url="/requests/" />
             </div>
         </div>
     );

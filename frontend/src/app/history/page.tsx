@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import Heading1 from '../Components/Heading1';
-import BodyText from "@/app/Components/BodyText";
 
 export default function History() {
     const [history, setHistory] = useState<number[]>([]);
@@ -44,7 +43,7 @@ export default function History() {
     return (
         <>
             <Heading1 text="Past Roasts" />
-            <BodyText text="Roast history information" />
+            <p>Roast history information</p>
             <div className="flex flex-wrap gap-2 mt-4">
                 {history.map((item, index) => (
                     <button
