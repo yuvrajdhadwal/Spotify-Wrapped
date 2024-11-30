@@ -224,13 +224,14 @@ def add_duo_wrapped(request):
 def display_artists(request):
     '''Displays artists for the frontend depending on the timeframe'''
     load_dotenv()
+    id = request.GET.get('id')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
+        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
-
-    artists = wrapped_data.favorite_artists[:5]
+    wrapped_data = list(wrapped_data)[0]
+    artists = wrapped_data['favorite_artists'][:5]
 
     out = []
     for artist in artists:
@@ -245,13 +246,14 @@ def display_artists(request):
 def display_genres(request):
     '''Displays the genres for the frontend depending on the timeframe'''
     load_dotenv()
+    id = request.GET.get('id')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
+        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
-
-    genres = wrapped_data.favorite_genres[:5]
+    wrapped_data = list(wrapped_data)[0]
+    genres = wrapped_data['favorite_genres'][:5]
 
     out = {
         'genres': ', '.join(genres),
@@ -262,13 +264,14 @@ def display_genres(request):
 def display_songs(request):
     '''Displays the songs for the frontend depending on the timeframe'''
     load_dotenv()
+    id = request.GET.get('id')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
+        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
-
-    tracks = wrapped_data.favorite_tracks[:5]
+    wrapped_data = list(wrapped_data)[0]
+    tracks = wrapped_data['favorite_tracks'][:5]
 
     out = []
     for track in tracks:
@@ -285,13 +288,14 @@ def display_songs(request):
 def display_quirky(request):
     '''Displays the songs for the frontend depending on the timeframe'''
     load_dotenv()
+    id = request.GET.get('id')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
+        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
-
-    tracks = wrapped_data.quirkiest_artists[:5]
+    wrapped_data = list(wrapped_data)[0]
+    tracks = wrapped_data['quirkiest_artists'][:5]
     out = []
     for track in tracks:
         out.append(track['name'])
@@ -303,16 +307,17 @@ def display_quirky(request):
 def display_summary(request):
     '''Displays a summary of a users music taste'''
     load_dotenv()
+    id = request.GET.get('id')
 
     try:
-        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
+        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
     except ObjectDoesNotExist:
         return HttpResponse("Wrapped grab failed: no data", status=500)
-    
-    artists = wrapped_data.favorite_artists[:5]
-    genres = wrapped_data.favorite_genres[:5]
-    tracks = wrapped_data.favorite_tracks[:5]
-    quirky = wrapped_data.quirkiest_artists[0]
+    wrapped_data = list(wrapped_data)[0]
+    artists = wrapped_data['favorite_artists'][:5]
+    genres = wrapped_data['favorite_genres'][:5]
+    tracks = wrapped_data['favorite_tracks'][:5]
+    quirky = wrapped_data['quirkiest_artists'][0]
 
     artist_list = []
     for artist in artists:
@@ -331,3 +336,16 @@ def display_summary(request):
 
     print(summary)
     return JsonResponse(summary, safe=False, status=200)
+
+def display_history(request):
+    user = request.user
+
+    try:
+        user_data = SpotifyUser.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return HttpResponse("User grab failed: no data", status=500)
+    
+    ids = []
+    for roast in user_data.past_roasts:
+        ids.append(roast['id'])
+    return JsonResponse(ids, safe=False, status=200)

@@ -14,10 +14,12 @@ type SummaryData = {
 export default function Summary() {
     const router = useRouter();
     const [desc, setDesc] = useState<SummaryData | null>(null);
+    const [id, setId] = useState<string | null>(null); // State to store `id`
 
+    // Handle click to navigate to the dashboard
     useEffect(() => {
         const handleClick = () => {
-            router.push('/wrapped/title/');
+            router.push('/dashboard/');
         };
         document.addEventListener('click', handleClick);
 
@@ -26,14 +28,29 @@ export default function Summary() {
         };
     }, [router]);
 
-    async function fetchSummary(): Promise<void> {
+    // Retrieve `id` from localStorage
+    useEffect(() => {
+        const storedId = localStorage.getItem("id");
+        if (storedId) {
+            setId(storedId);
+        }
+    }, []);
+
+    // Fetch the summary data once `id` is available
+    useEffect(() => {
+        if (id) {
+            fetchSummary(id).catch(console.error);
+        }
+    }, [id]);
+
+    async function fetchSummary(id: string): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displaysummary`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displaysummary?id=${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include'
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -47,10 +64,6 @@ export default function Summary() {
             console.error("Error fetching SpotifyUser data:", error);
         }
     }
-
-    useEffect(() => {
-        fetchSummary().catch(console.error);
-    }, []);
 
     return (
         <div className="flex flex-row justify-center">
