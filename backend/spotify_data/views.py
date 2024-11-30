@@ -77,7 +77,7 @@ def update_or_add_spotify_user(request):
             defaults={
                 'user': user,
                 'spotify_id': user_data.get('id'),
-                'display_name': user_data.get('display_name'),
+                'display_name': user.username,
                 'email': user_data.get('email'),
                 'profile_image_url': user_data.get('images')[0]['url']
                 if user_data.get('images') else None,
@@ -164,7 +164,8 @@ def add_duo_wrapped(request):
     term_selection = request.GET.get('termselection')
 
     user1 = request.user
-    spotify_user1 = SpotifyUser.objects.get(user=user1) # pylint: disable=no-member
+    print(user1.username)
+    spotify_user1 = SpotifyUser.objects.get(display_name=user1.username) # pylint: disable=no-member
     try:
         spotify_user2 = SpotifyUser.objects.get(display_name=user2) # pylint: disable=no-member
     except SpotifyUser.DoesNotExist: # pylint: disable=no-member
@@ -219,6 +220,7 @@ def add_duo_wrapped(request):
     spotify_user1.save(update_fields=['past_roasts'])
     spotify_user2.past_roasts.append(wrapped)
     spotify_user2.save(update_fields=['past_roasts'])
+    print(wrapped)
     return JsonResponse({'duo_wrapped': wrapped_data})
 
 def display_artists(request):
@@ -349,3 +351,19 @@ def display_history(request):
     for roast in user_data.past_roasts:
         ids.append(roast['id'])
     return JsonResponse(ids, safe=False, status=200)
+
+def check_username_exists(request):
+    """
+    Check if a username exists in the database.
+    """
+    username = request.GET.get('username')  # Get the username from the request
+
+    if not username:
+        return JsonResponse({'error': 'No username provided'}, status=400)
+
+    try:
+        # Query the database for the username
+        SpotifyUser.objects.get(display_name=username)
+        return JsonResponse({'exists': True}, status=200)
+    except ObjectDoesNotExist:
+        return JsonResponse({'exists': False}, status=200)
