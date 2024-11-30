@@ -1,23 +1,32 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Track from "@/app/Components/Track";
-
-document.addEventListener('click', () => {window.location.href = "./quirky/"});
+import { useRouter } from "next/navigation";
 
 export default function Tracks() {
     const [tracks, setTracks] = useState<any[]>([]);
 
-    const [timeRange, setTimeRange] = useState<number>(() => {
-        // Load the initial value from localStorage or default to 2
-        return parseInt(localStorage.getItem("timeRange") || "2", 10);
-    });
+    const router = useRouter();
 
     useEffect(() => {
-        const storedTimeRange = localStorage.getItem("timeRange");
-        if (storedTimeRange) {
-            setTimeRange(parseInt(storedTimeRange, 10));
-        }
-    }, []);
+        const handleClick = () => {
+          router.push('/wrapped/quirky/');
+        };
+        document.addEventListener('click', handleClick);
+    
+        return () => {
+          document.removeEventListener('click', handleClick);
+        };
+      }, [router]);
+
+      const [timeRange, setTimeRange] = useState<number>(2);
+
+      useEffect(() => {
+          const storedTimeRange = localStorage.getItem("timeRange");
+          if (storedTimeRange) {
+              setTimeRange(parseInt(storedTimeRange, 10));
+          }
+      }, []);
 
     async function fetchFavoriteSongs(): Promise<void> {
         const datetimeCreated = localStorage.getItem("datetimeCreated");
