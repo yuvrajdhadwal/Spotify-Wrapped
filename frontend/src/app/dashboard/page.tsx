@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Button from "../Components/Button";
 import Heading1 from "../Components/Heading1";
 import Radio from "../Components/Radio";
-import BodyText from "@/app/Components/BodyText";
 import { getCookie } from "@/utils";
 import { logError, logInfo } from "../utils/logger";
 
@@ -176,12 +175,13 @@ export default function Dashboard() {
     return (
         <div className="flex flex-col items-center p-6 space-y-6 min-h-screen justify-center">
             <Heading1 text={`${username} again? Yikes`} />
-            <Button text={"Sign Out"} method={handleLogoutClick}/>
-            <Button text={"Delete Account"} method={handleDeleteAccount}/>
+
+            <Button text={"Sign Out"} extraClasses={"mr-10"} faded={true} small={true} method={handleLogoutClick}/>
+            <Button text={"Delete Account"} faded={true} small={true} method={handleDeleteAccount}/>
 
             <form className={"flex flex-grow flex-col"} action="/wrapped/title/" method="POST">
-                <div id="radio-group" className="flex-row flex items-center space-x-4 mt-10">
-                    <BodyText text="Choose a time range:" />
+                <div id="radio-group" className="flex flex-col items-start mt-8 ml-auto mr-auto">
+                    <p>choose a time range:</p>
                     <Radio
                         name="time_range"
                         value="short_term"
@@ -220,6 +220,7 @@ export default function Dashboard() {
                 <button type="submit" className="mt-2 p-2 bg-blue-500 text-white rounded">
                     Generate Duo Wrapped
                 </button>
+
             </form>
             {popupMessage && (
                 <div className="mt-4 p-4 bg-red-500 text-white rounded">
@@ -227,8 +228,8 @@ export default function Dashboard() {
                 </div>
             )}
             <div id="nav-buttons" className="flex items-center space-x-4">
-                <Button text="Past Roasts" url="/history/" />
-                <Button text="Duo Requests" url="/requests/" />
+                <Button text="Past Roasts" small={true} url="/history/" />
+                <Button text="Duo Requests" small={true} url="/requests/" />
             </div>
         </div>
     );

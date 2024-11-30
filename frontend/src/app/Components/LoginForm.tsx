@@ -95,7 +95,7 @@ const LoginForm: React.FC = () => {
           </div>
         </form>
         <div>
-          <Button text={"Don't Have An Account? Sign Up!"} method={handleSignupRedirect}/>
+          <Button text={"Don't Have An Account? Sign Up!"} small={true} method={handleSignupRedirect}/>
   </div>
   </>
 
