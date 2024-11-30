@@ -9,7 +9,7 @@ export default function Quirky() {
 
     useEffect(() => {
         const handleClick = () => {
-          router.push('/wrapped/title/');
+          router.push('/wrapped/summary/');
         };
         document.addEventListener('click', handleClick);
     

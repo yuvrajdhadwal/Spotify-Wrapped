@@ -299,3 +299,35 @@ def display_quirky(request):
     desc = create_groq_quirky(os.getenv('GROQ_API_KEY'),
                                             ', '.join(out))
     return JsonResponse(desc, safe=False, status=200)
+
+def display_summary(request):
+    '''Displays a summary of a users music taste'''
+    load_dotenv()
+
+    try:
+        wrapped_data = SpotifyWrapped.objects.order_by('id').last()
+    except ObjectDoesNotExist:
+        return HttpResponse("Wrapped grab failed: no data", status=500)
+    
+    artists = wrapped_data.favorite_artists[:5]
+    genres = wrapped_data.favorite_genres[:5]
+    tracks = wrapped_data.favorite_tracks[:5]
+    quirky = wrapped_data.quirkiest_artists[0]
+
+    artist_list = []
+    for artist in artists:
+        artist_list.append(artist['name'])
+
+    tracks_list = []
+    for track in tracks:
+        tracks_list.append(track['name'])
+
+    summary = {
+        'artists': artist_list,
+        'tracks': tracks_list,
+        'quirky': quirky['name'],
+        'genres': genres
+    }
+
+    print(summary)
+    return JsonResponse(summary, safe=False, status=200)
