@@ -101,6 +101,7 @@ const SpotifyUserPage = () => {
                 let wrapped_data = await wrapped_response.json();
                 wrapped_data = wrapped_data.spotify_wrapped;
                 console.log(wrapped_data)
+                localStorage.setItem("datetimeCreated", wrapped_data.datetime_created);
                 // (document.getElementById("display_name") as HTMLElement).innerText = `Display Name: ${data.display_name}`;
                 // (document.getElementById("email") as HTMLElement).innerText = `Email: ${data.email}`;
                 // (document.getElementById("profile_image") as HTMLImageElement).src = data.profile_image_url;
