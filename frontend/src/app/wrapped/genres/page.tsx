@@ -1,22 +1,32 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-
-document.addEventListener('click', () => {window.location.href = "./tracks/"});
+import { useRouter } from "next/navigation";
 
 export default function Genres() {
     const [genres, setGenres] = useState<any[]>([]);
     const [desc, setDesc] = useState<any[]>([]);
 
-    const [timeRange, setTimeRange] = useState<number>(() => {
-        return parseInt(localStorage.getItem("timeRange") || "2", 10);
-    });
+    const router = useRouter();
 
     useEffect(() => {
-        const storedTimeRange = localStorage.getItem("timeRange");
-        if (storedTimeRange) {
-            setTimeRange(parseInt(storedTimeRange, 10));
-        }
-    }, []);
+        const handleClick = () => {
+          router.push('/wrapped/tracks/');
+        };
+        document.addEventListener('click', handleClick);
+    
+        return () => {
+          document.removeEventListener('click', handleClick);
+        };
+      }, [router]);
+
+      const [timeRange, setTimeRange] = useState<number>(2);
+
+      useEffect(() => {
+          const storedTimeRange = localStorage.getItem("timeRange");
+          if (storedTimeRange) {
+              setTimeRange(parseInt(storedTimeRange, 10));
+          }
+      }, []);
 
     async function fetchFavoriteGenres(): Promise<void> {
         const datetimeCreated = localStorage.getItem("datetimeCreated");

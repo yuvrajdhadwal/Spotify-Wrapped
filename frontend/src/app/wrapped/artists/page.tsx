@@ -1,18 +1,27 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation";
 // import Image from 'next/image';
 // import Heading2 from "@/app/Components/Heading2";
 import Artist from "@/app/Components/Artist";
 
-document.addEventListener('click', () => {window.location.href = "./genres/"});
-
 export default function Artists() {
+    const router = useRouter();
+
+    useEffect(() => {
+        const handleClick = () => {
+          router.push('/wrapped/genres/');
+        };
+        document.addEventListener('click', handleClick);
+    
+        return () => {
+          document.removeEventListener('click', handleClick);
+        };
+      }, [router]);
+
     const [artists, setArtists] = useState<any[]>([]);
 
-    const [timeRange, setTimeRange] = useState<number>(() => {
-        // Load the initial value from localStorage or default to 2
-        return parseInt(localStorage.getItem("timeRange") || "2", 10);
-    });
+    const [timeRange, setTimeRange] = useState<number>(2);
 
     useEffect(() => {
         const storedTimeRange = localStorage.getItem("timeRange");
@@ -20,6 +29,7 @@ export default function Artists() {
             setTimeRange(parseInt(storedTimeRange, 10));
         }
     }, []);
+    
 
     async function fetchFavoriteArtists(): Promise<void> {
         const datetimeCreated = localStorage.getItem("datetimeCreated");
