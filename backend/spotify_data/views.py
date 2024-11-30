@@ -351,7 +351,8 @@ def display_history(request):
     
     ids = []
     for roast in user_data.past_roasts:
-        ids.append(roast['id'])
+        if roast.get('user') == user.username:
+                ids.append(roast['id'])
     return JsonResponse(ids, safe=False, status=200)
 
 def check_username_exists(request):
