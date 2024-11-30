@@ -1,8 +1,10 @@
 """
 Models for Spotify Roasted database.
 """
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
+from .utils import datetime_to_str
 
 class Song(models.Model):
     """
@@ -72,8 +74,9 @@ class SpotifyWrapped(models.Model):
         - quirkiest_artists: the quirkiest artists as they appear in the roast
         - llama_description: the description of how the user acts/thinks using an LLM
         - llama_songrecs: the song recommendation as pulled from the LLM
+        - datetime_created: the date/time the wrapped was generated
     """
-    user = models.CharField(max_length=100, unique=True)
+    user = models.CharField(max_length=100)
     term_selection = models.CharField(max_length=20)
     favorite_artists = models.JSONField(default=list, blank=True, null=True)
     favorite_tracks = models.JSONField(default=list, blank=True, null=True)
@@ -81,6 +84,7 @@ class SpotifyWrapped(models.Model):
     quirkiest_artists = models.JSONField(default=list, blank=True, null=True)
     llama_description = models.TextField(blank=True, null=True)
     llama_songrecs = models.TextField(blank=True, null=True)
+    datetime_created = models.CharField(default=datetime_to_str(datetime.now()), max_length=50)
 
 class DuoWrapped(SpotifyWrapped):
     """

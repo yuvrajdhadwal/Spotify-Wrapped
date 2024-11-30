@@ -19,8 +19,9 @@ export default function Genres() {
     }, []);
 
     async function fetchFavoriteGenres(): Promise<void> {
+        const datetimeCreated = localStorage.getItem("datetimeCreated");
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displaygenres?timeframe=${timeRange}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displaygenres?datetimecreated=${datetimeCreated}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

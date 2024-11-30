@@ -22,8 +22,9 @@ export default function Artists() {
     }, []);
 
     async function fetchFavoriteArtists(): Promise<void> {
+        const datetimeCreated = localStorage.getItem("datetimeCreated");
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displayartists?timeframe=${timeRange}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displayartists?datetimecreated=${datetimeCreated}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

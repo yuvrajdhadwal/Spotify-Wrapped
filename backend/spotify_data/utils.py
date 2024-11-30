@@ -3,6 +3,7 @@ Utils used in spotify_data/views.
 """
 
 from collections import Counter
+from datetime import datetime
 from groq import Groq,  GroqError
 import requests
 
@@ -150,7 +151,9 @@ def create_groq_description(groq_api_key, favorite_artists):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a music analyst who roasts and insults the user (use 2nd perspective) behavior based on their music tastes in less than 100 words."
+                    "content": "You are a music analyst who roasts and insults the user "
+                               "(use 2nd perspective) behavior based on their music tastes"
+                               " in less than 100 words."
                 },
                 {
                     "role": "user",
@@ -250,7 +253,9 @@ def create_groq_quirky(groq_api_key, favorite_artists):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a music analyst who roasts and insults the user (use 2nd perspective) behavior based on their music tastes in less than 100 words."
+                    "content": "You are a music analyst who roasts and insults the user "
+                               "(use 2nd perspective) behavior based on their music tastes "
+                               "in less than 100 words."
                 },
                 {
                     "role": "user",
@@ -266,3 +271,17 @@ def create_groq_quirky(groq_api_key, favorite_artists):
     except Exception as e:
         llama_description = f"Description unavailable due to API error: {str(e)}"  # pylint: disable=broad-exception-caught
     return llama_description
+
+def datetime_to_str(dt):
+    """
+    Convert datetime object to string.
+    """
+    return dt.strftime("%Y-%m-%d-%H-%M-%S-%f")
+
+def str_to_datetime(dtstr):
+    """
+    Convert string to datetime object.
+    """
+    strlist = dtstr.split("-")
+    return datetime(strlist[0], strlist[1], strlist[2], strlist[3],
+                    strlist[4], strlist[5], strlist[6])

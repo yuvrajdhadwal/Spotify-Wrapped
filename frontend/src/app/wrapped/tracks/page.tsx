@@ -20,8 +20,9 @@ export default function Tracks() {
     }, []);
 
     async function fetchFavoriteSongs(): Promise<void> {
+        const datetimeCreated = localStorage.getItem("datetimeCreated");
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displaytracks?timeframe=${timeRange}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displaytracks?datetimecreated=${datetimeCreated}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

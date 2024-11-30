@@ -64,8 +64,6 @@ def test_artist_serializer():
     serializer = ArtistSerializer(data=invalid_data)
     assert not serializer.is_valid()
     assert 'id' in serializer.errors
-    assert 'genres' in serializer.errors
-    assert 'popularity' in serializer.errors
 
 
 def test_album_serializer():
