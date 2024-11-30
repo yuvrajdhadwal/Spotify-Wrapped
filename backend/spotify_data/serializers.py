@@ -42,9 +42,10 @@ class ArtistSerializer(serializers.Serializer):
     """
     id = serializers.CharField()
     name = serializers.CharField()
-    genres = serializers.ListField()
-    popularity = serializers.IntegerField()
+    genres = serializers.ListField(required=False)
+    popularity = serializers.IntegerField(required=False)
     images = ImageSerializer(many=True, required=False)
+
 
 class AlbumSerializer(serializers.Serializer):
     """
@@ -99,17 +100,16 @@ class SpotifyWrappedSerializer(serializers.ModelSerializer):
     """
     Serializer for SpotifyWrapped model, including term selection.
     """
-    favorite_tracks = TrackSerializer(many=True)
+    favorite_tracks = TrackSerializer(many=True)  # Keep TrackSerializer if it fits your needs
     favorite_artists = ArtistSerializer(many=True)
-    favorite_genres = serializers.ListField(child=serializers.CharField())
     quirkiest_artists = ArtistSerializer(many=True)
-    term_selection = serializers.ChoiceField(choices=[
-                 ('short_term', 'Short Term'),
-                 ('medium_term', 'Medium Term'),
-                 ('long_term', 'Long Term')
-             ])
+    favorite_genres = serializers.ListField(child=serializers.CharField())
+    term_selection = serializers.ChoiceField(
+        choices=[('short_term', 'Short Term'), ('medium_term', 'Medium Term'), ('long_term', 'Long Term')],
+    )
     llama_description = serializers.CharField()
     llama_songrecs = serializers.JSONField()
+    datetime_created = serializers.CharField()
 
     class Meta:
         """

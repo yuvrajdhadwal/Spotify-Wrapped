@@ -14,7 +14,7 @@ from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_user_favorite_tracks,
                     get_top_genres, get_quirkiest_artists,
                     create_groq_description, get_spotify_recommendations,
-                    create_groq_quirky)
+                    create_groq_quirky, str_to_datetime)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
 from .serializers import (SongSerializer, SpotifyUserSerializer,
                           DuoWrappedSerializer, SpotifyWrappedSerializer)
@@ -100,7 +100,7 @@ def update_or_add_spotify_user(request):
 
     return JsonResponse({'error': 'Could not fetch user data from Spotify'}, status=500)
 
-def add_spotify_wrapped(request, term_selection):
+def add_spotify_wrapped(request):
     """
     Adds a Spotify Wrapped containing all necessary information to the user's profile.
     Parameters:
@@ -109,6 +109,7 @@ def add_spotify_wrapped(request, term_selection):
     """
     load_dotenv()
     groq_api_key = os.getenv('GROQ_API_KEY')
+    term_selection = request.GET.get('termselection')
 
     user = request.user
     spotify_user = SpotifyUser.objects.get(user=user) # pylint: disable=no-member
@@ -116,19 +117,19 @@ def add_spotify_wrapped(request, term_selection):
     favorite_tracks = None
     favorite_genres = None
     quirkiest_artists = None
-    access_token = SpotifyToken.objects.get(user=spotify_user.id)
+    access_token = SpotifyToken.objects.get(user=user.username)
     match term_selection:
-        case 'short_term':
+        case '0':
             favorite_artists = spotify_user.favorite_artists_short
             favorite_tracks = spotify_user.favorite_tracks_short
             favorite_genres = spotify_user.favorite_genres_short
             quirkiest_artists = spotify_user.quirkiest_artists_short
-        case 'medium_term':
+        case '1':
             favorite_artists = spotify_user.favorite_artists_medium
             favorite_tracks = spotify_user.favorite_tracks_medium
             favorite_genres = spotify_user.favorite_genres_medium
             quirkiest_artists = spotify_user.quirkiest_artists_medium
-        case 'long_term':
+        case '2':
             favorite_artists = spotify_user.favorite_artists_long
             favorite_tracks = spotify_user.favorite_tracks_long
             favorite_genres = spotify_user.favorite_genres_long
@@ -142,14 +143,15 @@ def add_spotify_wrapped(request, term_selection):
         favorite_genres=favorite_genres,
         quirkiest_artists=quirkiest_artists,
         llama_description=create_groq_description(groq_api_key, favorite_artists),
-        llama_songrecs=get_spotify_recommendations(access_token, favorite_artists,
-                                                   favorite_tracks, favorite_genres))
-    spotify_user.past_roasts.append(wrapped)
+        llama_songrecs=["placeholder1", "placeholder2", "placeholder3"],)
+
+    wrapped_data = SpotifyWrappedSerializer(wrapped).data
+    spotify_user.past_roasts.append(wrapped_data)
     spotify_user.save(update_fields=['past_roasts'])
-    return JsonResponse({'spotify_wrapped': SpotifyWrappedSerializer(wrapped).data})
+    return JsonResponse({'spotify_wrapped': wrapped_data})
 
 
-def add_duo_wrapped(request, user2, term_selection):
+def add_duo_wrapped(request):
     """
     Adds a Duo Wrapped containing all necessary information to both users' profiles.
     Parameters:
@@ -159,6 +161,8 @@ def add_duo_wrapped(request, user2, term_selection):
     """
     load_dotenv()
     groq_api_key = os.getenv('GROQ_API_KEY')
+    user2 = request.GET.get('user2')
+    term_selection = request.GET.get('termselection')
 
     user1 = request.user
     spotify_user1 = SpotifyUser.objects.get(user=user1) # pylint: disable=no-member
@@ -172,7 +176,7 @@ def add_duo_wrapped(request, user2, term_selection):
     quirkiest_artists = None
     access_token = SpotifyToken.objects.get(user=spotify_user1.id)
     match term_selection:
-        case 'short_term':
+        case '0':
             favorite_artists = (spotify_user1.favorite_artists_short
                                 + spotify_user2.favorite_artists_short)
             favorite_tracks = (spotify_user1.favorite_tracks_short
@@ -181,7 +185,7 @@ def add_duo_wrapped(request, user2, term_selection):
                                + spotify_user2.favorite_genres_short)
             quirkiest_artists = (spotify_user1.quirkiest_artists_short
                                  + spotify_user2.quirkiest_artists_short)
-        case 'medium_term':
+        case '1':
             favorite_artists = (spotify_user1.favorite_artists_medium
                                 + spotify_user2.favorite_artists_medium)
             favorite_tracks = (spotify_user1.favorite_tracks_medium
@@ -190,7 +194,7 @@ def add_duo_wrapped(request, user2, term_selection):
                                + spotify_user2.favorite_genres_medium)
             quirkiest_artists = (spotify_user1.quirkiest_artists_medium
                                  + spotify_user2.quirkiest_artists_medium)
-        case 'long_term':
+        case '2':
             favorite_artists = (spotify_user1.favorite_artists_long
                                 + spotify_user2.favorite_artists_long)
             favorite_tracks = (spotify_user1.favorite_tracks_long
@@ -211,29 +215,24 @@ def add_duo_wrapped(request, user2, term_selection):
         llama_description=create_groq_description(groq_api_key, favorite_artists),
         llama_songrecs=get_spotify_recommendations(access_token, favorite_artists,
                                                    favorite_tracks, favorite_genres))
+    wrapped_data = DuoWrappedSerializer(wrapped).data
     spotify_user1.past_roasts.append(wrapped)
     spotify_user1.save(update_fields=['past_roasts'])
     spotify_user2.past_roasts.append(wrapped)
     spotify_user2.save(update_fields=['past_roasts'])
-    return JsonResponse({'duo_wrapped': DuoWrappedSerializer(wrapped).data})
+    return JsonResponse({'duo_wrapped': wrapped_data})
 
 def display_artists(request):
     '''Displays artists for the frontend depending on the timeframe'''
     load_dotenv()
-    user = request.user
-    timeframe = request.GET.get('timeframe')
+    dtstr = request.GET.get('datetimecreated')
 
     try:
-        user_data = SpotifyUser.objects.get(user=user)
+        wrapped_data = SpotifyWrapped.objects.get(datetime_created=dtstr)
     except ObjectDoesNotExist:
-        return HttpResponse("User grab failed: no data", status=500)
+        return HttpResponse("Wrapped grab failed: no data", status=500)
 
-    if timeframe == '0':
-        artists = user_data.favorite_artists_short[:5]
-    elif timeframe == '1':
-        artists = user_data.favorite_artists_medium[:5]
-    else:
-        artists = user_data.favorite_artists_long[:5]
+    artists = wrapped_data.favorite_artists[:5]
 
     out = []
     for artist in artists:
@@ -248,20 +247,14 @@ def display_artists(request):
 def display_genres(request):
     '''Displays the genres for the frontend depending on the timeframe'''
     load_dotenv()
-    user = request.user
-    timeframe = request.GET.get('timeframe')
+    dtstr = request.GET.get('datetimecreated')
 
     try:
-        user_data = SpotifyUser.objects.get(user=user)
+        wrapped_data = SpotifyWrapped.objects.get(datetime_created=dtstr)
     except ObjectDoesNotExist:
-        return HttpResponse("User grab failed: no data", status=500)
+        return HttpResponse("Wrapped grab failed: no data", status=500)
 
-    if timeframe == '0':
-        genres = user_data.favorite_genres_short[:5]
-    elif timeframe == '1':
-        genres = user_data.favorite_genres_medium[:5]
-    else:
-        genres = user_data.favorite_genres_long[:5]
+    genres = wrapped_data.favorite_genres[:5]
 
     out = {
         'genres': ', '.join(genres),
@@ -272,20 +265,14 @@ def display_genres(request):
 def display_songs(request):
     '''Displays the songs for the frontend depending on the timeframe'''
     load_dotenv()
-    user = request.user
-    timeframe = request.GET.get('timeframe')
+    dtstr = request.GET.get('datetimecreated')
 
     try:
-        user_data = SpotifyUser.objects.get(user=user)
+        wrapped_data = SpotifyWrapped.objects.get(datetime_created=dtstr)
     except ObjectDoesNotExist:
-        return HttpResponse("User grab failed: no data", status=500)
+        return HttpResponse("Wrapped grab failed: no data", status=500)
 
-    if timeframe == '0':
-        tracks = user_data.favorite_tracks_short[:5]
-    elif timeframe == '1':
-        tracks = user_data.favorite_tracks_medium[:5]
-    else:
-        tracks = user_data.favorite_tracks_long[:5]
+    tracks = wrapped_data.favorite_tracks[:5]
 
     out = []
     for track in tracks:
@@ -302,21 +289,14 @@ def display_songs(request):
 def display_quirky(request):
     '''Displays the songs for the frontend depending on the timeframe'''
     load_dotenv()
-    user = request.user
-    timeframe = request.GET.get('timeframe')
+    dtstr = request.GET.get('datetimecreated')
 
     try:
-        user_data = SpotifyUser.objects.get(user=user)
+        wrapped_data = SpotifyWrapped.objects.create(datetime_created=dtstr)
     except ObjectDoesNotExist:
-        return HttpResponse("User grab failed: no data", status=500)
+        return HttpResponse("Wrapped grab failed: no data", status=500)
 
-    if timeframe == '0':
-        tracks = user_data.quirkiest_artists_short[:5]
-    elif timeframe == '1':
-        tracks = user_data.quirkiest_artists_medium[:5]
-    else:
-        tracks = user_data.quirkiest_artists_long[:5]
-    print(tracks[0]['name'])
+    tracks = wrapped_data.quirkiest_artists[:5]
     out = []
     for track in tracks:
         out.append(track['name'])

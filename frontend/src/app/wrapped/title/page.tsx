@@ -88,6 +88,19 @@ const SpotifyUserPage = () => {
                 let data = await response.json();
                 data = data.spotify_user;
                 console.log(data);
+
+                const termselection = localStorage.getItem("timeRange") ||  '1';
+                const wrapped_response = await fetch(`http://localhost:8000/spotify_data/addwrapped/?termselection=${encodeURIComponent(termselection)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+
+                let wrapped_data = await wrapped_response.json();
+                wrapped_data = wrapped_data.spotify_wrapped;
+                console.log(wrapped_data)
                 // (document.getElementById("display_name") as HTMLElement).innerText = `Display Name: ${data.display_name}`;
                 // (document.getElementById("email") as HTMLElement).innerText = `Email: ${data.email}`;
                 // (document.getElementById("profile_image") as HTMLImageElement).src = data.profile_image_url;

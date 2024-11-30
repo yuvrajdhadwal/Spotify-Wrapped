@@ -5,6 +5,7 @@ Utils used in spotify_data/views.
 from collections import Counter
 from groq import Groq,  GroqError
 import requests
+from datetime import datetime
 
 def get_spotify_user_data(access_token):
     """
@@ -266,3 +267,16 @@ def create_groq_quirky(groq_api_key, favorite_artists):
     except Exception as e:
         llama_description = f"Description unavailable due to API error: {str(e)}"  # pylint: disable=broad-exception-caught
     return llama_description
+
+def datetime_to_str(dt):
+    """
+    Convert datetime object to string.
+    """
+    return dt.strftime("%Y-%m-%d-%H-%M-%S-%f")
+
+def str_to_datetime(dtstr):
+    """
+    Convert string to datetime object.
+    """
+    strlist = dtstr.split("-")
+    return datetime(strlist[0], strlist[1], strlist[2], strlist[3], strlist[4], strlist[5], strlist[6])
