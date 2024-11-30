@@ -5,6 +5,7 @@ import Heading1 from '../Components/Heading1';
 
 export default function History() {
     const [history, setHistory] = useState<number[]>([]);
+    const [popupMessage, setPopupMessage] = useState<string | null>(null);
     const router = useRouter();
 
     async function fetchSummary(): Promise<void> {
@@ -18,7 +19,11 @@ export default function History() {
             });
 
             if (!response.ok) {
-                console.error("Failed to fetch SpotifyUser data");
+                if (response.status === 500) {
+                    setPopupMessage("No history for this account. Go create a roast!");
+                } else {
+                    console.error("Failed to fetch SpotifyUser data");
+                }        
                 return;
             }
             const data = await response.json();
@@ -55,6 +60,11 @@ export default function History() {
                     </button>
                 ))}
             </div>
+            {popupMessage && (
+                <div className="mt-4 p-4 bg-red-500 text-white rounded">
+                    {popupMessage}
+                </div>
+            )}
         </>
     );
 }

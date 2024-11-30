@@ -21,7 +21,7 @@ class SpotifyUser(models.Model):
     Parameters:
         - user: links Spotify id to Django User model
         - spotify_id: unique user identifier from Spotify
-        - display_name: username as seen on Spotify
+        - display_name: username as seen on roast account
         - email: user's registered email address
         - profile_image_url: link to user's profile picture
 
