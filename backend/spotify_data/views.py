@@ -13,7 +13,7 @@ from accounts.models import SpotifyToken  # Local imports
 from .utils import (get_spotify_user_data, get_user_favorite_artists,
                     get_user_favorite_tracks,
                     get_top_genres, get_quirkiest_artists,
-                    create_groq_description, get_spotify_recommendations,
+                    create_groq_description,
                     create_groq_quirky)
 from .models import Song, SpotifyUser, SpotifyWrapped, DuoWrapped
 from .serializers import (SongSerializer, SpotifyUserSerializer,
@@ -172,7 +172,6 @@ def add_duo_wrapped(request):
     favorite_tracks = None
     favorite_genres = None
     quirkiest_artists = None
-    access_token = SpotifyToken.objects.get(username=user1)
     match term_selection:
         case '0':
             favorite_artists = (spotify_user1.favorite_artists_short[:3]
@@ -224,9 +223,9 @@ def display_artists(request):
     '''Displays artists for the frontend depending on the timeframe'''
     load_dotenv()
     id = request.GET.get('id')
-    isDuo = request.GET.get('isDuo')
-    
-    if isDuo:
+    is_duo = request.GET.get('isDuo')
+
+    if is_duo:
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
@@ -253,9 +252,9 @@ def display_genres(request):
     '''Displays the genres for the frontend depending on the timeframe'''
     load_dotenv()
     id = request.GET.get('id')
-    isDuo = request.GET.get('isDuo')
-    
-    if isDuo:
+    is_duo = request.GET.get('isDuo')
+
+    if is_duo:
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
@@ -279,9 +278,9 @@ def display_songs(request):
     load_dotenv()
     id = request.GET.get('id')
 
-    isDuo = request.GET.get('isDuo')
-    
-    if isDuo:
+    is_duo = request.GET.get('isDuo')
+
+    if is_duo:
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
@@ -312,9 +311,9 @@ def display_quirky(request):
     load_dotenv()
     id = request.GET.get('id')
 
-    isDuo = request.GET.get('isDuo')
-    
-    if isDuo:
+    is_duo = request.GET.get('isDuo')
+
+    if is_duo:
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
@@ -339,9 +338,9 @@ def display_summary(request):
     load_dotenv()
     id = request.GET.get('id')
 
-    isDuo = request.GET.get('isDuo')
-    
-    if isDuo:
+    is_duo = request.GET.get('isDuo')
+
+    if is_duo:
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
@@ -375,13 +374,14 @@ def display_summary(request):
     return JsonResponse(summary, safe=False, status=200)
 
 def display_history(request):
+    '''Display history of wraps for a user'''
     user = request.user
 
     try:
         user_data = SpotifyUser.objects.get(display_name=user.username)
     except ObjectDoesNotExist:
         return HttpResponse("User grab failed: no data", status=500)
-    
+
     ids = []
     for roast in user_data.past_roasts:
         if roast.get('user') == user.username:
@@ -390,7 +390,7 @@ def display_history(request):
                 'isDuo': 'user2' in roast
             }
             ids.append(di)
-    
+
     # Return an empty list if no roasts found for the user
     if not ids:
         return JsonResponse([], safe=False, status=200)

@@ -94,12 +94,16 @@ class SpotifyUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SpotifyWrappedSerializer(serializers.ModelSerializer):
+    '''Spotify Wrapper Serializer'''
     class Meta:
+        '''Meta'''
         model = SpotifyWrapped
         fields = '__all__'
 
 
 class DuoWrappedSerializer(serializers.ModelSerializer):
+    '''Duo Wrapper Serializer'''
     class Meta:
+        '''Meta'''
         model = DuoWrapped
         fields = '__all__'

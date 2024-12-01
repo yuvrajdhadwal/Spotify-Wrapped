@@ -78,6 +78,7 @@ class WrapBase(models.Model):
     datetime_created = models.CharField(default=datetime_to_str(datetime.now()), max_length=50)
 
     class Meta:
+        '''Meta'''
         abstract = True
 
 
@@ -85,7 +86,7 @@ class SpotifyWrapped(WrapBase):
     """
     Model for individual Spotify Wrapped.
     """
-    pass
+
 
 
 class DuoWrapped(WrapBase):
