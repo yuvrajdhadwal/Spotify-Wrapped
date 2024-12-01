@@ -10,7 +10,7 @@ export default function Artists() {
 
     useEffect(() => {
         const handleClick = () => {
-            router.push('/wrapped/genres/');
+            router.push('/wrapped/artists2/');
         };
         document.addEventListener('click', handleClick);
 
@@ -51,16 +51,16 @@ export default function Artists() {
             const data = await response.json();
             console.log('everything went alright');
             console.log(data);
-            setArtists(data.slice(0, 5));
+            setArtists(data.slice(0, 2));
+            localStorage.setItem("artistsList", JSON.stringify(data.slice(2,4)));
         } catch (error) {
             console.error("Error fetching SpotifyUser data:", error);
         }
     }
-
     return (
         <div className={"flex flex-row justify-center"}>
             {artists.length > 0 ? (
-                artists.map((artist, index) => (
+                artists.map((artist: { name: string; image: string; desc: string; }, index: number) => (
                     <Artist
                         key={index}
                         name={artist.name}
