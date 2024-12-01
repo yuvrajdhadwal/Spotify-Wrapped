@@ -111,10 +111,10 @@ export default function Dashboard() {
         }
     }
 
-    async function createDuoWrapped(username: String) {
+    async function createDuoWrapped(user2: String) {
         try {
             const termselection = localStorage.getItem("timeRange") || "1";
-            const response = await fetch(`http://localhost:8000/spotify_data/addduo?user2=${username}&termselection=${termselection}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/addduo?user1=${username}&user2=${user2}&termselection=${termselection}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

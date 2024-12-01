@@ -93,46 +93,17 @@ class SpotifyUserSerializer(serializers.ModelSerializer):
         model = SpotifyUser
         fields = '__all__'
 
-
-
-
 class SpotifyWrappedSerializer(serializers.ModelSerializer):
-    """
-    Serializer for SpotifyWrapped model, including term selection.
-    """
-    favorite_tracks = TrackSerializer(many=True)  # Keep TrackSerializer if it fits your needs
-    favorite_artists = ArtistSerializer(many=True)
-    quirkiest_artists = ArtistSerializer(many=True)
-    favorite_genres = serializers.ListField(child=serializers.CharField())
-    term_selection = serializers.ChoiceField(
-        choices=[('short_term', 'Short Term'), ('medium_term', 'Medium Term'),
-                 ('long_term', 'Long Term')],
-    )
-    llama_description = serializers.CharField()
-    llama_songrecs = serializers.JSONField()
-    datetime_created = serializers.CharField()
-
-    class Meta: # pylint: disable=too-few-public-methods
-        """
-        SpotifyWrapped metadata.
-        """
+    '''Spotify Wrapper Serializer'''
+    class Meta:
+        '''Meta'''
         model = SpotifyWrapped
         fields = '__all__'
 
 
-class DuoWrappedSerializer(SpotifyUserSerializer):
-    """
-    Serializer for DuoWrapped model, extending SpotifyWrapped.
-    """
-    user1 = UserSerializer(read_only=True)
-    user2 = UserSerializer(read_only=True)
-
-    class Meta: # pylint: disable=too-few-public-methods
-        """
-        DuoWrapped metadata.
-        """
+class DuoWrappedSerializer(serializers.ModelSerializer):
+    '''Duo Wrapper Serializer'''
+    class Meta:
+        '''Meta'''
         model = DuoWrapped
-        fields = [
-            'user1', 'user2', 'favorite_tracks', 'favorite_artists',
-            'favorite_genres', 'quirkiest_artists', 'term_selection'
-        ]
+        fields = '__all__'

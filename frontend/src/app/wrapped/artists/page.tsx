@@ -7,6 +7,7 @@ export default function Artists() {
     const router = useRouter();
     const [artists, setArtists] = useState<any[]>([]);
     const [id, setId] = useState<string | null>(null);
+    const [isDuo, setIsDuo] = useState<boolean | null>(null);
 
     useEffect(() => {
         const handleClick = () => {
@@ -28,14 +29,21 @@ export default function Artists() {
     }, []);
 
     useEffect(() => {
-        if (id) {
+        const duo = localStorage.getItem("isDuo");
+        if (duo) {
+            setIsDuo(duo === 'true');
+        }
+    }, []);
+
+    useEffect(() => {
+        if (id && isDuo !== null) {
             fetchFavoriteArtists(id).catch(console.error);
         }
     }, [id]);
 
     async function fetchFavoriteArtists(id: string): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displayartists?id=${id}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displayartists?id=${id}&isDuo=${isDuo}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
