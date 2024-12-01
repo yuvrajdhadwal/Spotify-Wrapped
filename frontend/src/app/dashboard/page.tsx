@@ -176,12 +176,15 @@ export default function Dashboard() {
         <div className="flex flex-col items-center p-6 space-y-6 min-h-screen justify-center">
             <Heading1 text={`${username} again? Yikes`} />
 
-            <Button text={"Sign Out"} extraClasses={"mr-10"} faded={true} small={true} method={handleLogoutClick}/>
+            <div className={"space-x-8"}>
+            <Button text="Past Roasts" small={true} url="/history/" />
+            <Button text={"Sign Out"} faded={true} small={true} method={handleLogoutClick}/>
             <Button text={"Delete Account"} faded={true} small={true} method={handleDeleteAccount}/>
+            </div>
 
-            <form className={"flex flex-grow flex-col"} action="/wrapped/title/" method="POST">
+            <form className={"flex flex-col"} action="/wrapped/title/" method="POST">
                 <div id="radio-group" className="flex flex-col items-start mt-8 ml-auto mr-auto">
-                    <p>choose a time range:</p>
+                    <p>Choose a time range:</p>
                     <Radio
                         name="time_range"
                         value="short_term"
@@ -204,22 +207,20 @@ export default function Dashboard() {
                         checked={timeframe === 2}
                     />
                 </div>
-                <Button text="Generate Roast" method={() => null} extraClasses="mt-10" />
+                <Button text="Generate Roast" method={() => null} extraClasses="mt-10 w-50 ml-auto mr-auto" />
             </form>
 
             {/* Separate form for navigating to a friend's profile */}
-            <form onSubmit={handleSubmit} className="flex flex-col items-center mt-6">
+            <form onSubmit={handleSubmit} className="flex flex-grow flex-row items-center mt-2 mb-6">
                 <input
                     name="other_user"
                     type="text"
-                    placeholder="(Optional) Friend's Username"
-                    className="lowercase p-2 border rounded"
+                    placeholder="Enter Friend's Username"
+                    className="lowercase p-2 border rounded mr-5"
                     value={otherUser}
                     onChange={(e) => setOtherUser(e.target.value)} // Update `otherUser` state
                 />
-                <button type="submit" className="mt-2 p-2 bg-blue-500 text-white rounded">
-                    Generate Duo Wrapped
-                </button>
+                <Button text={"Generate Duo Roast"} method={() => null}/>
 
             </form>
             {popupMessage && (
@@ -227,10 +228,6 @@ export default function Dashboard() {
                     {popupMessage}
                 </div>
             )}
-            <div id="nav-buttons" className="flex items-center space-x-4">
-                <Button text="Past Roasts" small={true} url="/history/" />
-                <Button text="Duo Requests" small={true} url="/requests/" />
-            </div>
         </div>
     );
 }

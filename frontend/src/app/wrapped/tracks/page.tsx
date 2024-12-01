@@ -13,7 +13,7 @@ export default function Tracks() {
     // Handle click to navigate to the next page
     useEffect(() => {
         const handleClick = () => {
-            router.push('/wrapped/quirky/');
+            router.push('/wrapped/tracks2/');
         };
         document.addEventListener('click', handleClick);
 
@@ -72,7 +72,8 @@ export default function Tracks() {
             console.log('everything went alright');
             console.log(data);
 
-            setTracks(data.slice(0, 5));
+            setTracks(data.slice(0, 2));
+            localStorage.setItem("tracksList", JSON.stringify(data.slice(2,4)));
         } catch (error) {
             console.error("Error fetching SpotifyUser data:", error);
         }
