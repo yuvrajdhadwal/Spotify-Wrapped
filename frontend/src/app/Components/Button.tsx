@@ -5,6 +5,8 @@ type ButtonProps = {
     url?: string;
     method?: (...args: any[]) => any;
     extraClasses?: string;
+    faded?: boolean;
+    small?: boolean;
 }
 
 /**
@@ -20,8 +22,10 @@ function Button(props: ButtonProps) {
     const handleClick = () => {
         window.location.href = props.url ? props.url : "";
     };
+    const color = props.faded ? " bg-gradient-to-tr from-red-400 to-yellow-200 border-amber-700": " bg-gradient-to-tr from-red-500 to-yellow-500 border-amber-950";
+    const size = props.small ? " text-xl px-4 py-2": " text-2xl px-6 py-3";
     const clickMethod = props.method ? props.method : handleClick;
-    const classes = props.extraClasses + " lowercase text-2xl px-6 py-3 border-2 border-amber-950 rounded-2xl bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg";
+    const classes = props.extraClasses + color + size + " lowercase border-2 rounded-2xl text-white shadow-lg";
     return (<button onClick={clickMethod} className={classes}>
         {props.text}
     </button>);

@@ -1,36 +1,52 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 
 export default function Quirky() {
-    const [desc, setDesc] = useState<any[]>([]);
-
+    const [desc, setDesc] = useState<string>(""); // Assuming desc is a string
+    const [id, setId] = useState<string | null>(null); // State to store `id`
     const router = useRouter();
 
+    // Handle click event to navigate to the next page
     useEffect(() => {
         const handleClick = () => {
-          router.push('/wrapped/title/');
+            router.push('/wrapped/summary/');
         };
         document.addEventListener('click', handleClick);
-    
+
         return () => {
-          document.removeEventListener('click', handleClick);
+            document.removeEventListener('click', handleClick);
         };
-      }, [router]);
+    }, [router]);
 
-      const [timeRange, setTimeRange] = useState<number>(2);
+    // Load `id` from localStorage
+    useEffect(() => {
+        const storedId = localStorage.getItem("id");
+        if (storedId) {
+            setId(storedId);
+        }
+    }, []);
 
-      useEffect(() => {
-          const storedTimeRange = localStorage.getItem("timeRange");
-          if (storedTimeRange) {
-              setTimeRange(parseInt(storedTimeRange, 10));
-          }
-      }, []);
+    // Fetch quirky description once `id` is set
+    useEffect(() => {
+        if (id) {
+            fetchQuirkyDescription(id).catch(console.error);
+        }
+    }, [id]);
 
-    async function fetchFavoriteGenres(): Promise<void> {
-        const datetimeCreated = localStorage.getItem("datetimeCreated");
+    const [timeRange, setTimeRange] = useState<number>(2);
+
+    // Load `timeRange` from localStorage
+    useEffect(() => {
+        const storedTimeRange = localStorage.getItem("timeRange");
+        if (storedTimeRange) {
+            setTimeRange(parseInt(storedTimeRange, 10));
+        }
+    }, []);
+
+    async function fetchQuirkyDescription(id: string): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displayquirky?datetimecreated=${datetimeCreated}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displayquirky?id=${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,28 +58,25 @@ export default function Quirky() {
                 console.error("Failed to fetch SpotifyUser data");
                 return;
             }
-            let data = await response.json();
+            const data = await response.json();
             console.log('everything went alright');
             console.log(data);
-            
-            setDesc(data)
+
+            setDesc(data || "No description available");
         } catch (error) {
             console.error("Error fetching SpotifyUser data:", error);
         }
     }
 
-    useEffect(() => {
-        fetchFavoriteGenres().catch(console.error);
-    }, []);   
-
     return (
-        <div className={"flex flex-row justify-center"}>
-            <p>{desc}</p>
-            <img 
-                src="..\..\images\trashcan.png" 
-                alt="trash graphic" 
+        <div className="flex flex-col items-center">
+            <h1 className="text-2xl font-bold mb-4">Your Quirky Feature</h1>
+            <p className="text-lg italic mb-4">{desc}</p>
+            <img
+                src="../../images/trashcan.png"
+                alt="trash graphic"
                 style={{ maxWidth: "20%", height: "auto", marginTop: "20px" }}
-                />
+            />
         </div>
     );
 }

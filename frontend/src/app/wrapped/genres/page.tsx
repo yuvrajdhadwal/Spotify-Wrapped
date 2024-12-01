@@ -1,62 +1,71 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 
 export default function Genres() {
-    const [genres, setGenres] = useState<any[]>([]);
-    const [desc, setDesc] = useState<any[]>([]);
+    const [genres, setGenres] = useState<string[]>([]); // Assuming genres is a string array
+    const [desc, setDesc] = useState<string>(""); // Description is likely a string
+    const [id, setId] = useState<string | null>(null);
 
     const router = useRouter();
 
     useEffect(() => {
+        const storedId = localStorage.getItem("id");
+        if (storedId) {
+            setId(storedId);
+        }
+    }, []);
+
+    useEffect(() => {
         const handleClick = () => {
-          router.push('/wrapped/tracks/');
+            router.push('/wrapped/tracks/');
         };
         document.addEventListener('click', handleClick);
-    
+
         return () => {
-          document.removeEventListener('click', handleClick);
+            document.removeEventListener('click', handleClick);
         };
-      }, [router]);
+    }, [router]);
 
-      const [timeRange, setTimeRange] = useState<number>(2);
+    useEffect(() => {
+        const storedTimeRange = localStorage.getItem("timeRange");
+        if (storedTimeRange) {
+            setTimeRange(parseInt(storedTimeRange, 10));
+        }
+    }, []);
 
-      useEffect(() => {
-          const storedTimeRange = localStorage.getItem("timeRange");
-          if (storedTimeRange) {
-              setTimeRange(parseInt(storedTimeRange, 10));
-          }
-      }, []);
+    const [timeRange, setTimeRange] = useState<number>(2);
 
-    async function fetchFavoriteGenres(): Promise<void> {
-        const datetimeCreated = localStorage.getItem("datetimeCreated");
+    useEffect(() => {
+        if (id) {
+            fetchFavoriteGenres(id).catch(console.error); // Fetch genres only when `id` is available
+        }
+    }, [id]);
+
+    async function fetchFavoriteGenres(id: string): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displaygenres?datetimecreated=${datetimeCreated}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displaygenres?id=${id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include'
+                credentials: 'include',
             });
 
             if (!response.ok) {
                 console.error("Failed to fetch SpotifyUser data");
                 return;
             }
-            let data = await response.json();
+            const data = await response.json();
             console.log('everything went alright');
             console.log(data);
-            
-            setGenres(data.genres);
-            setDesc(data.desc)
+
+            setGenres(data.genres || []); // Ensure genres is always an array
+            setDesc(data.desc || ""); // Default to empty string if no desc
         } catch (error) {
             console.error("Error fetching SpotifyUser data:", error);
         }
     }
-
-    useEffect(() => {
-        fetchFavoriteGenres().catch(console.error);
-    }, []);   
 
     return (
         <div className={"flex flex-row justify-center"}>
