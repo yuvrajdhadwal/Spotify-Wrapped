@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Heading1 from '../Components/Heading1';
 
 export default function History() {
-    const [history, setHistory] = useState<number[]>([]);
+    const [history, setHistory] = useState<{ id: number, isDuo: boolean }[]>([]);
     const [popupMessage, setPopupMessage] = useState<string | null>(null);
     const router = useRouter();
 
@@ -41,10 +41,12 @@ export default function History() {
     const handleButtonClick = (value: number) => {
         // Store the clicked value in localStorage
         localStorage.setItem('id', value.toString());
+        localStorage.setItem('isDuo', 'false');
 
         // Redirect to another page
         router.push('/wrapped/title');
     };
+
     return (
         <>
             <Heading1 text="Past Roasts" />
@@ -53,10 +55,12 @@ export default function History() {
                 {history.map((item, index) => (
                     <button
                         key={index}
-                        onClick={() => handleButtonClick(item)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        onClick={() => handleButtonClick(item.id)}
+                        className={`px-4 py-2 rounded text-white hover:opacity-90 ${
+                            item.isDuo ? 'bg-green-500' : 'bg-blue-500'
+                        }`}
                     >
-                        {item}
+                        {item.id}
                     </button>
                 ))}
             </div>

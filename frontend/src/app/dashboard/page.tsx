@@ -18,6 +18,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         localStorage.setItem("id", "-1");
+        localStorage.setItem("isDuo", '0');
     }, []);
 
     // Fetch username from backend
@@ -38,6 +39,7 @@ export default function Dashboard() {
 
                 const data = await response.json();
                 setUsername(data.username);
+                localStorage.setItem("user1", data.username);
             } catch (error) {
                 console.error("Error fetching username:", error);
             }
@@ -86,7 +88,9 @@ export default function Dashboard() {
         if (otherUser.trim()) {
             console.log(otherUser);
             checkUsername(otherUser);
-            // router.push(`/profile/${otherUser}`); // Navigate to the user's profile
+            localStorage.setItem("isDuo", '1');
+            localStorage.setItem("user2", otherUser);
+            router.push(`/wrapped/title`); // Navigate to the duo wrapped
         }
     };
 
@@ -102,7 +106,6 @@ export default function Dashboard() {
             const data = await response.json();
             if (data.exists) {
                 setPopupMessage(null); // Clear popup if username exists
-                createDuoWrapped(username);
             } else {
                 setPopupMessage("Username does not exist. Please retype it.");
             }            
@@ -111,10 +114,10 @@ export default function Dashboard() {
         }
     }
 
-    async function createDuoWrapped(username: String) {
+    async function createDuoWrapped(user2: String) {
         try {
             const termselection = localStorage.getItem("timeRange") || "1";
-            const response = await fetch(`http://localhost:8000/spotify_data/addduo?user2=${username}&termselection=${termselection}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/addduo?user1=${username}&user2=${user2}&termselection=${termselection}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
