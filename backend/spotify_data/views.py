@@ -220,22 +220,22 @@ def add_duo_wrapped(request):
     return JsonResponse({'duo_wrapped': wrapped_data})
 
 def display_artists(request):
-    '''Displays artists for the frontend depending on the timeframe'''
+    """Displays artists for the frontend depending on the timeframe"""
     load_dotenv()
     id = request.GET.get('id')
     is_duo = request.GET.get('isDuo')
-
-    if is_duo:
+    if is_duo == 'true':
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
             return HttpResponse("Wrapped grab failed: no data", status=500)
+        wrapped_data = list(wrapped_data)[0]
     else:
         try:
             wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
             return HttpResponse("Wrapped grab failed: no data", status=500)
-    wrapped_data = list(wrapped_data)[0]
+        wrapped_data = list(wrapped_data)[0]
     artists = wrapped_data['favorite_artists'][:5]
 
     out = []
@@ -254,9 +254,9 @@ def display_genres(request):
     id = request.GET.get('id')
     is_duo = request.GET.get('isDuo')
 
-    if is_duo:
+    if is_duo == 'true':
         try:
-            wrapped_data = DuoWrapped.objects.filter(id=id).values()
+            wrapped_data = DuoWrapped.objects.get(id=id)
         except ObjectDoesNotExist:
             return HttpResponse("Wrapped grab failed: no data", status=500)
     else:
@@ -280,7 +280,7 @@ def display_songs(request):
 
     is_duo = request.GET.get('isDuo')
 
-    if is_duo:
+    if is_duo == 'true':
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
@@ -292,7 +292,6 @@ def display_songs(request):
             return HttpResponse("Wrapped grab failed: no data", status=500)
     wrapped_data = list(wrapped_data)[0]
     tracks = wrapped_data['favorite_tracks'][:5]
-    print(len(wrapped_data['favorite_tracks']))
 
     out = []
     for track in tracks:
@@ -313,7 +312,7 @@ def display_quirky(request):
 
     is_duo = request.GET.get('isDuo')
 
-    if is_duo:
+    if is_duo == 'true':
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:
@@ -340,7 +339,7 @@ def display_summary(request):
 
     is_duo = request.GET.get('isDuo')
 
-    if is_duo:
+    if is_duo == 'true':
         try:
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
         except ObjectDoesNotExist:

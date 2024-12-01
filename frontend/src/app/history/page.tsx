@@ -41,7 +41,7 @@ export default function History() {
     const handleButtonClick = (value: number) => {
         // Store the clicked value in localStorage
         localStorage.setItem('id', value.toString());
-        localStorage.setItem('isDuo', 'true');
+        localStorage.setItem('isDuo', 'false');
 
         // Redirect to another page
         router.push('/wrapped/title');
