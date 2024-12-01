@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 export default function Tracks() {
     const [tracks, setTracks] = useState<any[]>([]);
     const [id, setId] = useState<string | null>(null); // State to store `id`
+    const [isDuo, setIsDuo] = useState<boolean | null>(null);
+
     const router = useRouter();
 
     // Handle click to navigate to the next page
@@ -30,7 +32,14 @@ export default function Tracks() {
 
     // Fetch the tracks once `id` is available
     useEffect(() => {
-        if (id) {
+        const duo = localStorage.getItem("isDuo");
+        if (duo) {
+            setIsDuo(duo === 'true');
+        }
+    }, []);
+
+    useEffect(() => {
+        if (id && isDuo !== null) {
             fetchFavoriteSongs(id).catch(console.error);
         }
     }, [id]);
@@ -47,7 +56,7 @@ export default function Tracks() {
 
     async function fetchFavoriteSongs(id: string): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displaytracks?id=${id}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displaytracks?id=${id}&isDuo=${isDuo}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ export default function Genres() {
     const [genres, setGenres] = useState<string[]>([]); // Assuming genres is a string array
     const [desc, setDesc] = useState<string>(""); // Description is likely a string
     const [id, setId] = useState<string | null>(null);
+    const [isDuo, setIsDuo] = useState<boolean | null>(null);
 
     const router = useRouter();
 
@@ -37,14 +38,21 @@ export default function Genres() {
     const [timeRange, setTimeRange] = useState<number>(2);
 
     useEffect(() => {
-        if (id) {
-            fetchFavoriteGenres(id).catch(console.error); // Fetch genres only when `id` is available
+        const duo = localStorage.getItem("isDuo");
+        if (duo) {
+            setIsDuo(duo === 'true');
+        }
+    }, []);
+
+    useEffect(() => {
+        if (id && isDuo !== null) {
+            fetchFavoriteGenres(id).catch(console.error);
         }
     }, [id]);
 
     async function fetchFavoriteGenres(id: string): Promise<void> {
         try {
-            const response = await fetch(`http://localhost:8000/spotify_data/displaygenres?id=${id}`, {
+            const response = await fetch(`http://localhost:8000/spotify_data/displaygenres?id=${id}&isDuo=${isDuo}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
