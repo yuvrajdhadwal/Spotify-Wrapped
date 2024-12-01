@@ -214,9 +214,8 @@ def test_failed_user_data_fetch(request, session_id, mock_token, user):
 @patch('spotify_data.views.SpotifyUser.objects.get')  # Patch SpotifyUser retrieval
 @patch('spotify_data.views.SpotifyToken.objects.get')  # Patch SpotifyToken retrieval
 @patch('spotify_data.views.create_groq_description')  # Patch description generator
-@patch('spotify_data.views.get_spotify_recommendations')  # Patch recommendations generator
 @patch('spotify_data.views.SpotifyWrapped.objects.create')  # Patch object creation
-def test_add_spotify_wrapped_short_term(mock_create_wrapped, mock_get_recommendations,
+def test_add_spotify_wrapped_short_term(mock_create_wrapped,
                                         mock_create_description, mock_get_token,
                                         mock_get_user, mock_serializer):
     """
@@ -238,7 +237,6 @@ def test_add_spotify_wrapped_short_term(mock_create_wrapped, mock_get_recommenda
 
     # Mock description and recommendations
     mock_create_description.return_value = "Generated description"
-    mock_get_recommendations.return_value = ["placeholder1", "placeholder2", "placeholder3"]
 
     # Define a mock datetime
     mock_datetime_created = datetime(2024, 11, 29, 12, 0, 0, 123456)
@@ -302,9 +300,8 @@ def test_add_spotify_wrapped_short_term(mock_create_wrapped, mock_get_recommenda
 @patch('spotify_data.views.SpotifyUser.objects.get')  # Patch SpotifyUser retrieval
 @patch('spotify_data.views.SpotifyToken.objects.get')  # Patch SpotifyToken retrieval
 @patch('spotify_data.views.create_groq_description')  # Patch description generator
-@patch('spotify_data.views.get_spotify_recommendations')  # Patch recommendations generator
 @patch('spotify_data.views.SpotifyWrapped.objects.create')  # Patch object creation
-def test_add_spotify_wrapped_medium_term(mock_create_wrapped, mock_get_recommendations,
+def test_add_spotify_wrapped_medium_term(mock_create_wrapped,
                                         mock_create_description, mock_get_token,
                                         mock_get_user, mock_serializer):
     """
@@ -326,7 +323,6 @@ def test_add_spotify_wrapped_medium_term(mock_create_wrapped, mock_get_recommend
 
     # Mock description and recommendations
     mock_create_description.return_value = "Generated description"
-    mock_get_recommendations.return_value = ["placeholder1", "placeholder2", "placeholder3"]
 
     # Mock SpotifyWrapped creation and serializer
     mock_created_wrapped = Mock(
@@ -386,9 +382,8 @@ def test_add_spotify_wrapped_medium_term(mock_create_wrapped, mock_get_recommend
 @patch('spotify_data.views.SpotifyUser.objects.get')  # Patch SpotifyUser retrieval
 @patch('spotify_data.views.SpotifyToken.objects.get')  # Patch SpotifyToken retrieval
 @patch('spotify_data.views.create_groq_description')  # Patch description generator
-@patch('spotify_data.views.get_spotify_recommendations')  # Patch recommendations generator
 @patch('spotify_data.views.SpotifyWrapped.objects.create')  # Patch object creation
-def test_add_spotify_wrapped_long_term(mock_create_wrapped, mock_get_recommendations,
+def test_add_spotify_wrapped_long_term(mock_create_wrapped,
                                         mock_create_description, mock_get_token,
                                         mock_get_user, mock_serializer):
     """
@@ -410,7 +405,6 @@ def test_add_spotify_wrapped_long_term(mock_create_wrapped, mock_get_recommendat
 
     # Mock description and recommendations
     mock_create_description.return_value = "Generated description"
-    mock_get_recommendations.return_value = ["placeholder1", "placeholder2", "placeholder3"]
 
     # Mock SpotifyWrapped creation and serializer
     mock_created_wrapped = Mock(
@@ -467,9 +461,8 @@ def test_add_spotify_wrapped_long_term(mock_create_wrapped, mock_get_recommendat
 @patch('spotify_data.views.SpotifyUser.objects.get')
 @patch('spotify_data.views.SpotifyToken.objects.get')
 @patch('spotify_data.views.create_groq_description')
-@patch('spotify_data.views.get_spotify_recommendations')
 @patch('spotify_data.views.SpotifyWrapped.objects.create')
-def test_add_spotify_wrapped_invalid_term(mock_create_wrapped, mock_get_recommendations,
+def test_add_spotify_wrapped_invalid_term(mock_create_wrapped,
                                           mock_create_description, mock_get_token,
                                           mock_get_user, mock_request, mock_spotify_user):
     """
@@ -480,7 +473,6 @@ def test_add_spotify_wrapped_invalid_term(mock_create_wrapped, mock_get_recommen
     mock_get_user.return_value = mock_spotify_user
     mock_get_token.return_value = Mock()  # Mock token object
     mock_create_description.return_value = "Generated description"
-    mock_get_recommendations.return_value = "Generated recommendations"
     mock_create_wrapped.return_value = Mock(spec=SpotifyWrapped)
 
     response = add_spotify_wrapped(mock_request)
