@@ -66,7 +66,7 @@ class WrapBase(models.Model):
     """
     Abstract base model for shared fields between SpotifyWrapped and DuoWrapped.
     """
-    id = models.AutoField(primary_key=True)  # Shared ID field
+    id = models.AutoField(primary_key=True)  # Shared primary key
     user = models.CharField(max_length=100)
     term_selection = models.CharField(max_length=20)
     favorite_artists = models.JSONField(default=list, blank=True, null=True)
@@ -80,17 +80,16 @@ class WrapBase(models.Model):
     class Meta:
         abstract = True
 
+
 class SpotifyWrapped(WrapBase):
     """
-    Model used to create and save individual Spotify Wrapped data.
+    Model for individual Spotify Wrapped.
     """
     pass
 
+
 class DuoWrapped(WrapBase):
     """
-    Model used to create and save Duo Wrapped data.
-    Parameters:
-        - user: the display name of one user.
-        - user2: the display name of the second user.
+    Model for Duo Wrapped.
     """
-    user2 = models.CharField(max_length=100)
+    user2 = models.CharField(max_length=100)  # Additional field for DuoWrapped

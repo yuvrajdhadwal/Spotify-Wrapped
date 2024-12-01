@@ -110,9 +110,7 @@ def add_spotify_wrapped(request):
     load_dotenv()
     groq_api_key = os.getenv('GROQ_API_KEY')
     term_selection = request.GET.get('termselection')
-    print(term_selection)
     user = request.user
-    print(user.username)
     spotify_user = SpotifyUser.objects.get(display_name=user.username) # pylint: disable=no-member
     favorite_artists = None
     favorite_tracks = None
@@ -161,12 +159,11 @@ def add_duo_wrapped(request):
     """
     load_dotenv()
     groq_api_key = os.getenv('GROQ_API_KEY')
+    user1 = request.GET.get('user1')
     user2 = request.GET.get('user2')
     term_selection = request.GET.get('termselection')
 
-    user1 = request.user
-    print(user1.username)
-    spotify_user1 = SpotifyUser.objects.get(display_name=user1.username) # pylint: disable=no-member
+    spotify_user1 = SpotifyUser.objects.get(display_name=user1) # pylint: disable=no-member
     try:
         spotify_user2 = SpotifyUser.objects.get(display_name=user2) # pylint: disable=no-member
     except SpotifyUser.DoesNotExist: # pylint: disable=no-member
@@ -175,64 +172,70 @@ def add_duo_wrapped(request):
     favorite_tracks = None
     favorite_genres = None
     quirkiest_artists = None
-    access_token = SpotifyToken.objects.get(user=spotify_user1.id)
+    access_token = SpotifyToken.objects.get(username=user1)
     match term_selection:
         case '0':
-            favorite_artists = (spotify_user1.favorite_artists_short
-                                + spotify_user2.favorite_artists_short)
-            favorite_tracks = (spotify_user1.favorite_tracks_short
-                               + spotify_user2.favorite_tracks_short)
-            favorite_genres = (spotify_user1.favorite_genres_short
-                               + spotify_user2.favorite_genres_short)
-            quirkiest_artists = (spotify_user1.quirkiest_artists_short
-                                 + spotify_user2.quirkiest_artists_short)
+            favorite_artists = (spotify_user1.favorite_artists_short[:3]
+                                + spotify_user2.favorite_artists_short[:2])
+            favorite_tracks = (spotify_user1.favorite_tracks_short[:3]
+                               + spotify_user2.favorite_tracks_short[:2])
+            favorite_genres = (spotify_user1.favorite_genres_short[:3]
+                               + spotify_user2.favorite_genres_short[:2])
+            quirkiest_artists = (spotify_user1.quirkiest_artists_short[:3]
+                                 + spotify_user2.quirkiest_artists_short[:2])
         case '1':
-            favorite_artists = (spotify_user1.favorite_artists_medium
-                                + spotify_user2.favorite_artists_medium)
-            favorite_tracks = (spotify_user1.favorite_tracks_medium
-                               + spotify_user2.favorite_tracks_medium)
-            favorite_genres = (spotify_user1.favorite_genres_medium
-                               + spotify_user2.favorite_genres_medium)
-            quirkiest_artists = (spotify_user1.quirkiest_artists_medium
-                                 + spotify_user2.quirkiest_artists_medium)
+            favorite_artists = (spotify_user1.favorite_artists_medium[:3]
+                                + spotify_user2.favorite_artists_medium[:2])
+            favorite_tracks = (spotify_user1.favorite_tracks_medium[:3]
+                               + spotify_user2.favorite_tracks_medium[:2])
+            favorite_genres = (spotify_user1.favorite_genres_medium[:3]
+                               + spotify_user2.favorite_genres_medium[:2])
+            quirkiest_artists = (spotify_user1.quirkiest_artists_medium[:3]
+                                 + spotify_user2.quirkiest_artists_medium[:2])
         case '2':
-            favorite_artists = (spotify_user1.favorite_artists_long
-                                + spotify_user2.favorite_artists_long)
-            favorite_tracks = (spotify_user1.favorite_tracks_long
-                               + spotify_user2.favorite_tracks_long)
-            favorite_genres = (spotify_user1.favorite_genres_long
-                               + spotify_user2.favorite_genres_long)
-            quirkiest_artists = (spotify_user1.quirkiest_artists_long
-                                 + spotify_user2.quirkiest_artists_long)
+            favorite_artists = (spotify_user1.favorite_artists_long[:3]
+                                + spotify_user2.favorite_artists_long[:2])
+            favorite_tracks = (spotify_user1.favorite_tracks_long[:3]
+                               + spotify_user2.favorite_tracks_long[:2])
+            favorite_genres = (spotify_user1.favorite_genres_long[:3]
+                               + spotify_user2.favorite_genres_long[:2])
+            quirkiest_artists = (spotify_user1.quirkiest_artists_long[:3]
+                                 + spotify_user2.quirkiest_artists_long[:2])
     if favorite_artists is None:
         return HttpResponse("Bad term selection", status=400)
     wrapped = DuoWrapped.objects.create(  # pylint: disable=no-member
-        user1=spotify_user1.display_name,
+        user=spotify_user1.display_name,
         user2=spotify_user2.display_name,
         favorite_artists=favorite_artists,
         favorite_tracks=favorite_tracks,
         quirkiest_artists=quirkiest_artists,
         favorite_genres=favorite_genres,
         llama_description=create_groq_description(groq_api_key, favorite_artists),
-        llama_songrecs=get_spotify_recommendations(access_token, favorite_artists,
-                                                   favorite_tracks, favorite_genres))
+        llama_songrecs='none')
     wrapped_data = DuoWrappedSerializer(wrapped).data
-    spotify_user1.past_roasts.append(wrapped)
+    spotify_user1.past_roasts.append(wrapped_data)
     spotify_user1.save(update_fields=['past_roasts'])
-    spotify_user2.past_roasts.append(wrapped)
+    spotify_user2.past_roasts.append(wrapped_data)
     spotify_user2.save(update_fields=['past_roasts'])
-    print(wrapped)
+    print(wrapped.id)
     return JsonResponse({'duo_wrapped': wrapped_data})
 
 def display_artists(request):
     '''Displays artists for the frontend depending on the timeframe'''
     load_dotenv()
     id = request.GET.get('id')
-
-    try:
-        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
-    except ObjectDoesNotExist:
-        return HttpResponse("Wrapped grab failed: no data", status=500)
+    isDuo = request.GET.get('isDuo')
+    
+    if isDuo:
+        try:
+            wrapped_data = DuoWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
+    else:
+        try:
+            wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
     wrapped_data = list(wrapped_data)[0]
     artists = wrapped_data['favorite_artists'][:5]
 
@@ -250,11 +253,18 @@ def display_genres(request):
     '''Displays the genres for the frontend depending on the timeframe'''
     load_dotenv()
     id = request.GET.get('id')
-
-    try:
-        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
-    except ObjectDoesNotExist:
-        return HttpResponse("Wrapped grab failed: no data", status=500)
+    isDuo = request.GET.get('isDuo')
+    
+    if isDuo:
+        try:
+            wrapped_data = DuoWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
+    else:
+        try:
+            wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
     wrapped_data = list(wrapped_data)[0]
     genres = wrapped_data['favorite_genres'][:5]
 
@@ -269,12 +279,21 @@ def display_songs(request):
     load_dotenv()
     id = request.GET.get('id')
 
-    try:
-        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
-    except ObjectDoesNotExist:
-        return HttpResponse("Wrapped grab failed: no data", status=500)
+    isDuo = request.GET.get('isDuo')
+    
+    if isDuo:
+        try:
+            wrapped_data = DuoWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
+    else:
+        try:
+            wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
     wrapped_data = list(wrapped_data)[0]
     tracks = wrapped_data['favorite_tracks'][:5]
+    print(len(wrapped_data['favorite_tracks']))
 
     out = []
     for track in tracks:
@@ -293,10 +312,18 @@ def display_quirky(request):
     load_dotenv()
     id = request.GET.get('id')
 
-    try:
-        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
-    except ObjectDoesNotExist:
-        return HttpResponse("Wrapped grab failed: no data", status=500)
+    isDuo = request.GET.get('isDuo')
+    
+    if isDuo:
+        try:
+            wrapped_data = DuoWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
+    else:
+        try:
+            wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
     wrapped_data = list(wrapped_data)[0]
     tracks = wrapped_data['quirkiest_artists'][:5]
     out = []
@@ -312,15 +339,23 @@ def display_summary(request):
     load_dotenv()
     id = request.GET.get('id')
 
-    try:
-        wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
-    except ObjectDoesNotExist:
-        return HttpResponse("Wrapped grab failed: no data", status=500)
+    isDuo = request.GET.get('isDuo')
+    
+    if isDuo:
+        try:
+            wrapped_data = DuoWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
+    else:
+        try:
+            wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
+        except ObjectDoesNotExist:
+            return HttpResponse("Wrapped grab failed: no data", status=500)
     wrapped_data = list(wrapped_data)[0]
     artists = wrapped_data['favorite_artists'][:5]
     genres = wrapped_data['favorite_genres'][:5]
     tracks = wrapped_data['favorite_tracks'][:5]
-    quirky = wrapped_data['quirkiest_artists'][0]
+    quirky = wrapped_data['quirkiest_artists'][0] if wrapped_data['quirkiest_artists'] else ""
 
     artist_list = []
     for artist in artists:
@@ -333,18 +368,16 @@ def display_summary(request):
     summary = {
         'artists': artist_list,
         'tracks': tracks_list,
-        'quirky': quirky['name'],
+        'quirky': quirky['name'] if quirky else "",
         'genres': genres
     }
 
-    print(summary)
     return JsonResponse(summary, safe=False, status=200)
 
 def display_history(request):
     user = request.user
 
     try:
-        print(user.username)
         user_data = SpotifyUser.objects.get(display_name=user.username)
     except ObjectDoesNotExist:
         return HttpResponse("User grab failed: no data", status=500)
@@ -352,8 +385,18 @@ def display_history(request):
     ids = []
     for roast in user_data.past_roasts:
         if roast.get('user') == user.username:
-                ids.append(roast['id'])
+            di = {
+                'id': roast['id'],
+                'isDuo': 'user2' in roast
+            }
+            ids.append(di)
+    
+    # Return an empty list if no roasts found for the user
+    if not ids:
+        return JsonResponse([], safe=False, status=200)
+
     return JsonResponse(ids, safe=False, status=200)
+
 
 def check_username_exists(request):
     """
@@ -361,12 +404,16 @@ def check_username_exists(request):
     """
     username = request.GET.get('username')  # Get the username from the request
 
+    users = SpotifyUser.objects.all()  # Retrieve all SpotifyUser objects
+    for user in users:
+        print(user.display_name)
+
     if not username:
         return JsonResponse({'error': 'No username provided'}, status=400)
 
     try:
         # Query the database for the username
-        SpotifyUser.objects.get(display_name=username)
+        SpotifyUser.objects.filter(display_name=username)
         return JsonResponse({'exists': True}, status=200)
     except ObjectDoesNotExist:
         return JsonResponse({'exists': False}, status=200)
