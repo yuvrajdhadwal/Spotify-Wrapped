@@ -49,23 +49,45 @@ const SpotifyUserPage = () => {
 
             // Fetch Spotify Wrapped data
             const termselection = localStorage.getItem("timeRange") || "1";
-            const wrappedResponse = await fetch(
-                `http://localhost:8000/spotify_data/addwrapped/?termselection=${encodeURIComponent(termselection)}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include",
-                }
-            );
+            const user1 = localStorage.getItem("user1") || "user1";
+            const user2 = localStorage.getItem("user2") || "user2";
+            if (localStorage.getItem("isDuo") == '1') {
+                const wrappedResponse = await fetch(
+                    `http://localhost:8000/spotify_data/addduo/?termselection=${encodeURIComponent(termselection)}&user1=${encodeURIComponent(user1)}&user2=${encodeURIComponent(user2)}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        credentials: "include",
+                    }
+                );
 
-            let wrappedData = await wrappedResponse.json();
-            wrappedData = wrappedData.spotify_wrapped;
-            console.log(wrappedData);
+                let wrappedData = await wrappedResponse.json();
+                wrappedData = wrappedData.duo_wrapped;
+                console.log(wrappedData);
 
-            // Save the `id` to localStorage
-            localStorage.setItem("id", wrappedData.id);
+                // Save the `id` to localStorage
+                localStorage.setItem("id", wrappedData.id);
+            } else {
+                const wrappedResponse = await fetch(
+                    `http://localhost:8000/spotify_data/addwrapped/?termselection=${encodeURIComponent(termselection)}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        credentials: "include",
+                    }
+                );
+
+                let wrappedData = await wrappedResponse.json();
+                wrappedData = wrappedData.spotify_wrapped;
+                console.log(wrappedData);
+
+                // Save the `id` to localStorage
+                localStorage.setItem("id", wrappedData.id);
+            }
         } catch (error) {
             console.error("Error fetching SpotifyUser data:", error);
         }

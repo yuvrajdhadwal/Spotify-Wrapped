@@ -29,7 +29,7 @@ export default function Artists() {
     }, []);
 
     useEffect(() => {
-        const duo = localStorage.getItem("isDuo");
+        const duo = localStorage.getItem("isDuo") == '1' ? 'true' : 'false';
         if (duo) {
             setIsDuo(duo === 'true');
         }
