@@ -26,7 +26,7 @@ function Artist(props: ArtistProps) {
                     alt={altText}
                     width={160}
                     height={160}
-                    className={"mr-10 border-4 border-black"}
+                    className={"mr-10 border-4 border-black object-contain"}
                 />
                 <h2 className={"text-7xl text-black lowercase text-nowrap"}>#{props.rank} {props.name}</h2>
             </div>
