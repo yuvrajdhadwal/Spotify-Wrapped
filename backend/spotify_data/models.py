@@ -62,20 +62,11 @@ class SpotifyUser(models.Model):
     quirkiest_artists_long = models.JSONField(default=list, blank=True, null=True)
     past_roasts = models.JSONField(default=list, blank=True, null=True)
 
-class SpotifyWrapped(models.Model):
+class WrapBase(models.Model):
     """
-    Model used to create roasts and sae past roasts.
-    Parameters:
-        - user: display name of user associated with Wrapped
-        - term_selection: short_term (4weeks), medium_term (6months), or long_term (1year)
-        - favorite_artists: the favorite artists as they appear in the roast
-        - favorite_tracks: the favorite tracks as they appear in the roast
-        - favorite_genres: the favorite genres as they appear in the roast
-        - quirkiest_artists: the quirkiest artists as they appear in the roast
-        - llama_description: the description of how the user acts/thinks using an LLM
-        - llama_songrecs: the song recommendation as pulled from the LLM
-        - datetime_created: the date/time the wrapped was generated
+    Abstract base model for shared fields between SpotifyWrapped and DuoWrapped.
     """
+    id = models.AutoField(primary_key=True)  # Shared ID field
     user = models.CharField(max_length=100)
     term_selection = models.CharField(max_length=20)
     favorite_artists = models.JSONField(default=list, blank=True, null=True)
@@ -86,13 +77,20 @@ class SpotifyWrapped(models.Model):
     llama_songrecs = models.TextField(blank=True, null=True)
     datetime_created = models.CharField(default=datetime_to_str(datetime.now()), max_length=50)
 
-class DuoWrapped(SpotifyWrapped):
-    """
-    Model used to create and save a Duo Wrapped.
-    Parameters:
-        - user1: the display name of one user.
-        - user2: the display name of the second user.
+    class Meta:
+        abstract = True
 
-    Note: All other fields are inherited from SpotifyWrapped.
+class SpotifyWrapped(WrapBase):
     """
-    user2 = models.CharField(max_length=100, unique=True)
+    Model used to create and save individual Spotify Wrapped data.
+    """
+    pass
+
+class DuoWrapped(WrapBase):
+    """
+    Model used to create and save Duo Wrapped data.
+    Parameters:
+        - user: the display name of one user.
+        - user2: the display name of the second user.
+    """
+    user2 = models.CharField(max_length=100)
