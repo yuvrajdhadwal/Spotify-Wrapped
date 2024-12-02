@@ -17,7 +17,7 @@ type ComparisonProps = {
 function Comparison(props: ComparisonProps) {
     return (
         <div className={"flex flex-col items-center justify-items mt-10 space-y-6"}>
-            <div className={"flex flex-row mb-5 space-x-5"}>
+            <div className={"flex flex-row mb-5 space-x-5 items-center justify-center"}>
                 <Image
                     src={props.img1}
                     alt={"A picture of " + props.name1}
@@ -25,7 +25,7 @@ function Comparison(props: ComparisonProps) {
                     height={120}
                     className={"border-4 border-black object-contain"}
                 />
-                <div className={"mt-auto mb-auto"}>
+                <div className={"mt-auto mb-auto w-fit"}>
                     <p className={"text-5xl normal-case mt-auto mb-auto"}>{props.name1}</p>
                     <p className={"text-2xl normal-case"}>{props.sub1 ? props.sub1 : ""}</p>
                 </div>
@@ -37,7 +37,7 @@ function Comparison(props: ComparisonProps) {
                     height={120}
                     className={"border-4 border-black object-contain"}
                 />
-                <div className={"mt-auto mb-auto"}>
+                <div className={"mt-auto mb-auto w-fit"}>
                     <p className={"text-5xl normal-case mt-auto mb-auto"}>{props.name2}</p>
                     <p className={"text-2xl normal-case"}>{props.sub2 ? props.sub2 : ""}</p>
                 </div>

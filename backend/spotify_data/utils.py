@@ -303,7 +303,7 @@ def create_groq_comparison(groq_api_key, artist_1, artist_2):
 
     client = Groq(api_key=groq_api_key)
     description_prompt = (
-        f"Compare {artist_1['name']} and {artist_2['name']} in a funny and way that roasts both. "
+        f"Compare {artist_1} and {artist_2} in a funny and way that roasts both. "
         "Highlight their differences in style, fanbase, and anything else that makes them opposites."
     )
 

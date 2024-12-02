@@ -264,7 +264,7 @@ def display_artists(request):
             'image': artist['images'][0]['url'],
             'desc': create_groq_description(os.getenv('GROQ_API_KEY'), artist['name']),
         }
-        if is_duo:
+        if is_duo == 'true':
         # Add comparison with the next artist if it exists
             if i + 1 < len(artists):
                 next_artist = artists[i + 1]
@@ -305,27 +305,27 @@ def display_genres(request):
     return JsonResponse(out, safe=False, status=200)
 
 def display_songs(request):
-    '''Displays the songs for the frontend depending on the timeframe'''
+    """Displays the songs for the frontend depending on the timeframe."""
     load_dotenv()
     id = request.GET.get('id')
-
     is_duo = request.GET.get('isDuo')
 
-    if is_duo == 'true':
-        try:
+    # Fetch the appropriate wrapped data (DuoWrapped or SpotifyWrapped)
+    try:
+        if is_duo == 'true':
             wrapped_data = DuoWrapped.objects.filter(id=id).values()
-        except ObjectDoesNotExist:
-            return HttpResponse("Wrapped grab failed: no data", status=500)
-    else:
-        try:
+        else:
             wrapped_data = SpotifyWrapped.objects.filter(id=id).values()
-        except ObjectDoesNotExist:
-            return HttpResponse("Wrapped grab failed: no data", status=500)
+    except ObjectDoesNotExist:
+        return HttpResponse("Wrapped grab failed: no data", status=500)
+
     wrapped_data = list(wrapped_data)[0]
+
+    # Get the top 5 tracks
     tracks = wrapped_data['favorite_tracks'][:5]
 
     out = []
-    for track in tracks:
+    for i, track in enumerate(tracks):
         artist_info = {
             'name': track['name'],
             'artist': track['artists'][0]['name'],
@@ -333,7 +333,19 @@ def display_songs(request):
             'desc': create_groq_description(os.getenv('GROQ_API_KEY'),
                                             track['name'] + ' by ' + track['artists'][0]['name'])
         }
+
+        # Add duo comparison logic
+        if is_duo == 'true' and i + 1 < len(tracks):
+            next_track = tracks[i + 1]
+            comparison = create_groq_comparison(
+                os.getenv('GROQ_API_KEY'),
+                track['name'] + " by " + track['artists'][0]['name'],
+                next_track['name'] + " by " + next_track['artists'][0]['name'],
+            )
+            artist_info['desc'] = comparison
+
         out.append(artist_info)
+
     return JsonResponse(out, safe=False, status=200)
 
 def display_quirky(request):
