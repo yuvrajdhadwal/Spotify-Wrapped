@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/navigation";
 import Artist from "@/app/Components/Artist";
+import Loading from "@/app/Components/Loading";
 
 export default function Artists() {
     const router = useRouter();
@@ -78,7 +79,7 @@ export default function Artists() {
                     />
                 ))
             ) : (
-                <p>Loading artists...</p>
+                <Loading text={"artists"}/>
             )}
         </div>
     );

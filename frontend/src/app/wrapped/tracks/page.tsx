@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Track from "@/app/Components/Track";
 import { useRouter } from "next/navigation";
+import Loading from "@/app/Components/Loading";
 
 export default function Tracks() {
     const [tracks, setTracks] = useState<any[]>([]);
@@ -93,7 +94,7 @@ export default function Tracks() {
                     />
                 ))
             ) : (
-                <p>Loading tracks...</p>
+                <Loading text = {"tracks"}/>
             )}
         </div>
     );

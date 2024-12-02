@@ -218,7 +218,7 @@ export default function Dashboard() {
                 <input
                     name="other_user"
                     type="text"
-                    placeholder="Enter Friend's Username"
+                    placeholder="enter friend's username"
                     className="p-2 border rounded mr-5"
                     value={otherUser}
                     onChange={(e) => setOtherUser(e.target.value)} // Update `otherUser` state
