@@ -24,8 +24,8 @@ function Artist(props: ArtistProps) {
                 <Image
                     src={props.img}
                     alt={altText}
-                    width={150}
-                    height={150}
+                    width={120}
+                    height={120}
                     className={"border-4 border-black object-contain"}
                 />
                 <p className={"text-7xl lowercase text-nowrap mt-auto mb-auto"}>#{props.rank}</p>
