@@ -28,8 +28,8 @@ function Artist(props: ArtistProps) {
                     height={120}
                     className={"border-4 border-black object-contain"}
                 />
-                <p className={"text-7xl lowercase text-nowrap mt-auto mb-auto"}>#{props.rank}</p>
-                <p className={"text-5xl lowercase mt-auto mb-auto"}>{props.name}</p>
+                <p className={"text-7xl text-nowrap mt-auto mb-auto"}>#{props.rank}</p>
+                <p className={"text-5xl normal-case mt-auto mb-auto"}>{props.name}</p>
             </div>
             <p className={"items-start"}>{props.desc}</p>
         </div>
