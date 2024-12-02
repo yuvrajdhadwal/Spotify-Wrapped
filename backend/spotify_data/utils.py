@@ -285,3 +285,47 @@ def str_to_datetime(dtstr):
     strlist = dtstr.split("-")
     return datetime(strlist[0], strlist[1], strlist[2], strlist[3],
                     strlist[4], strlist[5], strlist[6])
+
+def create_groq_comparison(groq_api_key, artist_1, artist_2):
+    """
+    Create a humorous and roasty comparison between two favorite artists.
+
+    Args:
+        - groq_api_key: API key for Groq
+        - artist_1: Dictionary containing the first artist's name and additional info
+        - artist_2: Dictionary containing the second artist's name and additional info
+
+    Returns:
+        - llama_description: A funny roasty description of the comparison between the two artists
+    """
+    if not groq_api_key:
+        raise GroqError("GROQ_API_KEY environment variable is not set.")
+
+    client = Groq(api_key=groq_api_key)
+    description_prompt = (
+        f"Compare {artist_1['name']} and {artist_2['name']} in a funny and way that roasts both. "
+        "Highlight their differences in style, fanbase, and anything else that makes them opposites."
+    )
+
+    try:
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a music critic who roasts and humorously compares two artists "
+                               "(use 2nd perspective) in less than 100 words. Be witty and sarcastic."
+                },
+                {
+                    "role": "user",
+                    "content": description_prompt
+                }
+            ],
+            model="llama3-8b-8192",
+        )
+
+        llama_description = response.choices[0].message.content
+    except KeyError as e:
+        llama_description = f"Key error: {str(e)}"
+    except Exception as e:
+        llama_description = f"Comparison unavailable due to API error: {str(e)}"  # pylint: disable=broad-exception-caught
+    return llama_description
