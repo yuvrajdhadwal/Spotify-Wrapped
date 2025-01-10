@@ -31,11 +31,6 @@ b. +1 point if you use the LLM API to compare your taste with a friend's during 
 Duo-Wrapped
 c. See the payment disclaimer!
 
-5. As a user, I would like to be able to hear clips from some of my top songs play during
-my Spotify Wrapped
-a. 3 points
-b. +1 point for integrating music playback into Duo-Wrapped
-
 6. As a user, I would like to create Spotify Wraps over short, medium, and long terms of
 my listening history (each of these options must be distinguishable when saved)
 a. 2 points
@@ -51,11 +46,6 @@ adding new unit tests with each new PR
 Note: your codebase must meet or exceed this coverage goal during
 demo time to qualify. Your unit tests must also be non-trivial, as we
 will not accept purposeless tests.
-
-13. As a developer, I would like to run my Django website on a hosting service (like
-Heroku) so anyone can access my Spotify Wrapped application
-a. 5 points
-b. See the payment disclaimer!
 
 16. As a developer, I would like all functions to have proper documentation so I can
 easily understand them at a glance (use docstrings for Python functions and JSDoc
